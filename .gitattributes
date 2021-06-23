@@ -1,0 +1,5 @@
+requirements.txt !text !filter !merge !diff
+zairachem/tools/fpsim2/FPSim2/docs/_sources/index.rst.txt !text !filter !merge !diff
+zairachem/tools/fpsim2/FPSim2/docs/_sources/source/FPSim2.io.backends.rst.txt !text !filter !merge !diff
+zairachem/data/atom_pols.txt !text !filter !merge !diff
+zairachem/tools/ghost/ghostml/test_data/chembl3371_testing_data.pkl !text !filter !merge !diff
