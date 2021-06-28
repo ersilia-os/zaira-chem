@@ -16,7 +16,7 @@ N_ITER = 5
 clf_configs ={
     "model": ensemble.RandomForestClassifier(class_weight="balanced", random_state=SEED),
     "params": {
-        "n_estimators":[100, 500],
+        "n_estimators": [100, 500],
         "max_depth": [5, 10],
         "min_samples_split": [2, 3, 10],
         "criterion": ["gini", "entropy"],

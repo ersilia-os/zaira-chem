@@ -10,7 +10,10 @@ from sklearn.model_selection import StratifiedShuffleSplit, ShuffleSplit
 from ..descriptors.descriptors import DescriptorsCalculator
 from .finder import ModelFinder
 
-MAX_N = 70000
+MAX_N = 100000
+MAX_X = 5000
+MAX_Y = 100
+
 MAX_FOLDS = 3
 
 class Trainer(object):
@@ -82,22 +85,30 @@ class Trainer(object):
 
     def train(self):
         mdl = None
+        # sample batches
         for batch, smiles, y in self._batch_iterator():
             descriptors = DescriptorsCalculator(smiles)
+            # descriptor batches
             for i, d in enumerate(descriptors.calculate()):
                 X, n = d
-                mdl, params = self._get_fitted_model(X, y, mdl=mdl)
-                meta = {
-                    "batch": batch,
-                    "is_clf": self.is_clf,
-                    "descriptor": n,
-                    "dim": X.shape[1],
-                    "output": self.header[1],
-                    "params": params
-                }
-                dest = os.path.join(self.output_path, "model_{0}".format(i))
-                if not os.path.exists(dest):
-                    os.makedirs(dest)
-                    with open(os.path.join(dest, "meta.json"), "w") as f:
-                        json.dump(meta, f, indent=4)
-                joblib.dump(mdl, os.path.join(dest, "model_{0}.pkl".format(batch)))
+                # vertical batches on X
+                for X_vidxs in XXX:
+                    X_ = X[:,X_vidxs]
+                    # vertical batches on Y
+                    for y_vidxs in YYY:
+                        y_ = y[:,y_vidxs]
+                        mdl, params = self._get_fitted_model(X_, y_, mdl=mdl)
+                        meta = {
+                            "batch": batch,
+                            "is_clf": self.is_clf,
+                            "descriptor": n,
+                            "dim": X.shape[1],
+                            "output": self.header[1],
+                            "params": params
+                        }
+                        dest = os.path.join(self.output_path, "model_{0}".format(i))
+                        if not os.path.exists(dest):
+                            os.makedirs(dest)
+                            with open(os.path.join(dest, "meta.json"), "w") as f:
+                                json.dump(meta, f, indent=4)
+                        joblib.dump(mdl, os.path.join(dest, "model_{0}.pkl".format(batch)))
