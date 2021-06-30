@@ -10,7 +10,6 @@ BATCH_SIZE = 100000
 
 
 class Predictor(object):
-
     def __init__(self, smiles, models_path):
         self.smiles = smiles
         self.models_path = os.path.abspath(models_path)
@@ -18,7 +17,8 @@ class Predictor(object):
 
     def _search_models(self):
         for model_dir in os.listdir(self.models_path):
-            if model_dir[:5] != "model": continue
+            if model_dir[:5] != "model":
+                continue
             meta_file = os.path.join(self.models_path, model_dir, "meta.json")
             with open(meta_file, "r") as f:
                 meta = json.load(f)
@@ -35,7 +35,9 @@ class Predictor(object):
 
     def _sample_models(self):
         all_models = [(meta, model_file) for meta, model_file in self._search_models()]
-        sel_models = all_models[:self.max_n] # TO-DO select based on performance / for the moment it is random.
+        sel_models = all_models[
+            : self.max_n
+        ]  # TO-DO select based on performance / for the moment it is random.
         return sel_models
 
     def _get_descriptor_names(self, meta_models):
@@ -56,7 +58,7 @@ class Predictor(object):
         l = self.smiles
         n = BATCH_SIZE
         for i in range(0, len(l), n):
-            yield l[i:i + n]
+            yield l[i : i + n]
 
     def predict(self):
         models = self._sample_models()
@@ -68,7 +70,7 @@ class Predictor(object):
                 X = descriptors.calculate_one(n)
                 for is_clf, mdl in self._load_iterator(models, n):
                     if is_clf:
-                        p = mdl.predict_proba(X)[:,1]
+                        p = mdl.predict_proba(X)[:, 1]
                     else:
                         p = mdl.predict(X)
                 P += [p]

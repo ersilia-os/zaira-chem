@@ -7,7 +7,6 @@ useFeatures = True
 
 
 class Ecfp(object):
-
     def __init__(self):
         self.name = "ecfp"
         self.radius = radius
@@ -15,7 +14,12 @@ class Ecfp(object):
         self.useFeatures = useFeatures
 
     def calc(self, mols):
-        fps = [AllChem.GetMorganFingerprint(mol, self.radius, useCounts=self.useCounts, useFeatures=self.useFeatures) for mol in mols]
+        fps = [
+            AllChem.GetMorganFingerprint(
+                mol, self.radius, useCounts=self.useCounts, useFeatures=self.useFeatures
+            )
+            for mol in mols
+        ]
         size = 2048
         nfp = np.zeros((len(fps), size), np.int32)
         for i, fp in enumerate(fps):
