@@ -1,11 +1,12 @@
 import numpy as np
 from rdkit.Avalon import pyAvalonTools
+from rdkit import DataStructs
 
 
 nBits = 1024
 
-class Avalon(object):
 
+class Avalon(object):
     def __init__(self):
         self.name = "avalon"
         self.nBits = nBits

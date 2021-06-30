@@ -4,8 +4,7 @@ from signaturizer import Signaturizer as _Signaturizer
 dataset = "GLOBAL"
 
 
-class Signaturizer(mols):
-
+class Signaturizer(object):
     def __init__(self):
         self.name = "signaturizer"
         self.dataset = dataset

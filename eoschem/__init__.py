@@ -4,6 +4,7 @@ from ._version import __version__
 del _version
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # Internal imports

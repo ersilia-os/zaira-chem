@@ -19,3 +19,4 @@ def eoschem_cli(verbose):
         logger.set_verbosity(1)
     else:
         logger.set_verbosity(0)
+    logger.debug("Starting CLI")
