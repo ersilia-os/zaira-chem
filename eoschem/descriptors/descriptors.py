@@ -5,22 +5,28 @@ import csv
 from rdkit import Chem
 
 from .types.avalon import Avalon
+from .types.cddd import Cddd
 from .types.ecfp import Ecfp
 from .types.grover import Grover
 from .types.maccs import Maccs
 from .types.mordred import Mordred
+from .types.rdkit2d import Rdkit2d
+from .types.rdkitfpbits import RdkitFpBits
 from .types.signaturizer import Signaturizer
 
 from .. import logger
 from ..setup.setup import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
 
 
-descriptor_factory = [
-    Avalon(),
-    Ecfp(),
-    # Grover(),
-    Maccs(),
-    Mordred(),
+DESCRIPTOR_FACTORY = [
+    #Avalon(),
+    #Cddd(),
+    #Ecfp(),
+    #Grover(),
+    #Maccs(),
+    #Mordred(),
+    Rdkit2d(),
+    RdkitFpBits(),
     Signaturizer(),
 ]
 
@@ -28,7 +34,7 @@ descriptor_factory = [
 class DescriptorsCalculator(object):
     def __init__(self, data):
         self.data = data
-        self._factory = dict((d.name, d) for d in descriptor_factory)
+        self._factory = dict((d.name, d) for d in DESCRIPTOR_FACTORY)
         self._funcs = dict((k, v.calc) for k, v in self._factory.items())
 
     @staticmethod
