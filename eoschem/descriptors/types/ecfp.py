@@ -1,3 +1,4 @@
+from . import BaseDescriptorType
 import numpy as np
 from rdkit.Chem import AllChem
 
@@ -6,18 +7,19 @@ useCounts = True
 useFeatures = True
 
 
-class Ecfp(object):
+class Ecfp(BaseDescriptorType):
+
     def __init__(self):
-        self.name = "ecfp"
+        super().__init__()
         self.radius = radius
         self.useCounts = useCounts
         self.useFeatures = useFeatures
 
-    def calc(self, mols):
+    def _calc(self, mols):
         fps = [
             AllChem.GetMorganFingerprint(
-                mol, self.radius, useCounts=self.useCounts, useFeatures=self.useFeatures
-            )
+                mol, self.radius, useCounts=self.useCounts,
+                useFeatures=self.useFeatures)
             for mol in mols
         ]
         size = 2048
