@@ -19,12 +19,12 @@ from ..setup.setup import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
 
 
 DESCRIPTOR_FACTORY = [
-    #Avalon(),
-    #Cddd(),
-    #Ecfp(),
-    #Grover(),
-    #Maccs(),
-    #Mordred(),
+    Avalon(),
+    # Cddd(),
+    Ecfp(),
+    # Grover(),
+    Maccs(),
+    Mordred(),
     Rdkit2d(),
     RdkitFpBits(),
     Signaturizer(),
@@ -32,6 +32,7 @@ DESCRIPTOR_FACTORY = [
 
 
 class DescriptorsCalculator(object):
+
     def __init__(self, data):
         self.data = data
         self._factory = dict((d.name, d) for d in DESCRIPTOR_FACTORY)
@@ -66,6 +67,7 @@ class DescriptorsCalculator(object):
 
 
 class Descriptors(object):
+
     def __init__(self, dir):
         self.dir = os.path.abspath(dir)
         logger.debug("Calculating descriptors in {0}".format(self.dir))
@@ -98,17 +100,13 @@ class Descriptors(object):
     def calculate_iter(self):
         batches = self._find_batches()
         for batch, batch_dir in batches:
+            logger.debug("Calculating descriptors for batch {0}".format(batch))
             dir = os.path.join(self.dir, DESCRIPTORS_SUBFOLDER, batch)
             if not os.path.exists(dir):
                 os.mkdir(dir)
             data = self._read_batch_data(batch_dir)
             desc = DescriptorsCalculator(data)
             for X, name in desc.calculate():
-                logger.debug(
-                    "Calculating descriptors for batch {0} and type {1}".format(
-                        batch, name
-                    )
-                )
                 dir_ = os.path.join(dir, name)
                 if not os.path.exists(dir_):
                     os.mkdir(dir_)
