@@ -13,7 +13,7 @@ from .. import logger
 from ..metrics.metrics import Metric
 
 
-TIME_BUDGET = 1
+TIME_BUDGET = 10
 
 
 class Fit(object):
