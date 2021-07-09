@@ -97,6 +97,9 @@ class Descriptors(object):
     def _remove_constant(self, X):
         pass
 
+    def _drop_nan_columns(self, X):
+        return X[:, ~np.isnan(X).any(axis=0)]
+
     def calculate_iter(self):
         batches = self._find_batches()
         for batch, batch_dir in batches:
@@ -107,6 +110,7 @@ class Descriptors(object):
             data = self._read_batch_data(batch_dir)
             desc = DescriptorsCalculator(data)
             for X, name in desc.calculate():
+                X = self._drop_nan_columns(X)
                 dir_ = os.path.join(dir, name)
                 if not os.path.exists(dir_):
                     os.mkdir(dir_)
