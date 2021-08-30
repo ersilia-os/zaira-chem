@@ -47,8 +47,6 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ),
     keywords="qsar machine-learning chemistry computer-aided-drug-design",
-    project_urls={
-        "Source Code": "https://github.com/ersilia-os/eoschem",
-    },
+    project_urls={"Source Code": "https://github.com/ersilia-os/eoschem",},
     include_package_data=True,
 )
