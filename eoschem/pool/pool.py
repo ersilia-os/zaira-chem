@@ -1,13 +1,31 @@
 import os
 import json
+import joblib
 import numpy as np
 
+from flaml import AutoML
 from .. import logger
 
-from ..setup.setup import DATA_SUBFOLDER, MODELS_SUBFOLDER, POOL_SUBFOLDER
+from ..setup.setup import (
+    DATA_SUBFOLDER,
+    MODELS_SUBFOLDER,
+    POOL_SUBFOLDER,
+    _CONFIG_FILENAME,
+)
+
+from ..metrics.metrics import Metric
+
+from sklearn.linear_model import LinearRegression as Regressor
+from sklearn.linear_model import LogisticRegressionCV as Classifier
+
+_ESTIMATORS_FILENAME = "estimators.json"
+_META_TRANSFORMER_FILENAME = "meta.pkl"
+_META_MODEL_FILENAME = "model.pkl"
 
 #  TODO: If multiple batches are available, balance selected models per batch
 MAX_ESTIMATORS = 100
+
+TIME_BUDGET = 1
 
 
 class PoolEstimators(object):
@@ -40,7 +58,7 @@ class PoolEstimators(object):
         estimators = sorted(estimators.items(), key=lambda item: -item[1])[
             :MAX_ESTIMATORS
         ]
-        with open(os.path.join(self.dir, POOL_SUBFOLDER, "estimators.json"), "w") as f:
+        with open(os.path.join(self.dir, POOL_SUBFOLDER, _ESTIMATORS_FILENAME), "w") as f:
             json.dump(estimators, f, indent=4)
         return estimators
 
@@ -73,9 +91,9 @@ class PoolEstimators(object):
 
 
 class MetaTransformer(object):
-    def __init__(self, X, scores):
-        self.X = X
+    def __init__(self, scores):
         self.scores = scores
+        self.X = None
 
     def _avg_w(self):
         mask = ~np.isnan(self.X)
@@ -102,18 +120,38 @@ class MetaTransformer(object):
         funcs = [self._avg_w, self._avg, self._std, self._max, self._min]
         return funcs
 
-    def transform(self):
+    def transform(self, X):
+        self.X = X
         funcs = self._funcs()
         X = np.zeros((X.shape[0], len(funcs)))
         for i, func in enumerate(funcs):
             X[:, i] = func()
+        self.X = None
         return X
+
+
+class MetaModel(object):
+    def __init__(self, is_clf):
+        self.is_clf = is_clf
+        if self.is_clf:
+            self.mdl = Classifier()
+        else:
+            self.mdl = Regressor()
+
+    def fit(self, X, y):
+        self.mdl.fit(X, y)
 
 
 class Pool(object):
     def __init__(self, dir):
         self.dir = os.path.abspath(dir)
         self.pool_estimators = PoolEstimators(self.dir)
+        self.is_clf = self._is_classification()
+
+    def _is_classification(self):
+        with open(os.path.join(self.dir, DATA_SUBFOLDER, _CONFIG_FILENAME), "r") as f:
+            config = json.load(f)
+        return config["is_clf"]
 
     def _get_X_y_score(self):
         d = {}
@@ -124,7 +162,11 @@ class Pool(object):
             y_pred = pred["y_pred"]
             scores += [pred["score"]]
             for idx_, y_ in zip(idxs, y_pred):
-                d[(estimator, idx_)] = y_[1]  # classification y[1]
+                #  TODO handle multioutput
+                if self.is_clf:
+                    d[(estimator, idx_)] = y_[1]  # classification y_[1]
+                else:
+                    d[(estimator, idx_)] = y_  #  regression
         cols = sorted(set([k[0] for k, _ in d.items()]))
         cols_idx = dict((c, i) for i, c in enumerate(cols))
         rows = sorted(set([k[1] for k, _ in d.items()]))
@@ -133,7 +175,7 @@ class Pool(object):
         logger.debug("Assembling y")
         # TODO: batch
         with open(
-            os.path.join(self.dir, DATA_SUBFOLDER, "batch-01", "y.npy"), "rb"
+            os.path.join(self.dir, DATA_SUBFOLDER, "batch-0", "y.npy"), "rb"
         ) as f:
             y = np.load(f)
         y = y[rows]
@@ -148,9 +190,19 @@ class Pool(object):
 
     def pool(self):
         X, y, scores = self._get_X_y_score()
-        with open("/Users/mduran/Desktop/X.npy", "wb") as f:
-            np.save(f, X)
-        with open("/Users/mduran/Desktop/y.npy", "wb") as f:
-            np.save(f, y)
-        with open("/Users/mduran/Desktop/scores.npy", "wb") as f:
-            np.save(f, scores)
+        mt = MetaTransformer(scores)
+        X_t = mt.transform(X)
+        mt_file = os.path.join(self.dir, POOL_SUBFOLDER, "meta.pkl")
+        joblib.dump(mt, mt_file)
+        mdl = MetaModel(self.is_clf)
+        mdl.fit(X_t, y)
+        mdl_file = os.path.join(self.dir, POOL_SUBFOLDER, "model.pkl")
+        joblib.dump(mdl.mdl, mdl_file)
+        if self.is_clf:
+            y_pred = mdl.mdl.predict_proba(X_t)
+        else:
+            y_pred = mdl.mdl.predict(X_t)
+        metric = Metric(self.is_clf)
+        score = metric.score(y, y_pred)
+        with open(os.path.join(self.dir, POOL_SUBFOLDER, "eval.json"), "w") as f:
+            json.dump(score, f, indent=4)
