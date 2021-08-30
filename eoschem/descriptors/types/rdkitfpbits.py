@@ -8,16 +8,8 @@ _MAX_PATH_LEN = 7
 _N_BITS = 2048
 
 
-<<<<<<< HEAD
-class RdkitFpBits(object):
-=======
-<<<<<<< HEAD
 class RdkitFpBits(BaseDescriptorType):
 
-=======
-class RdkitFpBits(object):
->>>>>>> f7356c4... Major updates
->>>>>>> 8a05dcf7bcbfbee32aa23019194890e2b9ee485e
     def __init__(self):
         super().__init__()
         self.minPathLen = _MIN_PATH_LEN
@@ -33,17 +25,7 @@ class RdkitFpBits(object):
         fingerprints = []
         for mol in mols:
             counts = Chem.RDKFingerprint(
-<<<<<<< HEAD
-                mol, minPath=self.minPathLen, maxPath=self.maxPathLen, fpSize=self.nbits
-            )
-=======
-<<<<<<< HEAD
                 mol, minPath=self.minPathLen, maxPath=self.maxPathLen,
                 fpSize=self.nbits)
-=======
-                mol, minPath=self.minPathLen, maxPath=self.maxPathLen, fpSize=self.nbits
-            )
->>>>>>> f7356c4... Major updates
->>>>>>> 8a05dcf7bcbfbee32aa23019194890e2b9ee485e
             fingerprints += [[self._clip(c) for c in counts]]
         return np.array(fingerprints)

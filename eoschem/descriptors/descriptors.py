@@ -29,15 +29,7 @@ DESCRIPTOR_FACTORY = [
     Ecfp(),
     # Grover(),
     Maccs(),
-<<<<<<< HEAD
     # Mordred(),
-=======
-<<<<<<< HEAD
-    Mordred(),
-=======
-    # Mordred(),
->>>>>>> f7356c4... Major updates
->>>>>>> 8a05dcf7bcbfbee32aa23019194890e2b9ee485e
     Rdkit2d(),
     RdkitFpBits(),
     Signaturizer(),
