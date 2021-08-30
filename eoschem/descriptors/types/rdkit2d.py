@@ -1,3 +1,4 @@
+from . import BaseDescriptorType
 from rdkit.Chem import Descriptors
 import numpy as np
 
@@ -210,13 +211,22 @@ RDKIT_PROPS = {
 CURRENT_VERSION = "1.0.0"
 
 
+<<<<<<< HEAD
 class Rdkit2d(object):
+=======
+<<<<<<< HEAD
+class Rdkit2d(BaseDescriptorType):
+
+=======
+class Rdkit2d(object):
+>>>>>>> f7356c4... Major updates
+>>>>>>> 8a05dcf7bcbfbee32aa23019194890e2b9ee485e
     def __init__(self):
-        self.name = "rdkit2d"
+        super().__init__()
         self.properties = RDKIT_PROPS[CURRENT_VERSION]
         self._funcs = {name: func for name, func in Descriptors.descList}
 
-    def calc(self, mols):
+    def _calc(self, mols):
         R = []
         for mol in mols:
             r = []

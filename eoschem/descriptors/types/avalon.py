@@ -1,3 +1,4 @@
+from . import BaseDescriptorType
 import numpy as np
 from rdkit.Avalon import pyAvalonTools
 from rdkit import DataStructs
@@ -6,9 +7,10 @@ from rdkit import DataStructs
 nBits = 1024
 
 
-class Avalon(object):
+class Avalon(BaseDescriptorType):
+
     def __init__(self):
-        self.name = "avalon"
+        super().__init__()
         self.nBits = nBits
 
     def calc(self, mols):

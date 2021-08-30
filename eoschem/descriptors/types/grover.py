@@ -1,6 +1,10 @@
-class Grover(object):
-    def __init__(self):
-        self.name = "grover"
+from . import BaseDescriptorType
 
-    def calc(self, mols):
+
+class Grover(BaseDescriptorType):
+
+    def __init__(self):
+        super().__init__()
+
+    def _calc(self, mols):
         pass

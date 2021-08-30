@@ -21,7 +21,9 @@ from .. import logger
 from ..metrics.metrics import Metric
 
 
-TIME_BUDGET = 1
+TIME_BUDGET = 10
+
+_
 
 _
 
@@ -51,10 +53,16 @@ class Fit(object):
         logger.debug("Loading X from {0}".format(X_file))
         with open(X_file, "rb") as f:
             X = np.load(f)
+        nan_count = np.sum(np.isnan(X))
+        if nan_count != 0:
+            logger.warning("X contains {0} NaNs.".format(nan_count))
         y_file = os.path.join(self.dir, DATA_SUBFOLDER, batch, "y.npy")
         logger.debug("Loading y from {0}".format(y_file))
         with open(y_file, "rb") as f:
             y = np.load(f)
+        nan_count = np.sum(np.isnan(y))
+        if nan_count != 0:
+            logger.warning("y contains {0} NaNs.".format(nan_count))
         return X, y
 
     def _find_data(self):
