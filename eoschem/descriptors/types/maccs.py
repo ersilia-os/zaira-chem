@@ -1,13 +1,15 @@
+from . import BaseDescriptorType
 import numpy as np
 from rdkit.Chem import MACCSkeys
 from rdkit import DataStructs
 
 
-class Maccs(object):
-    def __init__(self):
-        self.name = "maccs"
+class Maccs(BaseDescriptorType):
 
-    def calc(self, mols):
+    def __init__(self):
+        super().__init__()
+
+    def _calc(self, mols):
         fingerprints = []
         fps = [MACCSkeys.GenMACCSKeys(mol) for mol in mols]
         for fp in fps:
