@@ -3,6 +3,8 @@ import numpy as np
 import csv
 
 from rdkit import Chem
+from sklearn.preprocessing import RobustScaler
+from sklearn.impute import SimpleImputer
 
 from .types.avalon import Avalon
 from .types.cddd import Cddd
@@ -13,10 +15,13 @@ from .types.mordred import Mordred
 from .types.rdkit2d import Rdkit2d
 from .types.rdkitfpbits import RdkitFpBits
 from .types.signaturizer import Signaturizer
+from .types.whales import Whales
 
 from .. import logger
-from ..setup.setup import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
+from ..setup.setup import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER, _SMILES_FILENAME
 
+
+_X_DESC_FILENAME = "X.npy"
 
 DESCRIPTOR_FACTORY = [
     Avalon(),
@@ -24,10 +29,15 @@ DESCRIPTOR_FACTORY = [
     Ecfp(),
     # Grover(),
     Maccs(),
+<<<<<<< HEAD
     Mordred(),
+=======
+    # Mordred(),
+>>>>>>> f7356c4... Major updates
     Rdkit2d(),
     RdkitFpBits(),
     Signaturizer(),
+    # Whales()
 ]
 
 
@@ -76,12 +86,12 @@ class Descriptors(object):
         logger.debug("Finding batches from setup output")
         data = os.path.join(self.dir, DATA_SUBFOLDER)
         for dir in os.listdir(data):
-            if dir[:5] == "batch":
+            if dir[:len(_BATCH_PREFIX)] == _BATCH_PREFIX:
                 batch_dir = os.path.join(data, dir)
                 yield dir, batch_dir
 
     def _read_batch_data(self, batch_dir):
-        with open(os.path.join(batch_dir, "data.smi"), "r") as f:
+        with open(os.path.join(batch_dir, _SMILES_FILENAME), "r") as f:
             reader = csv.reader(f)
             data = []
             for r in reader:
@@ -92,9 +102,12 @@ class Descriptors(object):
         pass
 
     def _impute(self, X):
-        pass
+        imp = SimpleImputer()
+        imp.fit(X)
+        with open():
+            joblib.dump()
 
-    def _remove_constant(self, X):
+    def _prune(self, X):
         pass
 
     def _drop_nan_columns(self, X):
@@ -114,7 +127,7 @@ class Descriptors(object):
                 dir_ = os.path.join(dir, name)
                 if not os.path.exists(dir_):
                     os.mkdir(dir_)
-                with open(os.path.join(dir_, "X.npy"), "wb") as f:
+                with open(os.path.join(dir_, _X_DESC_FILENAME), "wb") as f:
                     np.save(f, X, allow_pickle=False)
                 yield batch, name
 

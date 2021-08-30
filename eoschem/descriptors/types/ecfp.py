@@ -1,10 +1,15 @@
 from . import BaseDescriptorType
 import numpy as np
-from rdkit.Chem import AllChem
+from rdkit.Chem import rdMolDescriptors as rd
 
-radius = 2048
-useCounts = True
-useFeatures = True
+radius = 3
+nBits = 2048
+
+
+def clip(v):
+    if v > 255:
+        v = 255
+    return v
 
 
 class Ecfp(BaseDescriptorType):
@@ -12,9 +17,9 @@ class Ecfp(BaseDescriptorType):
     def __init__(self):
         super().__init__()
         self.radius = radius
-        self.useCounts = useCounts
-        self.useFeatures = useFeatures
+        self.nbits = nBits
 
+<<<<<<< HEAD
     def _calc(self, mols):
         fps = [
             AllChem.GetMorganFingerprint(
@@ -29,3 +34,12 @@ class Ecfp(BaseDescriptorType):
                 nidx = idx % size
                 nfp[i, nidx] += int(v)
         return np.array(nfp, dtype=np.int32)
+=======
+    def calc(self, mols):
+        fingerprints = []
+        for mol in mols:
+            counts = list(rd.GetHashedMorganFingerprint(mol, radius=self.radius, nBits=self.nbits))
+            counts = [clip(x) for x in counts]
+            fingerprints += [counts]
+        return np.array(fingerprints)
+>>>>>>> f7356c4... Major updates

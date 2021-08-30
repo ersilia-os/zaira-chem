@@ -3,12 +3,14 @@ from ._version import __version__
 
 del _version
 
-# Disable third-party warnings
+#  Disable third-party warnings
 import warnings
+
 warnings.filterwarnings("ignore")
 
 from rdkit import RDLogger
-RDLogger.DisableLog('rdApp.*')
+
+RDLogger.DisableLog("rdApp.*")
 
 # Internal imports
 from .utils.logging import logger

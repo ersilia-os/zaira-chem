@@ -6,7 +6,15 @@ import shutil
 
 from flaml import AutoML
 
-from ..setup.setup import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER, MODELS_SUBFOLDER
+from ..setup.setup import (
+    DATA_SUBFOLDER,
+    DESCRIPTORS_SUBFOLDER,
+    MODELS_SUBFOLDER,
+    _CONFIG_FILENAME,
+    SPLITS_SUBFOLDER,
+    _TRAIN_IDX_FILENAME,
+    _TEST_IDX_FILENAME
+)
 
 from .. import logger
 
@@ -15,13 +23,15 @@ from ..metrics.metrics import Metric
 
 TIME_BUDGET = 10
 
+_
+
 
 class Fit(object):
     def __init__(self, dir):
         self.dir = os.path.abspath(dir)
 
     def _is_clf(self):
-        data_json = os.path.join(self.dir, DATA_SUBFOLDER, "config.json")
+        data_json = os.path.join(self.dir, DATA_SUBFOLDER, _CONFIG_FILENAME)
         logger.debug("Reading task and metric from {0}".format(data_json))
         with open(data_json, "r") as f:
             data = json.load(f)
@@ -68,8 +78,11 @@ class Fit(object):
 
     def _fit_main(self, batch, descriptor):
         X, y = self._load_X_y(batch, descriptor)
-        y = y[:, 0]
         logger.debug("X shape ({0}, {1})".format(X.shape[0], X.shape[1]))
+        logger.debug("y shape ({0}, {1})".format(y.shape[0], y.shape[1]))
+        # TODO: Work in multioutput scenarios natively
+        assert y.shape[1] == 1
+        y = y.ravel()
         task, metric = self._task_and_metric()
         logger.info("Task: {0}".format(task))
         logger.info("Metric: {0}".format(metric))
@@ -78,6 +91,7 @@ class Fit(object):
             "metric": metric,
             "task": task,
             "log_file_name": "automl.log",
+            "verbose": 0
         }
         automl = AutoML()
         automl.fit(X_train=X, y_train=y, **automl_settings)
@@ -113,14 +127,14 @@ class Fit(object):
         mdl_dir = os.path.join(self.dir, MODELS_SUBFOLDER, batch, descriptor)
         mdl = joblib.load(os.path.join(mdl_dir, "model.pkl"))
         X, y = self._load_X_y(batch, descriptor)
-        splits_folder = os.path.join(self.dir, DATA_SUBFOLDER, batch, "splits")
+        splits_folder = os.path.join(self.dir, DATA_SUBFOLDER, batch, SPLITS_SUBFOLDER)
         for split in os.listdir(splits_folder):
-            if split[:5] == "split":
+            if split[:len(_SPLIT_PREFIX)] == _SPLIT_PREFIX:
                 logger.debug("Training on split {0}".format(split))
                 split_folder = os.path.join(splits_folder, split)
-                with open(os.path.join(split_folder, "train_idx.npy"), "rb") as f:
+                with open(os.path.join(split_folder, _TRAIN_IDX_FILENAME), "rb") as f:
                     train_idx = np.load(f)
-                with open(os.path.join(split_folder, "test_idx.npy"), "rb") as f:
+                with open(os.path.join(split_folder, _TEST_IDX_FILENAME), "rb") as f:
                     test_idx = np.load(f)
                 mdl.fit(X[train_idx], y[train_idx])
                 if is_clf:
