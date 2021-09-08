@@ -23,10 +23,6 @@ from ..metrics.metrics import Metric
 
 TIME_BUDGET = 10
 
-_
-
-_
-
 
 class Fit(object):
     def __init__(self, dir):
