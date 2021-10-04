@@ -1,21 +1,21 @@
-# Automated ML for Chemistry
+# Out-of-the-Box Supervised Machine Learning for Chemistry Datasets
 
 **WORK IN PROGRESS**
 
-This package provides an AutoML solution to perform supervised ML on chemistry datasets.
+This package provides an automated solution to perform supervised machine learning on chemistry datasets.
 
 We prioritise computational performance for low-resourced settings. Training takes time but is feasible on a conventional computer.
 
-Works on regression and classification.
+Works on regression and classification. Single task or multitask.
 
 ## Fit
 
 ```bash
-eoschem fit --input INPUT_CSV --output MODEL_FOLDER
+autosml fit --input INPUT_CSV --output MODEL_FOLDER
 ```
 
 ## Predict
 
 ```bash
-eoschem predict --model MODEL_FOLDER --output OUTPUT_FOLDER
+autosml predict --model MODEL_FOLDER --output OUTPUT_FOLDER
 ```
