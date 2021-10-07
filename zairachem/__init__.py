@@ -14,9 +14,20 @@ RDLogger.DisableLog("rdApp.*")
 from .utils.logging import logger
 
 # Base Zaira class
-class ZairaBase(self):
+import json
+import os
+from .vars import BASE_DIR
+from .vars import SESSION_FILE
+
+
+class ZairaBase(object):
     def __init__(self):
         self.logger = logger
+
+    def get_output_dir(self):
+        with open(os.path.join(BASE_DIR, SESSION_FILE), "r") as f:
+            session = json.load(f)
+        return session["output_dir"]
 
 
 __all__ = ["__version__"]

@@ -1,6 +1,9 @@
+import os
+import pandas as pd
+
+
 from .. import ZairaBase
 
-import pandas as pd
 
 _SNIFF_SAMPLE_SIZE = 10000
 _MAX_EMPTY = 0.2
@@ -26,7 +29,7 @@ class InputSchema(ZairaBase):
                 c += 1
         return float(c) / len(values)
 
-    def _is_smiles_column(self):
+    def _is_smiles_column(self, col):
         if "smiles" in col.lower():
             return True
         else:
@@ -68,7 +71,7 @@ class InputSchema(ZairaBase):
     def find_values_column(self):
         cols = []
         for col in self.columns:
-            if self._is_data_column(col):
+            if self._is_values_column(col):
                 cols += [col]
             else:
                 continue
@@ -86,7 +89,7 @@ class InputSchema(ZairaBase):
         else:
             return False
 
-    def find_qualifier_column(self, col):
+    def find_qualifier_column(self):
         cols = []
         for col in cols:
             if self._is_qualifier_column(col):
@@ -137,6 +140,18 @@ class InputSchema(ZairaBase):
             return True
         else:
             return False
+
+    def find_group_column(self):
+        cols = []
+        for col in self.columns:
+            if self._is_group_column(col):
+                cols += [col]
+        if len(cols) > 1:
+            raise Exception
+        if len(cols) == 0:
+            return None
+        if len(cols) == 1:
+            return cols[0]
 
     def find_identifier_column(self):
         cols = []
