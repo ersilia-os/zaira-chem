@@ -1,6 +1,7 @@
 # Manually added
 *.DS_Store
 output
+development.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

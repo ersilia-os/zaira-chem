@@ -13,7 +13,7 @@ from ..setup.setup import (
     _CONFIG_FILENAME,
     SPLITS_SUBFOLDER,
     _TRAIN_IDX_FILENAME,
-    _TEST_IDX_FILENAME
+    _TEST_IDX_FILENAME,
 )
 
 from .. import logger
@@ -89,7 +89,7 @@ class Fit(object):
             "metric": metric,
             "task": task,
             "log_file_name": "automl.log",
-            "verbose": 0
+            "verbose": 0,
         }
         automl = AutoML()
         automl.fit(X_train=X, y_train=y, **automl_settings)
@@ -127,7 +127,7 @@ class Fit(object):
         X, y = self._load_X_y(batch, descriptor)
         splits_folder = os.path.join(self.dir, DATA_SUBFOLDER, batch, SPLITS_SUBFOLDER)
         for split in os.listdir(splits_folder):
-            if split[:len(_SPLIT_PREFIX)] == _SPLIT_PREFIX:
+            if split[: len(_SPLIT_PREFIX)] == _SPLIT_PREFIX:
                 logger.debug("Training on split {0}".format(split))
                 split_folder = os.path.join(splits_folder, split)
                 with open(os.path.join(split_folder, _TRAIN_IDX_FILENAME), "rb") as f:

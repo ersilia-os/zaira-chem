@@ -4,7 +4,11 @@ import os
 import numpy as np
 import tempfile
 
-from ..pool.pool import _ESTIMATORS_FILENAME, _META_TRANSFORMER_FILENAME, _META_MODEL_FILENAME
+from ..pool.pool import (
+    _ESTIMATORS_FILENAME,
+    _META_TRANSFORMER_FILENAME,
+    _META_MODEL_FILENAME,
+)
 
 BATCH_SIZE = 100000
 
@@ -14,8 +18,8 @@ class Predictor(object):
         self.dir = os.path.abspath(dir)
         self.input_file = os.path.abspath(input_file)
         self.output_file = os.path.abspath(output_file)
-        #self.tmp_folder = tempfile.mkdtemp()
-        self.tmp_folder = os.path.abspath("tmp_predict") # Make it temporary
+        # self.tmp_folder = tempfile.mkdtemp()
+        self.tmp_folder = os.path.abspath("tmp_predict")  # Make it temporary
         self.estimators = self._get_estimators()
         self.mt = self._get_meta_transformer()
         self.mmdl = self._get_meta_model()
@@ -49,7 +53,11 @@ class Predictor(object):
             yield l[i : i + n]
 
     def setup(self):
-        logger.debug("Setting up predictor. Making descriptor folders in {0}".format(self.tmp_folder))
+        logger.debug(
+            "Setting up predictor. Making descriptor folders in {0}".format(
+                self.tmp_folder
+            )
+        )
         for descriptor_name in self.descriptor_names:
             dir_ = os.path.join(self.tmp_folder, descriptor_name)
             os.makedirs(dir_, exist_ok=True)
@@ -62,21 +70,10 @@ class Predictor(object):
 
 
 class PredictorSetup(object):
-
     def __init__(self, dir, output_dir):
         self.dir = os.path.abspath(dir)
         self.output_dir = os.path.abspath(output_dir)
 
-
-    def
-
-    def setup(self):
-        pass
-
-
-class Predictor(object):
-
-    def __init__(self, )
 
 class Predictor(object):
     def __init__(self, smiles, models_path):

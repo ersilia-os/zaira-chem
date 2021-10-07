@@ -176,9 +176,6 @@ class Splitter(object):
             yield train_idx, test_idx
 
 
-
-
-
 class TrainSetup(object):
     def __init__(self, input_file, output_dir, time_budget, standardize):
         self.input_file = os.path.abspath(input_file)

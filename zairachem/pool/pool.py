@@ -58,7 +58,9 @@ class PoolEstimators(object):
         estimators = sorted(estimators.items(), key=lambda item: -item[1])[
             :MAX_ESTIMATORS
         ]
-        with open(os.path.join(self.dir, POOL_SUBFOLDER, _ESTIMATORS_FILENAME), "w") as f:
+        with open(
+            os.path.join(self.dir, POOL_SUBFOLDER, _ESTIMATORS_FILENAME), "w"
+        ) as f:
             json.dump(estimators, f, indent=4)
         return estimators
 

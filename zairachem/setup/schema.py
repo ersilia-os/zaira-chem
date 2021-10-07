@@ -1,16 +1,15 @@
+from .. import ZairaBase
+
 import pandas as pd
 
 _SNIFF_SAMPLE_SIZE = 10000
 _MAX_EMPTY = 0.2
 _MIN_CORRECT = 0.8
 
-_INCHIKEY_COLUMN = "inchikey"
-_STANDARD_SMILES_COLUMN = "standard_smiles"
 
-
-class InputSchema(object):
-
+class InputSchema(ZairaBase):
     def __init__(self, input_file):
+        ZairaBase.__init__(self)
         self.input_file = os.path.abspath(input_file)
         self.df_ = pd.read_csv(self.input_file, nrows=_SNIFF_SAMPLE_SIZE)
         self.columns = list(self.df_.columns)
@@ -27,19 +26,32 @@ class InputSchema(object):
                 c += 1
         return float(c) / len(values)
 
-    def _find_smiles_column(self):
-        cands = []
+    def _is_smiles_column(self):
+        if "smiles" in col.lower():
+            return True
+        else:
+            return False
+        # TODO
+        if self._prop_correct_smiles(col) > _MIN_CORRECT:
+            return True
+        else:
+            return False
+
+    def find_smiles_column(self):
+        cols = []
         for col in self.columns:
-            if self._prop_correct_smiles(col) > _MIN_CORRECT:
-                cands += [col]
+            if self._is_smiles_column(col):
+                cols += [col]
             else:
                 continue
-        if len(cands) != 1:
+        if len(cols) == 0:
+            return None
+        if len(cols) > 1:
             raise Exception
         else:
-            return cands[0]
+            return cols[0]
 
-    def _is_data_column(self, col):
+    def _is_values_column(self, col):
         values = list(self.df_[self.df_[col].notnull()][col])
         c = 0
         for v in values:
@@ -53,29 +65,55 @@ class InputSchema(object):
         else:
             return False
 
-    def _find_data_columns(self):
-        datacols = []
+    def find_values_column(self):
+        cols = []
         for col in self.columns:
             if self._is_data_column(col):
-                datacols += [col]
+                cols += [col]
             else:
                 continue
-        return datacols
+        if len(cols) == 0:
+            return None
+        if len(cols) == 1:
+            return cols[0]
+        if len(cols) > 1:
+            raise Exception
 
     def _is_qualifier_column(self, col):
-        pass
-
-    def _is_date_column(self, col):
-        n = self.df_[self.df_[col].notnull()].shape[0]
-        df_ = self.df_.copy()
-        df_[col] = pd.to_datetime(df_[col], errors="coerce")
-        m = df_[df_[col].notnull()].shape[0]
-        if m/n > _MIN_CORRECT:
+        # TODO
+        if "qualifier" in col.lower():
             return True
         else:
             return False
 
-    def _find_date_columns(self):
+    def find_qualifier_column(self, col):
+        cols = []
+        for col in cols:
+            if self._is_qualifier_column(col):
+                cols += [col]
+        if len(cols) == 0:
+            return None
+        if len(cols) == 1:
+            return cols[0]
+        if len(cols) > 1:
+            raise Exception
+
+    def _is_date_column(self, col):
+        if "date" in col.lower():
+            return True
+        else:
+            return False
+        # TODO
+        n = self.df_[self.df_[col].notnull()].shape[0]
+        df_ = self.df_.copy()
+        df_[col] = pd.to_datetime(df_[col], errors="coerce")
+        m = df_[df_[col].notnull()].shape[0]
+        if m / n > _MIN_CORRECT:
+            return True
+        else:
+            return False
+
+    def find_date_column(self):
         datecols = []
         for col in self.columns:
             if self._is_date_column(col):
@@ -87,20 +125,26 @@ class InputSchema(object):
         return None
 
     def _is_identifier_column(self, col):
-        pass
+        # TODO
+        if "identifier" in col.lower():
+            return True
+        else:
+            return False
 
-    def _find_identifier_column(self):
-        pass
+    def _is_group_column(self, col):
+        # TODO
+        if "series" in col.lower() or "group" in col.lower():
+            return True
+        else:
+            return False
 
-    def schema(self):
-        logger.debug("Guessing schema")
-        d = {
-            "compound_identifier": self._find_identifier_column(),
-            "inchikey": _INCHIKEY_COLUMN,
-            "smiles": self._find_smiles_column(),
-            "standard_smiles": _STANDARD_SMILES_COLUMN,
-            "date": self._find_date_columns(),
-            "data_columns": self._find_data_columns(),
-        }
-        logger.debug("Guessed schema {0}".format(d))
-        return d
+    def find_identifier_column(self):
+        cols = []
+        for col in self.columns:
+            if self._is_identifier_column(col):
+                cols += [col]
+        if len(cols) > 1:
+            raise Exception
+        if len(cols) == 1:
+            return cols[0]
+        return None
