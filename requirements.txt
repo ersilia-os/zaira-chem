@@ -3,8 +3,5 @@ click
 joblib
 rdkit-pypi
 pandas
-standardiser
 sklearn
-tensorflow
 flaml
-zmq
