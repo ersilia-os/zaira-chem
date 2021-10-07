@@ -16,7 +16,7 @@ def get_version_and_cmdclass(package_path):
     return module.__version__, module.cmdclass
 
 
-version, cmdclass = get_version_and_cmdclass("eoschem")
+version, cmdclass = get_version_and_cmdclass("zairachem")
 
 with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
@@ -26,7 +26,7 @@ with open("requirements.txt") as f:
 
 
 setup(
-    name="eoschem",
+    name="zairachem",
     version=version,
     cmdclass=cmdclass,
     author="Miquel Duran-Frigola",
@@ -39,7 +39,7 @@ setup(
     python_requires=">=3.7",
     install_requires=install_requires,
     packages=find_packages(exclude=("utilities")),
-    entry_points={"console_scripts": ["eoschem=eoschem.cli:cli"]},
+    entry_points={"console_scripts": ["zairachem=zairachem.cli:cli"]},
     classifiers=(
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",

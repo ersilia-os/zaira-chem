@@ -6,7 +6,5 @@ pandas
 standardiser
 sklearn
 tensorflow
-mordred
-signaturizer
 flaml
 zmq
