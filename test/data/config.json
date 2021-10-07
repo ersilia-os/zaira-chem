@@ -1,0 +1,13 @@
+{
+    "time_budget": 60,
+    "type_of_y": "binary",
+    "is_clf": true,
+    "schema": {
+        "inchikey": "inchikey",
+        "smiles": "smiles",
+        "standard_smiles": "standard_smiles",
+        "columns": [
+            "bin_activity"
+        ]
+    }
+}
