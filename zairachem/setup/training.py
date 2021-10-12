@@ -3,6 +3,10 @@ import json
 import shutil
 
 from .files import SingleFile
+from .standardize import Standardize
+from .folding import Folds
+
+from . import PARAMETERS_FILE
 
 from ..vars import BASE_DIR
 from ..vars import SESSION_FILE
@@ -12,6 +16,8 @@ from ..vars import DESCRIPTORS_SUBFOLDER
 from ..vars import MODELS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
+
+from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 
 
 class TrainSetup(object):
@@ -27,6 +33,10 @@ class TrainSetup(object):
         with open(params, "r") as f:
             params = json.load(f)
         return params
+
+    def _save_params(self):
+        with open(os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE), "w") as f:
+            json.dump(self.params, f, indent=4)
 
     def _make_output_dir(self):
         if os.path.exists(self.output_dir):
@@ -52,8 +62,21 @@ class TrainSetup(object):
         f = SingleFile(self.input_file, self.params)
         f.process()
 
+    def _melloddy_tuner_run(self):
+        MelloddyTunerTrainPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
+    def _standardize(self):
+        Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
+    def _folds(self):
+        Folds(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
     def setup(self):
         self._make_output_dir()
         self._open_session()
         self._make_subfolders()
+        self._save_params()
         self._normalize_input()
+        self._melloddy_tuner_run()
+        self._standardize()
+        self._folds()

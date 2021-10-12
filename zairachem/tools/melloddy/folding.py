@@ -6,8 +6,7 @@ from . import TAG
 from . import MELLODDY_SUBFOLDER
 from . import PARAMS_FILE, KEY_FILE
 from . import NUM_CPU
-
-_SCRIPT_FILENAME = "run.sh"
+from . import _SCRIPT_FILENAME
 
 
 class Folding(object):

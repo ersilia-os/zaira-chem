@@ -7,8 +7,7 @@ from . import TAG
 from . import MELLODDY_SUBFOLDER
 from . import PARAMS_FILE, KEY_FILE
 from . import NUM_CPU
-
-_SCRIPT_FILENAME = "run.sh"
+from . import _SCRIPT_FILENAME
 
 
 class Standardize(object):
@@ -32,7 +31,6 @@ class Standardize(object):
             NUM_CPU,
         )
         tmp_dir = tempfile.mkdtemp()
-        tmp_dir = "/home/mduranfrigola/Desktop/"
         self.script_path = os.path.join(tmp_dir, _SCRIPT_FILENAME)
         with open(self.script_path, "w") as f:
             f.write(text)

@@ -3,6 +3,9 @@
 COMPOUNDS_FILENAME = "compounds.csv"
 VALUES_FILENAME = "values.csv"
 ASSAYS_FILENAME = "assays.csv"
+PARAMETERS_FILE = "parameters.json"
+
+FOLDS_FILENAME = "folds.csv"
 
 COMPOUND_IDENTIFIER_COLUMN = "compound_id"
 ASSAY_IDENTIFIER_COLUMN = "assay_id"

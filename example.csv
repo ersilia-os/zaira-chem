@@ -1,5 +1,6 @@
 smiles,norm_activity
 FC(F)Oc1ccc(-c2nnc3cncc(CN4Cc5ccccc5C4)n23)cc1,0.9612403100775194
+FC(F)Oc1ccc(-c2nnc3cncc(CN4Cc5ccccc5C4)n23)cc1,0.9612403100775194
 Cc1c(Cl)cccc1NC(=O)c1cncc2nnc(-c3ccc(OC(F)F)cc3)n12,0.5142118863049095
 O=C(Nc1cccc(Cl)c1)c1cncc2nnc(-c3ccc(OC(F)F)cc3)n12,0.9147286821705426
 N#Cc1ccc(-c2nnc3cncc(OCCc4ccccc4Cl)n23)cc1,0.8656330749354005

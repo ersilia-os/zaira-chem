@@ -15,8 +15,20 @@ from . import (
     ASSAY_TYPE_COLUMN,
     DIRECTION_COLUMN,
     EXPERT_THRESHOLD_COLUMN_PREFIX,
-    PERCENTILE_THRESHOLD_COLUMN_PREFIX
+    PERCENTILE_THRESHOLD_COLUMN_PREFIX,
+    PARAMETERS_FILE
 )
+
+
+class ParametersFile(object):
+
+    def __init__(self, path):
+        self.filename = os.path.join(path, PARAMETERS_FILE)
+        self.params = self.load()
+
+    def load(self):
+        with open(self.filename, "r") as f:
+            return json.load(f)
 
 
 class SingleFile(InputSchema):
@@ -91,11 +103,11 @@ class SingleFile(InputSchema):
         return df
 
     def compounds_table(self, df):
-        dfc = df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN, GROUP_COLUMN]]
+        dfc = df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN, GROUP_COLUMN]].drop_duplicates(inplace=False).reset_index(drop=True)
         return dfc
 
     def assays_table(self, df):
-        dfa = pd.DataFrame({ASSAY_IDENTIFIER_COLUMN: self.params["assay_id"]})
+        dfa = pd.DataFrame({ASSAY_IDENTIFIER_COLUMN: [self.params["assay_id"]]})
         # TODO: Allowed types: ADME, OTHER, PANEL, AUX_HTS
         assay_type = self.params["assay_type"]
         if assay_type is None:
@@ -108,8 +120,15 @@ class SingleFile(InputSchema):
         thresholds = self.params["thresholds"]
         for k, v in thresholds.items():
             num = k.split("_")[-1]
-            dfa[EXPERT_THRESHOLD_COLUMN_PREFIX+num] = v
+            dfa[EXPERT_THRESHOLD_COLUMN_PREFIX + num] = v
         return dfa
+
+    def values_table(self, df):
+        dfv = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: df[COMPOUND_IDENTIFIER_COLUMN]})
+        dfv[ASSAY_IDENTIFIER_COLUMN] = self.params["assay_id"]
+        dfv[QUALIFIER_COLUMN] = df[QUALIFIER_COLUMN]
+        dfv[VALUES_COLUMN] = df[VALUES_COLUMN]
+        return dfv
 
     def process(self):
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
@@ -118,6 +137,11 @@ class SingleFile(InputSchema):
         dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
         dfa = self.assays_table(df)
         dfa.to_csv(os.path.join(path, ASSAYS_FILENAME), index=False)
+        dfv = self.values_table(df)
+        dfv.to_csv(os.path.join(path, VALUES_FILENAME), index=False)
+
+
+# TODO: When three files are given, use the following
 
 
 class CompoundsFile(InputSchema):
