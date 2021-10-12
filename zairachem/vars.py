@@ -15,3 +15,5 @@ DESCRIPTORS_SUBFOLDER = "descriptors"
 MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"
 LITE_SUBFOLDER = "lite"
+
+_CONFIG_FILENAME = "config.json"

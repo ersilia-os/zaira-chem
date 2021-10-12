@@ -6,7 +6,7 @@ import numpy as np
 from flaml import AutoML
 from .. import logger
 
-from ..setup.setup import (
+from ..vars import (
     DATA_SUBFOLDER,
     MODELS_SUBFOLDER,
     POOL_SUBFOLDER,

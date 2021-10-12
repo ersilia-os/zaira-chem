@@ -6,16 +6,12 @@ import shutil
 
 from flaml import AutoML
 
-from ..setup.setup import (
+from ..vars import (
     DATA_SUBFOLDER,
     DESCRIPTORS_SUBFOLDER,
     MODELS_SUBFOLDER,
     _CONFIG_FILENAME,
-    SPLITS_SUBFOLDER,
-    _TRAIN_IDX_FILENAME,
-    _TEST_IDX_FILENAME,
 )
-
 from .. import logger
 
 from ..metrics.metrics import Metric

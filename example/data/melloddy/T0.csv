@@ -1,0 +1,2 @@
+input_assay_id,assay_type,use_in_regression,expert_threshold_1,expert_threshold_2,expert_threshold_3,expert_threshold_4,expert_threshold_5
+AID0,OTHER,True,,,,,
