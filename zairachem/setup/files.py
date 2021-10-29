@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 
 from ..vars import DATA_SUBFOLDER
 from .schema import InputSchema
@@ -16,12 +17,11 @@ from . import (
     DIRECTION_COLUMN,
     EXPERT_THRESHOLD_COLUMN_PREFIX,
     PERCENTILE_THRESHOLD_COLUMN_PREFIX,
-    PARAMETERS_FILE
+    PARAMETERS_FILE,
 )
 
 
 class ParametersFile(object):
-
     def __init__(self, path):
         self.filename = os.path.join(path, PARAMETERS_FILE)
         self.params = self.load()
@@ -103,7 +103,11 @@ class SingleFile(InputSchema):
         return df
 
     def compounds_table(self, df):
-        dfc = df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN, GROUP_COLUMN]].drop_duplicates(inplace=False).reset_index(drop=True)
+        dfc = (
+            df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN, GROUP_COLUMN]]
+            .drop_duplicates(inplace=False)
+            .reset_index(drop=True)
+        )
         return dfc
 
     def assays_table(self, df):

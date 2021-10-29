@@ -5,6 +5,7 @@ VALUES_FILENAME = "values.csv"
 ASSAYS_FILENAME = "assays.csv"
 PARAMETERS_FILE = "parameters.json"
 
+TASKS_FILENAME = "tasks.csv"
 FOLDS_FILENAME = "folds.csv"
 
 COMPOUND_IDENTIFIER_COLUMN = "compound_id"

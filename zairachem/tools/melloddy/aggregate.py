@@ -27,9 +27,7 @@ class AggregateActivity(object):
         return os.path.join(self.outdir, T1_FILE)
 
     def get_input_file_5(self):
-        return os.path.join(
-            self.outdir, TAG, "mapping_table", "T5.csv"
-        )
+        return os.path.join(self.outdir, TAG, "mapping_table", "T5.csv")
 
     def script_file(self):
         text = "tunercli agg_activity_data --assay_file {0} --activity_file {1} --mapping_table {2} --config_file {3} --key_file {4} --output_dir {5} --run_name {6} --number_cpu {7} --non_interactive".format(

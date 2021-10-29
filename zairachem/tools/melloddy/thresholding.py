@@ -23,9 +23,7 @@ class Thresholding(object):
         return os.path.join(self.outdir, T0_FILE)
 
     def get_input_file_4r(self):
-        return os.path.join(
-            self.outdir, TAG, "results_tmp", "aggregation", "T4r.csv"
-        )
+        return os.path.join(self.outdir, TAG, "results_tmp", "aggregation", "T4r.csv")
 
     def script_file(self):
         text = "tunercli apply_thresholding --activity_file {0} --assay_file {1} --config_file {2} --key_file {3} --output_dir {4} --run_name {5} --number_cpu {6} --non_interactive".format(

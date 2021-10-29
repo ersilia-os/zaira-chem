@@ -8,7 +8,7 @@ from ...setup.prediction import PredictSetup
 
 
 def setup_cmd():
-    @zairachem_cli.command(help="Setup Zaira Machine Learning task")
+    @zairachem_cli.command(help="Setup Zaira machine learning task")
     @click.argument("task", type=click.STRING)
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default="output", type=click.STRING)

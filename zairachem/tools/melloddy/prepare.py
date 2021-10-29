@@ -17,7 +17,7 @@ from ...setup import (
     DIRECTION_COLUMN,
     COMPOUND_IDENTIFIER_COLUMN,
     SMILES_COLUMN,
-    PARAMETERS_FILE
+    PARAMETERS_FILE,
 )
 
 
@@ -86,7 +86,7 @@ class Prepare(object):
             uparam = json.load(f)
         with open(DEFAULT_PARAMS_FILE, "r") as f:
             dparam = json.load(f)
-        
+
     def run(self):
         self.t0()
         self.t1()
