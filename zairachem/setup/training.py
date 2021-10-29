@@ -5,6 +5,7 @@ import shutil
 from .files import SingleFile
 from .standardize import Standardize
 from .folding import Folds
+from .tasks import SingleTasks
 
 from . import PARAMETERS_FILE
 
@@ -35,7 +36,9 @@ class TrainSetup(object):
         return params
 
     def _save_params(self):
-        with open(os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE), "w") as f:
+        with open(
+            os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE), "w"
+        ) as f:
             json.dump(self.params, f, indent=4)
 
     def _make_output_dir(self):
@@ -71,6 +74,9 @@ class TrainSetup(object):
     def _folds(self):
         Folds(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def _tasks(self):
+        SingleTasks(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
     def setup(self):
         self._make_output_dir()
         self._open_session()
@@ -80,3 +86,4 @@ class TrainSetup(object):
         self._melloddy_tuner_run()
         self._standardize()
         self._folds()
+        self._tasks()

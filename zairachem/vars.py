@@ -16,4 +16,11 @@ MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"
 LITE_SUBFOLDER = "lite"
 
+CLF_SUBFOLDER = "clf"
+REG_SUBFOLDER = "reg"
+
+CLF_PERCENTILES = [1, 10, 25]
+
+MIN_CLASS = 10
+
 _CONFIG_FILENAME = "config.json"
