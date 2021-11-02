@@ -59,7 +59,9 @@ class PrecomputedNeighbourInfo(NamedTuple):
     """Class container for the information about pre-computed nearest neighbours per class."""
 
     prec_distance_to_nn: Union[Dict[int, np.ndarray], np.ndarray]
-    prec_ind_of_nn: Union[Dict[int, np.ndarray], np.ndarray]  # Rhys- only dict for training, where I cache
+    prec_ind_of_nn: Union[
+        Dict[int, np.ndarray], np.ndarray
+    ]  # Rhys- only dict for training, where I cache
     # arrays for all values of allowed num neighbours
 
 
@@ -179,17 +181,24 @@ class ModelWithPredictionInterval:
             local_distance, ind = self.calc_nn_dist(x_star)
         if isinstance(local_distance, np.ndarray):
             dist = self._alpha * np.average(
-                local_distance, weights=np.arange(local_distance.shape[1], 0, -1), axis=1,
+                local_distance,
+                weights=np.arange(local_distance.shape[1], 0, -1),
+                axis=1,
             )
         else:
-            raise ValueError('Need to remove pre-cached training neighbour data from training')
+            raise ValueError(
+                "Need to remove pre-cached training neighbour data from training"
+            )
         if isinstance(ind, np.ndarray):
             error = self._beta * np.average(
                 abs(self.train_err[ind.astype(int)]),
                 weights=1.0 / (1 + local_distance),
-                axis=1,)
+                axis=1,
+            )
         else:
-            raise ValueError('Need to remove pre-cached training neighbour data from training')
+            raise ValueError(
+                "Need to remove pre-cached training neighbour data from training"
+            )
 
         return dist + error
 
@@ -212,7 +221,9 @@ class ModelWithPredictionInterval:
         if isinstance(ind, np.ndarray):
             train_error = self.train_err[ind.astype(int)]
         else:
-            raise ValueError('Need to remove pre-cached training neighbour data from training')
+            raise ValueError(
+                "Need to remove pre-cached training neighbour data from training"
+            )
         if isinstance(local_distance, np.ndarray):
             error_weighted_dist = np.average(
                 local_distance * abs(train_error),
@@ -220,7 +231,9 @@ class ModelWithPredictionInterval:
                 axis=1,
             )
         else:
-            raise ValueError('Need to remove pre-cached training neighbour data from training')
+            raise ValueError(
+                "Need to remove pre-cached training neighbour data from training"
+            )
 
         error_weighted_poly = self._alpha * error_weighted_dist ** self._beta
         return error_weighted_poly
@@ -268,19 +281,27 @@ class ModelWithPredictionInterval:
         if self.point_preds is not None:
             point_preds = self.point_preds
         else:
-            point_preds = self.predict(x_star,)
+            point_preds = self.predict(
+                x_star,
+            )
         if self.error_dist == "normal":
-            scale = self.std_on_y_star(x_star,)
+            scale = self.std_on_y_star(
+                x_star,
+            )
             dist = norm(loc=point_preds, scale=scale)
         elif self.error_dist == "laplace":
-            scale = self.laplace_scale_on_y_star(x_star,)
+            scale = self.laplace_scale_on_y_star(
+                x_star,
+            )
             dist = laplace(loc=point_preds, scale=scale)
         else:
             raise ValueError(f"Unknown distance function: {self.dist_func}")
         return dist
 
     def predict_interval(
-        self, x_star: np.ndarray, conf_level: Union[np.ndarray, int, float] = 90,
+        self,
+        x_star: np.ndarray,
+        conf_level: Union[np.ndarray, int, float] = 90,
     ) -> np.ndarray:
         """
         Predict the upper and lower prediction interval bounds for a given confidence level.
@@ -299,7 +320,9 @@ class ModelWithPredictionInterval:
         return np.array([dist.ppf(lower_vec.T), dist.ppf(upper_vec.T)]).T
 
     def calculate_prediction_interval_width(
-        self, x_star: np.ndarray, conf_level: Union[np.ndarray, int, float] = 90,
+        self,
+        x_star: np.ndarray,
+        conf_level: Union[np.ndarray, int, float] = 90,
     ) -> np.ndarray:
         """
         Calculate the absolute width of a prediction interval for a given confidence level.
@@ -353,11 +376,11 @@ class ModelWithPredictionInterval:
         init_args = self.search_method_args.init_kwargs
         index = nmslib.init(**init_args)
 
-        if 'space' not in list(init_args.keys()):
-            raise ValueError('You must pass a space in your search method init args')
+        if "space" not in list(init_args.keys()):
+            raise ValueError("You must pass a space in your search method init args")
 
-        space = init_args['space']
-        if space[-6:] == 'sparse':
+        space = init_args["space"]
+        if space[-6:] == "sparse":
             sparse_metric = True
         else:
             sparse_metric = False
@@ -370,14 +393,15 @@ class ModelWithPredictionInterval:
 
         if sparse_metric != sparse_data:
             raise ValueError(
-                f'Data type and space are not compatible, your space is {space} '
-                f'and search data type is data_type nmslib.{data_type}')
+                f"Data type and space are not compatible, your space is {space} "
+                f"and search data type is data_type nmslib.{data_type}"
+            )
 
     def _check_data_consistent_with_search_args(self) -> None:
         init_args = self.search_method_args.init_kwargs
 
-        space = init_args['space']
-        if space[-6:] == 'sparse':
+        space = init_args["space"]
+        if space[-6:] == "sparse":
             sparse_metric = True
         else:
             sparse_metric = False
@@ -391,8 +415,9 @@ class ModelWithPredictionInterval:
 
         if sparse_metric != sparse_data:
             raise ValueError(
-                f'Training data type and space are not compatible, your space is {space} '
-                f'and training data type is {training_data_type}')
+                f"Training data type and space are not compatible, your space is {space} "
+                f"and training data type is {training_data_type}"
+            )
 
 
 class _TrainingHelper(object):
@@ -444,8 +469,8 @@ class _TrainingHelper(object):
         max_ind = max_neighbours[x_cal_len_array, 0]
 
         for k in num_nbrs:
-            dist = max_dist[x_cal_len_array, 0: int(k)]
-            ind = max_ind[x_cal_len_array, 0: int(k)]
+            dist = max_dist[x_cal_len_array, 0 : int(k)]
+            ind = max_ind[x_cal_len_array, 0 : int(k)]
 
             dist_dict[k] = dist
             ind_dict[k] = ind
@@ -540,7 +565,10 @@ def picp_loss(
     """
     levels = np.array((90, 70, 50, 30, 10))
 
-    intervals = interval_model.predict_interval(x_test, conf_level=levels,).T
+    intervals = interval_model.predict_interval(
+        x_test,
+        conf_level=levels,
+    ).T
 
     lower = intervals[0]
     upper = intervals[1]

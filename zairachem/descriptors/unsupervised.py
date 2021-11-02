@@ -1,8 +1,7 @@
 import joblib
 
 
-class NanFilter():
-
+class NanFilter:
     def __init__(self):
         pass
 
@@ -13,8 +12,7 @@ class NanFilter():
         pass
 
 
-class Scaler():
-
+class Scaler:
     def __init__(self):
         pass
 
@@ -26,7 +24,6 @@ class Scaler():
 
 
 class Imputer(self):
-
     def __init__(self):
         pass
 
@@ -38,7 +35,6 @@ class Imputer(self):
 
 
 class VarianceFilter(self):
-
     def __init__(self):
         pass
 
@@ -50,7 +46,6 @@ class VarianceFilter(self):
 
 
 class Pca(self):
-
     def __init__(self):
         pass
 
@@ -62,7 +57,6 @@ class Pca(self):
 
 
 class OptSne(self):
-
     def __init__(self):
         pass
 
@@ -74,7 +68,6 @@ class OptSne(self):
 
 
 class Umap(self):
-
     def __init__(self):
         pass
 
@@ -83,7 +76,6 @@ class Umap(self):
 
     def transform(self):
         pass
-
 
 
 class UnsupervisedTransformations(self):

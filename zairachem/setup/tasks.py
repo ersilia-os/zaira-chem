@@ -12,8 +12,8 @@ from ..vars import CLF_PERCENTILES, MIN_CLASS
 
 # TODO MULTITASKS
 
-class RegTasks(object):
 
+class RegTasks(object):
     def __init__(self, data, params):
         self.values = np.array(data[VALUES_COLUMN])
         self.direction = params["direction"]
@@ -31,12 +31,12 @@ class RegTasks(object):
         return -np.log10(raw)
 
     def rnk(self):
-        assert(self.direction in ["high", "low"])
+        assert self.direction in ["high", "low"]
         if self.direction == "high":
             ranked = rankdata(self.values, method="ordinal")
         if self.direction == "low":
             ranked = rankdata(-self.values, method="ordinal")
-        return ranked/np.max(ranked)
+        return ranked / np.max(ranked)
 
     def as_dict(self):
         res = OrderedDict()
@@ -47,7 +47,6 @@ class RegTasks(object):
 
 
 class ClfTasks(object):
-
     def __init__(self, data, params):
         self.values = np.array(data[VALUES_COLUMN])
         self.direction = params["direction"]
@@ -97,7 +96,7 @@ class ClfTasks(object):
         cuts = []
         for p in CLF_PERCENTILES:
             if is_high:
-                p = 100-p
+                p = 100 - p
             cuts += [np.percentile(self.values, p)]
         return cuts
 
@@ -106,7 +105,7 @@ class ClfTasks(object):
         pcuts = self.percentiles()
         res = OrderedDict()
         for i, cut in enumerate(ecuts):
-            k = "clf_ex{0}".format(i+1)
+            k = "clf_ex{0}".format(i + 1)
             v = self._binarize(cut)
             if self._has_enough_min_class(v):
                 res[k] = v
@@ -119,7 +118,6 @@ class ClfTasks(object):
 
 
 class SingleTasks(object):
-
     def __init__(self, path):
         self.path = path
         os.makedirs(os.path.join(self.path, CLF_SUBFOLDER), exist_ok=True)
@@ -145,10 +143,10 @@ class SingleTasks(object):
         else:
             params = self._get_params()
             reg = RegTasks(df, params).as_dict()
-            for k,v in reg.items():
+            for k, v in reg.items():
                 df[k] = v
             clf = ClfTasks(df, params).as_dict()
-            for k,v in clf.items():
+            for k, v in clf.items():
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)

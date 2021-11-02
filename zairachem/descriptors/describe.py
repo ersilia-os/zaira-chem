@@ -9,7 +9,6 @@ from .. import ZairaBase
 
 
 class Describer(ZairaBase):
-
     def __init__(self, path):
         ZairaBase.__init__(self)
         if path is None:

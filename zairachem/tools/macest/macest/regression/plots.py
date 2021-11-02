@@ -64,7 +64,8 @@ def plot_pred_with_conf(
     plt.figure(figsize=(12, 6))
     sns.histplot(pred_dist.T, stat="probability", label="p(y|x)")
     lower, upper, = conf_model.predict_interval(
-        x_star, conf_level=np.array(confidence_level),
+        x_star,
+        conf_level=np.array(confidence_level),
     ).T
 
     plt.axvline(lower, linestyle="--", color="b")
@@ -341,7 +342,10 @@ def _make_prediction_intervals(
     lower_bounds = {}
     upper_bounds = {}
     for percentile in [95, 90, 70]:
-        lower, upper = conf_model.predict_interval(x_star, conf_level=np.array(percentile),).T
+        lower, upper = conf_model.predict_interval(
+            x_star,
+            conf_level=np.array(percentile),
+        ).T
         lower_bounds[percentile] = lower.flatten()
         upper_bounds[percentile] = upper.flatten()
 
@@ -373,7 +377,10 @@ def _sort_predictions(
     :return:
     """
     if sort_by == "predictions":
-        sorted_preds, sorted_y, = zip(*sorted(zip(point_preds, y_true)))
+        (
+            sorted_preds,
+            sorted_y,
+        ) = zip(*sorted(zip(point_preds, y_true)))
 
         sorted_preds, sorted_upper_95 = zip(
             *sorted(zip(point_preds, intervals.upper_95))
