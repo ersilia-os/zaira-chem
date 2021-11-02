@@ -9,7 +9,7 @@ def describe_cmd():
     @zairachem_cli.command(help="Calculate descriptors and normalize them")
     @click.option("--dir", "-d", default=None, type=click.STRING)
     def describe(dir):
-        echo("Calculating descriptors".format(dir))
+        echo("Calculating descriptors")
         desc = Describer(path=dir)
         desc.run()
         echo("Done", fg="green")
