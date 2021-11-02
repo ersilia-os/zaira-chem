@@ -5,3 +5,6 @@ rdkit-pypi
 pandas
 sklearn
 flaml
+dask
+tqdm
+faiss-cpu
