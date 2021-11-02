@@ -10,7 +10,6 @@ from ..vars import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
 
 
 class RawDescriptors(ZairaBase):
-
     def __init__(self):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()
@@ -33,6 +32,11 @@ class RawDescriptors(ZairaBase):
 
     def run(self):
         for eos_id in self.eos_ids():
-            if eos_id != "morgan-counts": continue
+            if eos_id != "morgan-counts":
+                continue
             output_h5 = self.output_h5_filename(eos_id)
-            run_command("ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}".format(eos_id, self.input_csv, output_h5))
+            run_command(
+                "ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}".format(
+                    eos_id, self.input_csv, output_h5
+                )
+            )

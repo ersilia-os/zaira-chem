@@ -10,7 +10,6 @@ N_NEIGHBORS = 5
 
 
 class Similarity(object):
-
     def __init__(self):
         self.n_neighbors = N_NEIGHBORS
         self.index = None
@@ -23,9 +22,9 @@ class Similarity(object):
         m_norm = np.linalg.norm(V, axis=1)
         index.add(V / m_norm[:, None])
         self.index = index
-        D, I = index.search(V / m_norm[:, None], self.n_neighbors+1)
-        D = D[:,1:]
-        I = I[:,1:]
+        D, I = index.search(V / m_norm[:, None], self.n_neighbors + 1)
+        D = D[:, 1:]
+        I = I[:, 1:]
         return D
 
     def kneighbors(self, file_name):

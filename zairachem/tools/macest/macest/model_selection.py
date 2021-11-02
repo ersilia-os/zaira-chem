@@ -9,32 +9,35 @@ import numpy as np
 class KFoldConfidenceSplit:
     """Equivalent api to sklearn.model_selection.KFold for Confidence calibration splits."""
 
-    def __init__(self,
-                 n_splits: int = 10,
-                 shuffle: bool = True,
-                 random_state: Optional[int] = None,
-                 pp_train_graph_cal_split: Sequence[float] = (0.5, 0.3, 0.2),
-                 ):
+    def __init__(
+        self,
+        n_splits: int = 10,
+        shuffle: bool = True,
+        random_state: Optional[int] = None,
+        pp_train_graph_cal_split: Sequence[float] = (0.5, 0.3, 0.2),
+    ):
         """
-        The constructor for KFoldConfidenceSplit. 
+        The constructor for KFoldConfidenceSplit.
 
-        :param n_splits: Number of folds, Must be at least 2 
+        :param n_splits: Number of folds, Must be at least 2
         :param shuffle: Whether to shuffle the data before splitting into batches
         :param random_state: If int, random_state is the seed used by the random number generator
-        :param pp_train_graph_cal_split: The fraction of training data to be used when splitting 
-            between the data used to train the point prediction model, the data to build the hnsw 
+        :param pp_train_graph_cal_split: The fraction of training data to be used when splitting
+            between the data used to train the point prediction model, the data to build the hnsw
             graph and the MACEst model calibration parameters
         """  # noqa
         self.n_splits = n_splits
         if self.n_splits < 2:
-            raise ValueError('number of splits must be at least 2')
+            raise ValueError("number of splits must be at least 2")
         self.shuffle = shuffle
         self.random_state = random_state
         self.pp_train_graph_cal_split = pp_train_graph_cal_split
         if abs(np.array(self.pp_train_graph_cal_split).sum() - 1.0) > 10 ** -6:
             raise ValueError("split of training data must sum to 1")
 
-    def split(self, data: np.ndarray) -> Iterator[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+    def split(
+        self, data: np.ndarray
+    ) -> Iterator[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
         """
         Split the data into 4 distinct sets for k folds.
 
@@ -47,8 +50,7 @@ class KFoldConfidenceSplit:
         :param data: Training data, where n_samples is the number of samples
             and n_features is the number of features.
         """
-        test_bound = int(1 / self.n_splits * data.shape[
-            0])
+        test_bound = int(1 / self.n_splits * data.shape[0])
 
         non_test_data = 1 - (1.0 / self.n_splits)
 

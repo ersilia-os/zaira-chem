@@ -212,8 +212,7 @@ def plot_quantile_spaced_calibration_curve(
         color="r",
         label="overconfident",
     )
-    plt.xticks(100 * lin_ticks,
-               labels=np.round(100 * av_conf, 2))
+    plt.xticks(100 * lin_ticks, labels=np.round(100 * av_conf, 2))
 
     plt.legend()
     if save:

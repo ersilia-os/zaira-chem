@@ -39,15 +39,15 @@ class MergedBinData(NamedTuple):
 
 
 def histogram_max_conf_pred(
-        targets: Union[Sequence[int], np.ndarray],
-        predictions: Union[Sequence[int], np.ndarray],
-        point_prediction_conf: Union[Sequence[int], np.ndarray],
-        class_conf: Optional[Union[Sequence[float], np.ndarray]] = None,
-        n_bins: int = 10,
-        min_bin_size: int = 10,
-        merge_bins_below_threshold: bool = True,
-        bin_method: Literal["quantile", "uniform"] = "quantile",
-        check_conflicting_preds: bool = False,
+    targets: Union[Sequence[int], np.ndarray],
+    predictions: Union[Sequence[int], np.ndarray],
+    point_prediction_conf: Union[Sequence[int], np.ndarray],
+    class_conf: Optional[Union[Sequence[float], np.ndarray]] = None,
+    n_bins: int = 10,
+    min_bin_size: int = 10,
+    merge_bins_below_threshold: bool = True,
+    bin_method: Literal["quantile", "uniform"] = "quantile",
+    check_conflicting_preds: bool = False,
 ) -> HistogramPredsOutput:
     """
     Take a set of confidence estimates and groups them into bins of similar confidence, then
@@ -113,14 +113,16 @@ def histogram_max_conf_pred(
     frac_correct = bin_num_correct[bins_to_keep] / bin_count
     av_conf = bin_conf_sum[bins_to_keep] / bin_count
 
-    return HistogramPredsOutput(bins, frac_correct, bin_count, av_conf, conflicting_predictions)
+    return HistogramPredsOutput(
+        bins, frac_correct, bin_count, av_conf, conflicting_predictions
+    )
 
 
 def _merge_low_count_bins(
-        bin_count: np.ndarray,
-        bin_confidence_sum: np.ndarray,
-        bin_num_correct: np.ndarray,
-        min_bin_size: int,
+    bin_count: np.ndarray,
+    bin_confidence_sum: np.ndarray,
+    bin_num_correct: np.ndarray,
+    min_bin_size: int,
 ) -> MergedBinData:
     """
     Merge the bin with the bin to the right, If the number of elements in a bin is below a certain threshold, \
@@ -139,7 +141,7 @@ def _merge_low_count_bins(
         if bin_count[idx] < min_bin_size:
             bin_count[idx + 1] = bin_count[idx] + bin_count[idx + 1]
             bin_confidence_sum[idx + 1] = (
-                    bin_confidence_sum[idx] + bin_confidence_sum[idx + 1]
+                bin_confidence_sum[idx] + bin_confidence_sum[idx + 1]
             )
             bin_num_correct[idx + 1] = bin_num_correct[idx] + bin_num_correct[idx + 1]
             bin_count[idx] = -1
@@ -160,10 +162,10 @@ def _merge_low_count_bins(
 
 
 def calculate_brier_decomposition(
-        confidence_scores: np.ndarray,
-        point_preds: np.ndarray,
-        targets: np.ndarray,
-        min_bin_size: int = 1,
+    confidence_scores: np.ndarray,
+    point_preds: np.ndarray,
+    targets: np.ndarray,
+    min_bin_size: int = 1,
 ) -> BrierDecomposition:
     """
     Calculate the three-part decomposition of the brier score, this allows one to identify different important \
@@ -199,19 +201,21 @@ def calculate_brier_decomposition(
     av_conf = bin_conf_sum[bins_to_keep] / bin_count
 
     calibration = (
-                      (((frac_correct - av_conf) ** 2) * bin_count).sum()
-                  ) / bin_count.sum()
+        (((frac_correct - av_conf) ** 2) * bin_count).sum()
+    ) / bin_count.sum()
     uncertainty = prediction_is_correct.mean() * (1 - prediction_is_correct.mean())
 
     resolution = (
-                     ((frac_correct - prediction_is_correct.mean()) ** 2 * bin_count).sum()
-                 ) / bin_count.sum()
+        ((frac_correct - prediction_is_correct.mean()) ** 2 * bin_count).sum()
+    ) / bin_count.sum()
 
     return BrierDecomposition(calibration, resolution, uncertainty)
 
 
-def check_for_conflicting_preds(class_conf: Union[Sequence[int], np.ndarray],
-                                predictions: Union[Sequence[int], np.ndarray]) -> np.ndarray:
+def check_for_conflicting_preds(
+    class_conf: Union[Sequence[int], np.ndarray],
+    predictions: Union[Sequence[int], np.ndarray],
+) -> np.ndarray:
     """
     Check when MACEst max confidence prediction is different to the point prediction.
 

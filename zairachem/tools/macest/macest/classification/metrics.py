@@ -9,15 +9,15 @@ from typing import Callable, Sequence, Union
 import numpy as np
 
 CalibFuncType = Callable[
-        [
-            Union[Sequence[int], np.ndarray],
-            Union[Sequence[int], np.ndarray],
-            np.ndarray,
-            int,
-            int,
-        ],
+    [
+        Union[Sequence[int], np.ndarray],
+        Union[Sequence[int], np.ndarray],
         np.ndarray,
-    ]
+        int,
+        int,
+    ],
+    np.ndarray,
+]
 
 
 def average_calibration_error(
@@ -233,7 +233,8 @@ def simulate_from_calibrated_model(
         calibrated_true = np.ones(len(calibrated_predictions))
 
         calibrated_scores[i] = calibration_function(
-            calibrated_true, calibrated_predictions, probs, 10, 1)
+            calibrated_true, calibrated_predictions, probs, 10, 1
+        )
 
     return calibrated_scores
 

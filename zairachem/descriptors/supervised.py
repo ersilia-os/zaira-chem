@@ -1,7 +1,4 @@
-
-
 class RfeCv(object):
-
     def __init__(self):
         pass
 
@@ -13,7 +10,6 @@ class RfeCv(object):
 
 
 class LolliPop(object):
-
     def __init__(self):
         pass
 

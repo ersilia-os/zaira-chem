@@ -13,11 +13,11 @@ log = logging.getLogger()
 
 
 def predictions_in_range(
-        test_true_val: np.ndarray,
-        x_star: np.ndarray,
-        interval_model: ModelWithPredictionInterval,
-        conf_level: Union[np.ndarray, int, float] = 90,
-        verbose: bool = False,
+    test_true_val: np.ndarray,
+    x_star: np.ndarray,
+    interval_model: ModelWithPredictionInterval,
+    conf_level: Union[np.ndarray, int, float] = 90,
+    verbose: bool = False,
 ) -> float:
     """
     Test the predicted intervals against the known test values to estimate the interval calibration.
@@ -35,17 +35,22 @@ def predictions_in_range(
     ).T
     lower = lower.flatten()
     upper = upper.flatten()
-    in_range = (100 * len(np.where(np.logical_and(test_true_val >= lower, test_true_val <= upper))[0])
-                / len(test_true_val))
+    in_range = (
+        100
+        * len(
+            np.where(np.logical_and(test_true_val >= lower, test_true_val <= upper))[0]
+        )
+        / len(test_true_val)
+    )
     if verbose:
         log.info(f"percentage of values inside of interval {in_range:.0f}%")
     return in_range
 
 
 def mean_prediction_interval_width(
-        interval_model: ModelWithPredictionInterval,
-        x_test: np.ndarray,
-        conf_level: Union[np.ndarray, int, float] = 90,
+    interval_model: ModelWithPredictionInterval,
+    x_test: np.ndarray,
+    conf_level: Union[np.ndarray, int, float] = 90,
 ) -> np.ndarray:
     """
     Calculate the mean prediction interval width (mean_prediction_interval_width), \
@@ -62,10 +67,10 @@ def mean_prediction_interval_width(
 
 
 def prediction_interval_coverage_probability(
-        interval_model: ModelWithPredictionInterval,
-        x_star: np.ndarray,
-        y_true: np.ndarray,
-        conf_level: Union[np.ndarray, int, float] = 90,
+    interval_model: ModelWithPredictionInterval,
+    x_star: np.ndarray,
+    y_true: np.ndarray,
+    conf_level: Union[np.ndarray, int, float] = 90,
 ) -> float:
     """
      Calculate the prediction interval coverage probability (prediction_interval_coverage_probability) \
@@ -79,4 +84,10 @@ def prediction_interval_coverage_probability(
     :return: Prediction interval coverage probability for x_star
     """
     intervals = interval_model.predict_interval(x_star, conf_level=conf_level).T
-    return 100 * len(np.where(np.logical_and(y_true >= intervals[0], y_true <= intervals[1]))[0]) / len(y_true)
+    return (
+        100
+        * len(
+            np.where(np.logical_and(y_true >= intervals[0], y_true <= intervals[1]))[0]
+        )
+        / len(y_true)
+    )
