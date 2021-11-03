@@ -1,5 +1,7 @@
 # Manually added
 *.DS_Store
+naturals
+AfricanNaturalProducts*
 output
 development.py
 
