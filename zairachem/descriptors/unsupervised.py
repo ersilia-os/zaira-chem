@@ -1,6 +1,7 @@
 import joblib
 import numpy as np
 from sklearn.preprocessing import RobustScaler
+from sklearn.decomposition import PCA
 from umap import UMAP
 
 
@@ -103,11 +104,12 @@ class Pca(object):
     def __init__(self):
         pass
 
-    def fit(self):
-        pass
+    def fit(self, X):
+        self.pca = PCA(n_components=0.9)
+        self.pca.fit(X)
 
-    def transform(self):
-        pass
+    def transform(self, X):
+        return self.pca.transform(X)
 
     def save(self, file_name):
         joblib.dump(self)
