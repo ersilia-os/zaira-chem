@@ -1,20 +1,27 @@
 import joblib
+import os
+import json
 import numpy as np
 from sklearn.preprocessing import RobustScaler
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.decomposition import PCA
 from umap import UMAP
 
+from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
+from .. import ZairaBase
+from ..utils.matrices import Hdf5
 
 MAX_NA = 0.2
 
+
 class NanFilter(object):
     def __init__(self):
-        pass
+        self._name = "nan_filter"
 
     def fit(self, X):
         max_na = int((1-MAX_NA)*X.shape[0])
         idxs = []
-        for j in X.shape[1]:
+        for j in range(X.shape[1]):
             c = np.sum(np.isnan(X[:, j]))
             if c > max_na:
                 continue
@@ -26,7 +33,7 @@ class NanFilter(object):
         return X[:, self.col_idxs]
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
@@ -34,6 +41,7 @@ class NanFilter(object):
 
 class Scaler(object):
     def __init__(self):
+        self._name = "scaler"
         self.abs_limit = 10
 
     def fit(self, X):
@@ -46,7 +54,7 @@ class Scaler(object):
         return X
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
@@ -55,6 +63,7 @@ class Scaler(object):
 class Imputer(object):
 
     def __init__(self):
+        self._name = "imputer"
         self._fallback = 0
 
     def fit(self, X):
@@ -77,7 +86,7 @@ class Imputer(object):
         return X
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
@@ -85,16 +94,17 @@ class Imputer(object):
 
 class VarianceFilter(object):
     def __init__(self):
-        pass
+        self._name = "variance_filter"
 
-    def fit(self):
-        pass
+    def fit(self, X):
+        self.sel = VarianceThreshold()
+        self.sel.fit(X)
 
-    def transform(self):
-        pass
+    def transform(self, X):
+        return self.sel.transform(X)
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
@@ -102,7 +112,7 @@ class VarianceFilter(object):
 
 class Pca(object):
     def __init__(self):
-        pass
+        self._name = "pca"
 
     def fit(self, X):
         self.pca = PCA(n_components=0.9)
@@ -112,7 +122,7 @@ class Pca(object):
         return self.pca.transform(X)
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
@@ -120,7 +130,7 @@ class Pca(object):
 
 class OptSne(object):
     def __init__(self):
-        pass
+        self._name = "opt_tsne"
 
     def fit(self):
         pass
@@ -131,7 +141,7 @@ class OptSne(object):
 
 class UnsupervisedUmap(object):
     def __init__(self):
-        pass
+        self._name = "unsupervised_umap"
 
     def fit(self, X):
         self.reducer = UMAP(densmap=False)
@@ -141,12 +151,53 @@ class UnsupervisedUmap(object):
         return self.reducer.transform(X)
 
     def save(self, file_name):
-        joblib.dump(self)
+        joblib.dump(self, file_name)
 
     def load(self, file_name):
         return joblib.load(file_name)
 
 
-class UnsupervisedTransformations(object):
+
+class IndividualUnsupervisedTransformations(ZairaBase):
+
     def __init__(self):
+        ZairaBase.__init__(self)
+        self.path = self.get_output_dir()
+        self.pipeline = [
+            NanFilter(),
+            Imputer(),
+            VarianceFilter(),
+            Scaler(),
+        ]
+        self._name = "individual_unsupervised.h5"
+
+    def done_eos_iter(self):
+        with open(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r") as f:
+            data = json.load(f)
+        for eos_id in data:
+            yield eos_id
+
+    def run(self):
+        rl = RawLoader()
+        for eos_id in self.done_eos_iter():
+            path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id)
+            data = rl.open(eos_id)
+            data = data.load()
+            X = data.values()
+            for algo in self.pipeline:
+                algo.fit(X)
+                X = algo.transform(X)
+                algo.save(os.path.join(path, algo._name+".joblib"))
+            file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name)
+            data._values = X
+            Hdf5(file_name).save(data)
+
+
+class StackedUnsupervisedTransformations(ZairaBase):
+
+    def __init__(self):
+        ZairaBase.__init__(self)
+        self.path = self.get_output_dir()
+
+    def run(self):
         pass
