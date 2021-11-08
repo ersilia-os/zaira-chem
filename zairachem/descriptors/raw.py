@@ -4,9 +4,21 @@ import csv
 
 from .. import ZairaBase
 from ..utils.terminal import run_command
+from ..utils.matrices import Hdf5
 
 from ..setup import PARAMETERS_FILE, COMPOUNDS_FILENAME
 from ..vars import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
+
+
+class RawLoader(ZairaBase):
+
+    def __init__(self):
+        ZairaBase.__init__(self)
+        self.path = self.get_output_dir()
+
+    def open(self, eos_id):
+        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, "raw.h5")
+        return Hdf5(path)
 
 
 class RawDescriptors(ZairaBase):
@@ -31,6 +43,7 @@ class RawDescriptors(ZairaBase):
         return os.path.join(path, "raw.h5")
 
     def run(self):
+        done_eos = []
         for eos_id in self.eos_ids():
             if eos_id != "morgan-counts":
                 continue
@@ -40,3 +53,6 @@ class RawDescriptors(ZairaBase):
                     eos_id, self.input_csv, output_h5
                 )
             )
+            done_eos += [eos_id]
+        with open(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w") as f:
+            json.dump(done_eos, f, indent=4)

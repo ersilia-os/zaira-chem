@@ -80,3 +80,10 @@ class Hdf5(object):
         data = Data()
         data.set(keys=self.keys(), inputs=self.inputs(), values=self.values(), features=self.features())
         return data
+
+    def save(self, data):
+        with h5py.File(self.file_name, "w") as f:
+            f.create_dataset("Values", data=data.values())
+            f.create_dataset("Keys", data=data.keys())
+            f.create_dataset("Inputs", data=data.inputs())
+            f.create_dataset("Features", data=data.features())

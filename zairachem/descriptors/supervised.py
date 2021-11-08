@@ -1,6 +1,6 @@
 from lol import LOL
 from umap import UMAP
-
+import joblib
 
 
 class RfeCv(object):
@@ -16,7 +16,7 @@ class RfeCv(object):
 
 class LolliPop(object):
     def __init__(self):
-        pass
+        self._name = "lollipop"
 
     def fit(self, X, y):
         n_components = min(1024, X.shape[0])
@@ -26,11 +26,17 @@ class LolliPop(object):
     def transform(self, X):
         return self.lmao.transform(X)
 
+    def save(self, file_name):
+        joblib.dump(self, file_name)
+
+    def load(self, file_name):
+        return joblib.load(file_name)
+
 
 class SupervisedUmap(object):
 
     def __init__(self):
-        pass
+        self._name = "supervised_umap"
 
     def fit(self, X, y):
         self.reducer = UMAP(densmap=False)
@@ -48,4 +54,7 @@ class SupervisedUmap(object):
 
 class SupervisedTransformations(object):
     def __init__(self):
+        pass
+
+    def run(self):
         pass
