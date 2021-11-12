@@ -6,9 +6,11 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-from rdkit import RDLogger
-
-RDLogger.DisableLog("rdApp.*")
+try:
+    from rdkit import RDLogger
+    RDLogger.DisableLog("rdApp.*")
+except:
+    pass
 
 # Internal imports
 from .utils.logging import logger

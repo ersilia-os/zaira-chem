@@ -17,7 +17,7 @@ class FlamlClassifier(object):
             "metric": self.metric,
             "task": self.task,
             "log_file_name": "automl.log",
-            "verbose": 3,
+            "verbose": 1,
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
