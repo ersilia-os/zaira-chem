@@ -10,7 +10,7 @@ from .files import ParametersFile
 from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER
 from ..vars import CLF_PERCENTILES, MIN_CLASS
 
-# TODO MULTITASKS
+# TODO Multitask
 
 
 class RegTasks(object):
@@ -150,3 +150,12 @@ class SingleTasks(object):
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)
+
+
+
+class AuxiliaryBinaryTask(object):
+
+    def __init__(self, path):
+        self.path = path
+
+    def 

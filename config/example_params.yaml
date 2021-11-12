@@ -1,0 +1,28 @@
+---
+# This is an example configuration for the Zaira Chem module
+# The example assumes a
+outcomes:
+  assay_id: AID0
+    credibility_range:
+      min: 10
+      max: 10
+    thresholds:
+      expert_1:
+      expert_2:
+      expert_3:
+      expert_4:
+      expert_5:
+    direction: high
+  assay_id: AID2
+ersilia_hub:
+- avalon
+- morgan-counts
+- cc-signaturizer
+- chembl-multitask-descriptor
+- continuous-data-driven
+- grover-embedding
+- molbert
+- mordred
+- rdkit-descriptors
+- rdkit-fingerprint
+- whales-descriptor
