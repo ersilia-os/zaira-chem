@@ -44,7 +44,7 @@ class RawDescriptors(ZairaBase):
     def run(self):
         done_eos = []
         for eos_id in self.eos_ids():
-            if eos_id != "morgan-counts":
+            if eos_id != "morgan-counts" and eos_id != "molbert":
                 continue
             output_h5 = self.output_h5_filename(eos_id)
             run_command(
