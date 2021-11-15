@@ -11,7 +11,6 @@ from ..vars import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
 
 
 class RawLoader(ZairaBase):
-
     def __init__(self):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()
@@ -54,5 +53,7 @@ class RawDescriptors(ZairaBase):
                 )
             )
             done_eos += [eos_id]
-        with open(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w") as f:
+        with open(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w"
+        ) as f:
             json.dump(done_eos, f, indent=4)

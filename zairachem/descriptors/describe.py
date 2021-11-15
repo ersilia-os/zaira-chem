@@ -2,7 +2,10 @@ import os
 import pandas as pd
 
 from .raw import RawDescriptors
-from .unsupervised import IndividualUnsupervisedTransformations, StackedUnsupervisedTransformations
+from .unsupervised import (
+    IndividualUnsupervisedTransformations,
+    StackedUnsupervisedTransformations,
+)
 from .supervised import SupervisedTransformations
 
 from ..setup import COMPOUNDS_FILENAME
@@ -24,7 +27,7 @@ class Describer(ZairaBase):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, COMPOUNDS_FILENAME))
 
     def _raw_descriptions(self):
-        #RawDescriptors().run()
+        # RawDescriptors().run()
         IndividualUnsupervisedTransformations().run()
         StackedUnsupervisedTransformations().run()
         SupervisedTransformations().run()

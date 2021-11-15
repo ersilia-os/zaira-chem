@@ -45,7 +45,6 @@ class FaissSimilarity(object):
 
 
 class NearestSimilarity(object):
-
     def __init__(self):
         self.n_neighbors = N_NEIGHBORS + 1
         self.metric = "cosine"
@@ -55,19 +54,19 @@ class NearestSimilarity(object):
         self.nn = NearestNeighbors(n_neighbors=self.n_neighbors, metric=self.metric)
         self.nn.fit(X)
         D, _ = self.nn.kneighbors(X, return_distance=True)
-        D = D[:,1:]
+        D = D[:, 1:]
         self.background = np.sum(D, axis=1)
         print(len(self.background))
 
     def pvalue(self, X):
         D, _ = self.nn.kneighbors(X, return_distance=True)
-        D = D[:,:-1]
+        D = D[:, :-1]
         dists = np.sum(D, axis=1)
         n = len(self.background)
         pvalues = []
         for d in dists:
             b = np.sum(self.background >= d)
-            pvalues += [b/n]
+            pvalues += [b / n]
         return len(pvalues)
 
     def save(self, file_name):

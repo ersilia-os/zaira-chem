@@ -4,7 +4,6 @@ import numpy as np
 
 
 class SmilesTextRegressor(object):
-
     def __init__(self):
         self.mdl = ak.TextRegressor(overwrite=True, max_trials=10)
 

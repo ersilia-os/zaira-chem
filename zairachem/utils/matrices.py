@@ -5,7 +5,6 @@ SNIFF_N = 100000
 
 
 class Data(object):
-
     def __init__(self):
         pass
 
@@ -62,7 +61,7 @@ class Hdf5(object):
     def is_sparse(self):
         V = self._sniff_ravel()
         n_zeroes = np.sum(V == 0)
-        if n_zeroes/len(V) > 0.5:
+        if n_zeroes / len(V) > 0.5:
             return True
         return False
 
@@ -78,7 +77,12 @@ class Hdf5(object):
 
     def load(self):
         data = Data()
-        data.set(keys=self.keys(), inputs=self.inputs(), values=self.values(), features=self.features())
+        data.set(
+            keys=self.keys(),
+            inputs=self.inputs(),
+            values=self.values(),
+            features=self.features(),
+        )
         return data
 
     def save(self, data):

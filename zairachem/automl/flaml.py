@@ -6,7 +6,6 @@ DEFAULT_TIME_BUDGET_MIN = 1
 
 
 class FlamlClassifier(object):
-
     def __init__(self, metric="auto"):
         self.task = "classification"
         self.metric = metric
@@ -54,7 +53,6 @@ class FlamlClassifier(object):
 
 
 class FlamlRegressor(object):
-
     def __init__(self):
         self.task = "regression"
 
