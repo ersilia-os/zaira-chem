@@ -45,7 +45,7 @@ class Data(object):
             "keys": len(self._keys),
             "inputs": len(self._inputs),
             "features": len(self._features),
-            "values": np.array(self._values).shape
+            "values": np.array(self._values).shape,
         }
         with open(file_name, "w") as f:
             json.dump(info, f, indent=4)

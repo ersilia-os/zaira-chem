@@ -37,8 +37,6 @@ class Describer(ZairaBase):
         SupervisedTransformations().run()
 
     def run(self):
-        #self._raw_descriptions()
-        #self._unsupervised()
+        self._raw_descriptions()
+        self._unsupervised()
         self._supervised()
-        df = self.load_inputs()
-        pass

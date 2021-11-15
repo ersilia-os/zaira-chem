@@ -11,10 +11,11 @@ from ..utils.matrices import Hdf5, Data
 
 from .raw import DESCRIPTORS_SUBFOLDER
 from .unsupervised import GLOBAL_UNSUPERVISED_FILE_NAME
-from ..setup import AUXILIARY_TASK_COLUMN, TASKS_FILENAME
-from ..vars import DATA_SUBFOLDER
+from ..setup import AUXILIARY_TASK_COLUMN
+from ..vars import DATA_SUBFOLDER, DATA_FILENAME
 
-GLOBAL_SUPERVISED_FILE_NAME = "global_supervised.h5"
+from . import GLOBAL_SUPERVISED_FILE_NAME
+
 MAX_COMPONENTS = 512
 MAX_COMPONENTS_LOLLIPOP_FACTOR = 0.8
 
@@ -35,7 +36,13 @@ class LolliPop(object):
         self._name = "lollipop"
 
     def fit(self, X, y):
-        n_components = np.min([MAX_COMPONENTS, X.shape[0], int(X.shape[1]*MAX_COMPONENTS_LOLLIPOP_FACTOR)])
+        n_components = np.min(
+            [
+                MAX_COMPONENTS,
+                X.shape[0],
+                int(X.shape[1] * MAX_COMPONENTS_LOLLIPOP_FACTOR),
+            ]
+        )
         self.lmao = LOL(n_components=n_components, svd_solver="full")
         self.lmao.fit(X, y)
         X = self.lmao.transform(X)
@@ -75,21 +82,30 @@ class SupervisedUmap(object):
 class SupervisedTransformations(DescriptorBase):
     def __init__(self):
         DescriptorBase.__init__(self)
-        self.pipeline = None # TODO
+        self.pipeline = None  # TODO
 
     def load_y(self):
-        file_name = os.path.join(self.path, DATA_SUBFOLDER, TASKS_FILENAME)
+        file_name = os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME)
         return np.array(pd.read_csv(file_name)[AUXILIARY_TASK_COLUMN])
 
     def run(self):
-        data = Hdf5(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME)).load()
+        data = Hdf5(
+            os.path.join(
+                self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
+            )
+        ).load()
         X = data.values()
         y = self.load_y()
         algo = LolliPop()
         algo.fit(X, y)
-        algo.save(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name+".joblib"))
+        algo.save(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name + ".joblib")
+        )
         X = algo.transform(X)
-        data = Data().set(inputs=data.inputs(), keys=data.keys(), values=X, features=None)
-        file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_SUPERVISED_FILE_NAME)
-        Hdf5(file_name).save(data)
-        data.save_info(file_name.split(".")[0]+".json")
+        data_ = Data()
+        data_.set(inputs=data.inputs(), keys=data.keys(), values=X, features=None)
+        file_name = os.path.join(
+            self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_SUPERVISED_FILE_NAME
+        )
+        Hdf5(file_name).save(data_)
+        data_.save_info(file_name.split(".")[0] + ".json")

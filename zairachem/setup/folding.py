@@ -97,6 +97,31 @@ class DateFolding(object):
         pass
 
 
+class AuxiliaryFolding(object):
+    def __init__(self, df):
+        self.df = df.copy()
+
+    @staticmethod
+    def split(a, n):
+        k, m = divmod(len(a), n)
+        return (a[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n))
+
+    def get_folds(self):
+        # TODO: Use time or pseudo-time (e.g. based on PCA)
+        N = self.df.shape[0]
+        self.df["index"] = [i for i in range(self.df.shape[0])]
+        self.df = self.df.sort_values(["fld_scf", "fld_lsh", "fld_rnd"]).reset_index(
+            drop=True
+        )
+        chunks = list(self.split(range(N), N_FOLDS))
+        indices = list(self.df["index"])
+        folds = [0] * N
+        for j, c in enumerate(chunks):
+            for i in c:
+                folds[indices[i]] = j
+        return folds
+
+
 # TODO: check minimum number of folds
 class Folds(object):
     def __init__(self, path):
@@ -105,9 +130,10 @@ class Folds(object):
 
     def run(self):
         data = {
-            "random": RandomFolding(self.path).get_folds(),
-            "scaffold": ScaffoldFolding(self.path).get_folds(),
-            "lsh": LshFolding(self.path).get_folds(),
+            "fld_rnd": RandomFolding(self.path).get_folds(),
+            "fld_scf": ScaffoldFolding(self.path).get_folds(),
+            "fld_lsh": LshFolding(self.path).get_folds(),
         }
         df = pd.DataFrame(data)
+        df["fld_aux"] = AuxiliaryFolding(df).get_folds()
         df.to_csv(self.file_name, index=False)

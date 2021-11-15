@@ -5,6 +5,8 @@ VALUES_FILENAME = "values.csv"
 ASSAYS_FILENAME = "assays.csv"
 PARAMETERS_FILE = "parameters.json"
 
+SCHEMA_MERGE_FILENAME = "data_schema.json"
+
 TASKS_FILENAME = "tasks.csv"
 FOLDS_FILENAME = "folds.csv"
 

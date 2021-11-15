@@ -4,7 +4,13 @@ import pandas as pd
 from collections import OrderedDict
 from scipy.stats import rankdata
 
-from . import VALUES_FILENAME, VALUES_COLUMN, QUALIFIER_COLUMN, TASKS_FILENAME, AUXILIARY_TASK_COLUMN
+from . import (
+    VALUES_FILENAME,
+    VALUES_COLUMN,
+    QUALIFIER_COLUMN,
+    TASKS_FILENAME,
+    AUXILIARY_TASK_COLUMN,
+)
 from .files import ParametersFile
 
 from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER

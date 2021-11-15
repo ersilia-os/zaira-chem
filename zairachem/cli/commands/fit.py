@@ -3,7 +3,7 @@ import click
 from . import zairachem_cli
 from ..echo import echo
 
-from ...fit.fit import Fit
+from ...fit.fit import Fitter
 
 
 def fit_cmd():
@@ -11,6 +11,6 @@ def fit_cmd():
     @click.option("--dir", "-d", type=click.STRING)
     def fit(dir):
         echo("Fitting from {0}".format(dir))
-        ft = Fit(dir)
-        ft.fit()
+        ft = Fitter(path=dir)
+        ft.run()
         echo("Done", fg="green")
