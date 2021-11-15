@@ -20,7 +20,7 @@ class LolliPop(object):
 
     def fit(self, X, y):
         n_components = min(1024, X.shape[0])
-        self.lmao = LOL(n_components=n_components, svd_solver='full')
+        self.lmao = LOL(n_components=n_components, svd_solver="full")
         self.lmao.fit(X, y)
 
     def transform(self, X):
@@ -34,7 +34,6 @@ class LolliPop(object):
 
 
 class SupervisedUmap(object):
-
     def __init__(self):
         self._name = "supervised_umap"
 

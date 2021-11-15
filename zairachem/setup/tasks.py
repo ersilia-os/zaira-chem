@@ -10,8 +10,6 @@ from .files import ParametersFile
 from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER
 from ..vars import CLF_PERCENTILES, MIN_CLASS
 
-# TODO Multitask
-
 
 class RegTasks(object):
     def __init__(self, data, params):
@@ -117,6 +115,17 @@ class ClfTasks(object):
         return res
 
 
+class AuxiliaryBinaryTask(object):
+
+    def __init__(self, data):
+        self.df = data
+        self.reference = "clf_p10"
+
+    def get(self):
+        # TODO: Work with multitask
+        return df[self.reference]
+
+
 class SingleTasks(object):
     def __init__(self, path):
         self.path = path
@@ -149,13 +158,6 @@ class SingleTasks(object):
             for k, v in clf.items():
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
+        auxiliary = AuxiliaryBinaryTask(df)
+        df["clf_aux"] = auxiliary.get()
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)
-
-
-
-class AuxiliaryBinaryTask(object):
-
-    def __init__(self, path):
-        self.path = path
-
-    def 

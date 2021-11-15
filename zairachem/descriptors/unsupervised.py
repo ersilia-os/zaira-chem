@@ -19,7 +19,7 @@ class NanFilter(object):
         self._name = "nan_filter"
 
     def fit(self, X):
-        max_na = int((1-MAX_NA)*X.shape[0])
+        max_na = int((1 - MAX_NA) * X.shape[0])
         idxs = []
         for j in range(X.shape[1]):
             c = np.sum(np.isnan(X[:, j]))
@@ -61,7 +61,6 @@ class Scaler(object):
 
 
 class Imputer(object):
-
     def __init__(self):
         self._name = "imputer"
         self._fallback = 0
@@ -157,9 +156,7 @@ class UnsupervisedUmap(object):
         return joblib.load(file_name)
 
 
-
 class IndividualUnsupervisedTransformations(ZairaBase):
-
     def __init__(self):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()
@@ -172,7 +169,9 @@ class IndividualUnsupervisedTransformations(ZairaBase):
         self._name = "individual_unsupervised.h5"
 
     def done_eos_iter(self):
-        with open(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r") as f:
+        with open(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r"
+        ) as f:
             data = json.load(f)
         for eos_id in data:
             yield eos_id
@@ -187,14 +186,15 @@ class IndividualUnsupervisedTransformations(ZairaBase):
             for algo in self.pipeline:
                 algo.fit(X)
                 X = algo.transform(X)
-                algo.save(os.path.join(path, algo._name+".joblib"))
-            file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name)
+                algo.save(os.path.join(path, algo._name + ".joblib"))
+            file_name = os.path.join(
+                self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name
+            )
             data._values = X
             Hdf5(file_name).save(data)
 
 
 class StackedUnsupervisedTransformations(ZairaBase):
-
     def __init__(self):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()

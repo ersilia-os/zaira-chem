@@ -8,6 +8,7 @@ warnings.filterwarnings("ignore")
 
 try:
     from rdkit import RDLogger
+
     RDLogger.DisableLog("rdApp.*")
 except:
     pass
