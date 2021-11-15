@@ -1,5 +1,7 @@
 import joblib
 import h5py
+import json
+import numpy as np
 
 SNIFF_N = 100000
 
@@ -8,11 +10,17 @@ class Data(object):
     def __init__(self):
         pass
 
+    def _arbitrary_features(self, n):
+        return ["f{0}".format(i) for i in range(n)]
+
     def set(self, keys, inputs, values, features):
         self._keys = keys
         self._inputs = inputs
         self._values = values
-        self._features = features
+        if features is None:
+            self._features = self._arbitrary_features(len(values[0]))
+        else:
+            self._features = features
 
     def keys(self):
         return self._keys
@@ -31,6 +39,16 @@ class Data(object):
 
     def load(self, file_name):
         return joblib.load(file_name)
+
+    def save_info(self, file_name):
+        info = {
+            "keys": len(self._keys),
+            "inputs": len(self._inputs),
+            "features": len(self._features),
+            "values": np.array(self._values).shape
+        }
+        with open(file_name, "w") as f:
+            json.dump(info, f, indent=4)
 
 
 class Hdf5(object):
