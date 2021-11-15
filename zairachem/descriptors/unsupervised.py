@@ -198,13 +198,13 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
             )
             data._values = X
             Hdf5(file_name).save(data)
-            data.save_info(file_name.split(".")[0]+".json")
+            data.save_info(file_name.split(".")[0] + ".json")
 
 
 class StackedUnsupervisedTransformations(DescriptorBase):
     def __init__(self):
         DescriptorBase.__init__(self)
-        self.pipeline = None # TODO
+        self.pipeline = None  # TODO
 
     def run(self):
         Xs = []
@@ -212,7 +212,10 @@ class StackedUnsupervisedTransformations(DescriptorBase):
         inputs = None
         for eos_id in self.done_eos_iter():
             file_name = os.path.join(
-                self.path, DESCRIPTORS_SUBFOLDER, eos_id, INDIVIDUAL_UNSUPERVISED_FILE_NAME
+                self.path,
+                DESCRIPTORS_SUBFOLDER,
+                eos_id,
+                INDIVIDUAL_UNSUPERVISED_FILE_NAME,
             )
             data = Hdf5(file_name).load()
             Xs += [data.values()]
@@ -224,9 +227,13 @@ class StackedUnsupervisedTransformations(DescriptorBase):
         algo = Pca()
         algo.fit(X)
         X = algo.transform(X)
-        algo.save(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name+".joblib"))
-        file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME)
+        algo.save(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name + ".joblib")
+        )
+        file_name = os.path.join(
+            self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
+        )
         data = Data()
         data.set(inputs=inputs, keys=keys, values=X, features=None)
         Hdf5(file_name).save(data)
-        data.save_info(file_name.split(".")[0]+".json")
+        data.save_info(file_name.split(".")[0] + ".json")

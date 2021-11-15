@@ -3,9 +3,10 @@ import json
 from .. import ZairaBase
 from .raw import DESCRIPTORS_SUBFOLDER
 
+GLOBAL_SUPERVISED_FILE_NAME = "global_supervised.h5"
+
 
 class DescriptorBase(ZairaBase):
-
     def __init__(self):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()

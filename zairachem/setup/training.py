@@ -6,6 +6,7 @@ from .files import SingleFile
 from .standardize import Standardize
 from .folding import Folds
 from .tasks import SingleTasks
+from .merge import DataMerger
 
 from . import PARAMETERS_FILE
 
@@ -77,6 +78,9 @@ class TrainSetup(object):
     def _tasks(self):
         SingleTasks(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def _merge(self):
+        DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
     def setup(self):
         self._make_output_dir()
         self._open_session()
@@ -87,3 +91,4 @@ class TrainSetup(object):
         self._standardize()
         self._folds()
         self._tasks()
+        self._merge()

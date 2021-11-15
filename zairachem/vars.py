@@ -11,6 +11,7 @@ SESSION_FILE = "session.json"
 # Environmental variables
 
 DATA_SUBFOLDER = "data"
+DATA_FILENAME = "data.csv"
 DESCRIPTORS_SUBFOLDER = "descriptors"
 MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"

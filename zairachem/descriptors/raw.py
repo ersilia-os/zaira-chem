@@ -6,8 +6,8 @@ from .. import ZairaBase
 from ..utils.terminal import run_command
 from ..utils.matrices import Hdf5
 
-from ..setup import PARAMETERS_FILE, COMPOUNDS_FILENAME
-from ..vars import DATA_SUBFOLDER, DESCRIPTORS_SUBFOLDER
+from ..setup import PARAMETERS_FILE
+from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
 
 
 class RawLoader(ZairaBase):
@@ -25,7 +25,7 @@ class RawDescriptors(ZairaBase):
         ZairaBase.__init__(self)
         self.path = self.get_output_dir()
         self.params = self._load_params()
-        self.input_csv = os.path.join(self.path, DATA_SUBFOLDER, COMPOUNDS_FILENAME)
+        self.input_csv = os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME)
 
     def _load_params(self):
         with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:

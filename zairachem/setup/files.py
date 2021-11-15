@@ -135,13 +135,28 @@ class SingleFile(InputSchema):
         dfv[QUALIFIER_COLUMN] = df[QUALIFIER_COLUMN]
         dfv[VALUES_COLUMN] = df[VALUES_COLUMN]
         dedupe = collections.defaultdict(list)
-        for r in dfv[[COMPOUND_IDENTIFIER_COLUMN, ASSAY_IDENTIFIER_COLUMN, QUALIFIER_COLUMN, VALUES_COLUMN]].values:
-            dedupe[(r[0],r[1])] += [(r[2], r[3])]
+        for r in dfv[
+            [
+                COMPOUND_IDENTIFIER_COLUMN,
+                ASSAY_IDENTIFIER_COLUMN,
+                QUALIFIER_COLUMN,
+                VALUES_COLUMN,
+            ]
+        ].values:
+            dedupe[(r[0], r[1])] += [(r[2], r[3])]
         R = []
-        for k,v in dedupe.items():
+        for k, v in dedupe.items():
             v = np.median([x[1] for x in v])
             R += [[k[0], k[1], "=", v]]
-        dfv = pd.DataFrame(R, columns = [COMPOUND_IDENTIFIER_COLUMN, ASSAY_IDENTIFIER_COLUMN, QUALIFIER_COLUMN, VALUES_COLUMN])
+        dfv = pd.DataFrame(
+            R,
+            columns=[
+                COMPOUND_IDENTIFIER_COLUMN,
+                ASSAY_IDENTIFIER_COLUMN,
+                QUALIFIER_COLUMN,
+                VALUES_COLUMN,
+            ],
+        )
         return dfv
 
     def process(self):
