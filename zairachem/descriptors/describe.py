@@ -27,12 +27,18 @@ class Describer(ZairaBase):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, COMPOUNDS_FILENAME))
 
     def _raw_descriptions(self):
-        # RawDescriptors().run()
+        RawDescriptors().run()
+
+    def _unsupervised(self):
         IndividualUnsupervisedTransformations().run()
         StackedUnsupervisedTransformations().run()
+
+    def _supervised(self):
         SupervisedTransformations().run()
 
     def run(self):
-        self._raw_descriptions()
+        #self._raw_descriptions()
+        #self._unsupervised()
+        self._supervised()
         df = self.load_inputs()
         pass

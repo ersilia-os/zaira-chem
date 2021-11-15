@@ -19,6 +19,7 @@ ASSAY_TYPE_COLUMN = "assay_type"
 DIRECTION_COLUMN = "direction"
 EXPERT_THRESHOLD_COLUMN_PREFIX = "expert_threshold_"
 PERCENTILE_THRESHOLD_COLUMN_PREFIX = "percentile_threshold_"
+AUXILIARY_TASK_COLUMN = "clf_aux"
 
 INCHIKEY_COLUMN = "inchikey"
 STANDARD_SMILES_COLUMN = "standard_smiles"

@@ -4,7 +4,7 @@ import pandas as pd
 from collections import OrderedDict
 from scipy.stats import rankdata
 
-from . import VALUES_FILENAME, VALUES_COLUMN, QUALIFIER_COLUMN, TASKS_FILENAME
+from . import VALUES_FILENAME, VALUES_COLUMN, QUALIFIER_COLUMN, TASKS_FILENAME, AUXILIARY_TASK_COLUMN
 from .files import ParametersFile
 
 from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER
@@ -116,14 +116,13 @@ class ClfTasks(object):
 
 
 class AuxiliaryBinaryTask(object):
-
     def __init__(self, data):
         self.df = data
         self.reference = "clf_p10"
 
     def get(self):
         # TODO: Work with multitask
-        return df[self.reference]
+        return self.df[self.reference]
 
 
 class SingleTasks(object):
@@ -159,5 +158,5 @@ class SingleTasks(object):
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         auxiliary = AuxiliaryBinaryTask(df)
-        df["clf_aux"] = auxiliary.get()
+        df[AUXILIARY_TASK_COLUMN] = auxiliary.get()
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)

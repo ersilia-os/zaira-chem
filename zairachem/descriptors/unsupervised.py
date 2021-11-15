@@ -8,10 +8,15 @@ from sklearn.decomposition import PCA
 from umap import UMAP
 
 from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
-from .. import ZairaBase
-from ..utils.matrices import Hdf5
+from . import DescriptorBase
+from ..utils.matrices import Hdf5, Data
 
 MAX_NA = 0.2
+
+INDIVIDUAL_UNSUPERVISED_FILE_NAME = "individual_unsupervised.h5"
+GLOBAL_UNSUPERVISED_FILE_NAME = "global_unsupervised.h5"
+
+MAX_COMPONENTS = 1024
 
 
 class NanFilter(object):
@@ -114,7 +119,8 @@ class Pca(object):
         self._name = "pca"
 
     def fit(self, X):
-        self.pca = PCA(n_components=0.9)
+        n_components = np.min([MAX_COMPONENTS, X.shape[0], X.shape[1]])
+        self.pca = PCA(n_components=n_components, whiten=True)
         self.pca.fit(X)
 
     def transform(self, X):
@@ -156,17 +162,17 @@ class UnsupervisedUmap(object):
         return joblib.load(file_name)
 
 
-class IndividualUnsupervisedTransformations(ZairaBase):
+class IndividualUnsupervisedTransformations(DescriptorBase):
     def __init__(self):
-        ZairaBase.__init__(self)
-        self.path = self.get_output_dir()
+        DescriptorBase.__init__(self)
         self.pipeline = [
             NanFilter(),
             Imputer(),
             VarianceFilter(),
             Scaler(),
+            Pca(),
         ]
-        self._name = "individual_unsupervised.h5"
+        self._name = INDIVIDUAL_UNSUPERVISED_FILE_NAME
 
     def done_eos_iter(self):
         with open(
@@ -192,12 +198,35 @@ class IndividualUnsupervisedTransformations(ZairaBase):
             )
             data._values = X
             Hdf5(file_name).save(data)
+            data.save_info(file_name.split(".")[0]+".json")
 
 
-class StackedUnsupervisedTransformations(ZairaBase):
+class StackedUnsupervisedTransformations(DescriptorBase):
     def __init__(self):
-        ZairaBase.__init__(self)
-        self.path = self.get_output_dir()
+        DescriptorBase.__init__(self)
+        self.pipeline = None # TODO
 
     def run(self):
-        pass
+        Xs = []
+        keys = None
+        inputs = None
+        for eos_id in self.done_eos_iter():
+            file_name = os.path.join(
+                self.path, DESCRIPTORS_SUBFOLDER, eos_id, INDIVIDUAL_UNSUPERVISED_FILE_NAME
+            )
+            data = Hdf5(file_name).load()
+            Xs += [data.values()]
+            if keys is None:
+                keys = data.keys()
+            if inputs is None:
+                inputs = data.inputs()
+        X = np.hstack(Xs)
+        algo = Pca()
+        algo.fit(X)
+        X = algo.transform(X)
+        algo.save(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name+".joblib"))
+        file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME)
+        data = Data()
+        data.set(inputs=inputs, keys=keys, values=X, features=None)
+        Hdf5(file_name).save(data)
+        data.save_info(file_name.split(".")[0]+".json")
