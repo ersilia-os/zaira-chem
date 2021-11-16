@@ -4,11 +4,15 @@ COMPOUNDS_FILENAME = "compounds.csv"
 VALUES_FILENAME = "values.csv"
 ASSAYS_FILENAME = "assays.csv"
 PARAMETERS_FILE = "parameters.json"
+MAPPING_FILENAME = "mapping.csv"
 
 SCHEMA_MERGE_FILENAME = "data_schema.json"
 
 TASKS_FILENAME = "tasks.csv"
 FOLDS_FILENAME = "folds.csv"
+
+MAPPING_ORIGINAL_COLUMN = "orig_idx"
+MAPPING_DEDUPE_COLUMN = "uniq_idx"
 
 COMPOUND_IDENTIFIER_COLUMN = "compound_id"
 ASSAY_IDENTIFIER_COLUMN = "assay_id"

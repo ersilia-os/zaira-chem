@@ -12,9 +12,10 @@ def setup_cmd():
     @click.argument("task", type=click.STRING)
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default="output", type=click.STRING)
+    @click.option("--model_dir", "-m", default=None, type=click.STRING)
     @click.option("--time_budget", "-t", default=60, type=click.INT)
     @click.option("--parameters", "-p", default=None, type=click.STRING)
-    def setup(task, input_file, output_dir, time_budget, parameters):
+    def setup(task, input_file, output_dir, model_dir, time_budget, parameters):
         echo("Reading from {0}".format(input_file))
         if task == "train":
             s = TrainSetup(
@@ -25,12 +26,13 @@ def setup_cmd():
             )
             s.setup()
         elif task == "predict":
-            Setup = TestSetup(
+            s = PredictSetup(
                 input_file=input_file,
                 output_dir=output_dir,
+                model_dir=model_dir,
                 time_budget=time_budget,
-                parameters=parameters,
             )
+            s.setup()
         else:
             echo("Task must be 'train' or 'predict'", fg="red")
             sys.exit(0)
