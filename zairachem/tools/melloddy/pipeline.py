@@ -15,8 +15,11 @@ class MelloddyTunerTrainPipeline(object):
         Standardize(self.path).run()
         Descriptors(self.path).run()
         Folding(self.path).run()
+
+
 #        AggregateActivity(self.path).run()
 #        Thresholding(self.path).run()
+
 
 class MelloddyTunerPredictPipeline(object):
     def __init__(self, path):

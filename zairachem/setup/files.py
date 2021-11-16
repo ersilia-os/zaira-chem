@@ -175,7 +175,6 @@ class SingleFile(InputSchema):
 
 
 class SingleFileForPrediction(SingleFile):
-
     def __init__(self, input_file):
         SingleFile.__init__(self, input_file, params=None)
 
@@ -204,8 +203,8 @@ class SingleFileForPrediction(SingleFile):
             mapping[cid] += [i]
             cid2smiles[cid] = smi
         unique_cids = sorted(set(mapping.keys()))
-        unique_cids_idx = dict((k, i) for i,k in enumerate(unique_cids))
-        mapping = dict((x, k) for k,v in mapping.items() for x in v)
+        unique_cids_idx = dict((k, i) for i, k in enumerate(unique_cids))
+        mapping = dict((x, k) for k, v in mapping.items() for x in v)
         R = []
         for i in range(df.shape[0]):
             if i in mapping:
@@ -213,12 +212,19 @@ class SingleFileForPrediction(SingleFile):
                 R += [[i, unique_cids_idx[cid], cid]]
             else:
                 R += [[i, None, None]]
-        dfm = pd.DataFrame(R, columns = [MAPPING_ORIGINAL_COLUMN, MAPPING_DEDUPE_COLUMN, COMPOUND_IDENTIFIER_COLUMN])
+        dfm = pd.DataFrame(
+            R,
+            columns=[
+                MAPPING_ORIGINAL_COLUMN,
+                MAPPING_DEDUPE_COLUMN,
+                COMPOUND_IDENTIFIER_COLUMN,
+            ],
+        )
         dfm.to_csv(os.path.join(path, MAPPING_FILENAME), index=False)
         R = []
         for cid in unique_cids:
             R += [[cid, cid2smiles[cid]]]
-        dfc = pd.DataFrame(R, columns = [COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN])
+        dfc = pd.DataFrame(R, columns=[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN])
         dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
 
 

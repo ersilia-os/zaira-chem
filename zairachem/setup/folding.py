@@ -11,9 +11,7 @@ from . import (
 )
 
 from sklearn.model_selection import KFold
-
-
-N_FOLDS = 5
+from ..vars import N_FOLDS
 
 
 class RandomFolding(object):

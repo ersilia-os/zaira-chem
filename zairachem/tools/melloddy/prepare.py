@@ -90,7 +90,6 @@ class Prepare(object):
 
 
 class PrepareTrain(Prepare):
-
     def __init__(self, path):
         Prepare.__init__(self, path)
 
@@ -102,7 +101,6 @@ class PrepareTrain(Prepare):
 
 
 class PreparePredict(Prepare):
-
     def __init__(self, path):
         Prepare.__init__(self, path)
 

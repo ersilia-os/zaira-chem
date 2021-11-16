@@ -173,6 +173,7 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
             Pca(),
         ]
         self._name = INDIVIDUAL_UNSUPERVISED_FILE_NAME
+        self._is_predict = self.is_predict()
 
     def done_eos_iter(self):
         with open(
@@ -186,13 +187,22 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
         rl = RawLoader()
         for eos_id in self.done_eos_iter():
             path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id)
+            if not self._is_predict:
+                trained_path = path
+            else:
+                trained_path = os.path.join(
+                    self.trained_path, DESCRIPTORS_SUBFOLDER, eos_id
+                )
             data = rl.open(eos_id)
             data = data.load()
             X = data.values()
             for algo in self.pipeline:
-                algo.fit(X)
+                if not self._is_predict:
+                    algo.fit(X)
+                    algo.save(os.path.join(trained_path, algo._name + ".joblib"))
+                else:
+                    algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
                 X = algo.transform(X)
-                algo.save(os.path.join(path, algo._name + ".joblib"))
             file_name = os.path.join(
                 self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name
             )
@@ -223,13 +233,18 @@ class StackedUnsupervisedTransformations(DescriptorBase):
                 keys = data.keys()
             if inputs is None:
                 inputs = data.inputs()
+        if not self._is_predict:
+            trained_path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER)
+        else:
+            trained_path = os.path.join(self.trained_path, DESCRIPTORS_SUBFOLDER)
         X = np.hstack(Xs)
         algo = Pca()
-        algo.fit(X)
+        if not self._is_predict:
+            algo.fit(X)
+            algo.save(os.path.join(trained_path, algo._name + ".joblib"))
+        else:
+            algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
         X = algo.transform(X)
-        algo.save(
-            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name + ".joblib")
-        )
         file_name = os.path.join(
             self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
         )
