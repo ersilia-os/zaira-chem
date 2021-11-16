@@ -170,12 +170,34 @@ class SingleFile(InputSchema):
         dfv.to_csv(os.path.join(path, VALUES_FILENAME), index=False)
 
 
+class SingleFileForPrediction(SingleFile):
+
+    def __init__(self, input_file):
+        SingleFile.__init__(self, input_file, params=None)
+
+    def normalize_dataframe(self):
+        self.identifier_column = self.find_identifier_column()
+        self.smiles_column = self.find_smiles_column()
+        if self.identifier_column is None:
+            identifiers = self._make_identifiers()
+        else:
+            identifiers = list(self.df[self.identifier_column])
+        df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
+        df[SMILES_COLUMN] = self.df[self.smiles_column]
+        return df
+
+    def process(self):
+        path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
+        df = self.normalize_dataframe()
+        df.to_csv(os.path.join(path))
+
+
 # TODO: When three files are given, use the following
 
 
 class CompoundsFile(InputSchema):
     def __init__(self, input_file):
-        InputSchema.__init__(self)
+        InputSchema.__init__(self, input_file)
 
     def process(self):
         pass
