@@ -4,10 +4,14 @@ import json
 import numpy as np
 import collections
 
+from rdkit import Chem
+
 from ..vars import DATA_SUBFOLDER
 from .schema import InputSchema
-from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME
+from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME, MAPPING_FILENAME
 from . import (
+    MAPPING_ORIGINAL_COLUMN,
+    MAPPING_DEDUPE_COLUMN,
     COMPOUND_IDENTIFIER_COLUMN,
     ASSAY_IDENTIFIER_COLUMN,
     SMILES_COLUMN,
@@ -189,7 +193,33 @@ class SingleFileForPrediction(SingleFile):
     def process(self):
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
         df = self.normalize_dataframe()
-        df.to_csv(os.path.join(path))
+        mapping = collections.defaultdict(list)
+        cid2smiles = {}
+        for i, r in enumerate(df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]].values):
+            cid = r[0]
+            smi = r[1]
+            mol = Chem.MolFromSmiles(smi)
+            if mol is None:
+                continue
+            mapping[cid] += [i]
+            cid2smiles[cid] = smi
+        unique_cids = sorted(set(mapping.keys()))
+        unique_cids_idx = dict((k, i) for i,k in enumerate(unique_cids))
+        mapping = dict((x, k) for k,v in mapping.items() for x in v)
+        R = []
+        for i in range(df.shape[0]):
+            if i in mapping:
+                cid = mapping[i]
+                R += [[i, unique_cids_idx[cid], cid]]
+            else:
+                R += [[i, None, None]]
+        dfm = pd.DataFrame(R, columns = [MAPPING_ORIGINAL_COLUMN, MAPPING_DEDUPE_COLUMN, COMPOUND_IDENTIFIER_COLUMN])
+        dfm.to_csv(os.path.join(path, MAPPING_FILENAME), index=False)
+        R = []
+        for cid in unique_cids:
+            R += [[cid, cid2smiles[cid]]]
+        dfc = pd.DataFrame(R, columns = [COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN])
+        dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
 
 
 # TODO: When three files are given, use the following

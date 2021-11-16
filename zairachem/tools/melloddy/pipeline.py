@@ -1,4 +1,4 @@
-from .prepare import Prepare
+from .prepare import PrepareTrain, PreparePredict
 from .standardize import Standardize
 from .descriptors import Descriptors
 from .folding import Folding
@@ -11,19 +11,17 @@ class MelloddyTunerTrainPipeline(object):
         self.path = path
 
     def run(self):
-        Prepare(self.path).run()
+        PrepareTrain(self.path).run()
         Standardize(self.path).run()
         Descriptors(self.path).run()
         Folding(self.path).run()
-
-
 #        AggregateActivity(self.path).run()
 #        Thresholding(self.path).run()
 
-class MelloddyTunerPredictPipelien(object):
+class MelloddyTunerPredictPipeline(object):
     def __init__(self, path):
         self.path = path
 
     def run(self):
-        Prepare(self.path).run()
+        PreparePredict(self.path).run()
         Standardize(self.path).run()

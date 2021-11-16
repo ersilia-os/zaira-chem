@@ -27,3 +27,19 @@ class DataMerger(object):
         df.to_csv(os.path.join(self.path, DATA_FILENAME), index=False)
         with open(os.path.join(self.path, SCHEMA_MERGE_FILENAME), "w") as f:
             json.dump(schema, f, indent=4)
+
+
+class DataMergerForPrediction(object):
+    def __init__(self, path):
+        self.path = path
+
+    def run(self):
+        # TODO: This is a placeholder for more elaborate predict-time scenearios (e.g. validation data available)
+        df_cpd = pd.read_csv(os.path.join(self.path, COMPOUNDS_FILENAME))[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]]
+        schema = {
+            "compounds": list(df_cpd.columns)
+        }
+        with open(os.path.join(self.path, SCHEMA_MERGE_FILENAME), "w") as f:
+            json.dump(schema, f, indent=4)
+        df = df_cpd
+        df.to_csv(os.path.join(self.path, DATA_FILENAME), index=False)

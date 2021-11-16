@@ -17,6 +17,8 @@ MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"
 LITE_SUBFOLDER = "lite"
 
+TRAINED_MODEL_SUBFOLDER = "trained"
+
 CLF_SUBFOLDER = "clf"
 REG_SUBFOLDER = "reg"
 

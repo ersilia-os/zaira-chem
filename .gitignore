@@ -3,7 +3,9 @@
 naturals
 AfricanNaturalProducts*
 output
+output_pred
 development.py
+development.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

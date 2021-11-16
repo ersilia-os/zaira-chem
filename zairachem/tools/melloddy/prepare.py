@@ -82,13 +82,29 @@ class Prepare(object):
         dfo.to_csv(os.path.join(self.outdir, T2_FILE), index=False)
 
     def params(self):
+        # TODO
         with open(os.path.join(self.indir, PARAMETERS_FILE), "r") as f:
             uparam = json.load(f)
         with open(DEFAULT_PARAMS_FILE, "r") as f:
             dparam = json.load(f)
+
+
+class PrepareTrain(Prepare):
+
+    def __init__(self, path):
+        Prepare.__init__(self, path)
 
     def run(self):
         self.t0()
         self.t1()
         self.t2()
         self.params()
+
+
+class PreparePredict(Prepare):
+
+    def __init__(self, path):
+        Prepare.__init__(self, path)
+
+    def run(self):
+        self.t2()
