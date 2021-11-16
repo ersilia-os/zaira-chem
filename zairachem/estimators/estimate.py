@@ -26,9 +26,13 @@ class BaseEstimator(ZairaBase):
         else:
             self.path = path
         self.logger.debug(self.path)
+        if self.is_predict():
+            self.trained_path = self.get_trained_dir()
+        else:
+            self.trained_path = self.path
         with open(
             os.path.join(
-                self.path,
+                self.trained_path,
                 DATA_SUBFOLDER,
                 SCHEMA_MERGE_FILENAME,
             )
@@ -98,12 +102,12 @@ class Predictor(BaseEstimator):
             model = FlamlClassifier()
             file_name = os.path.join(self.trained_path, t+".joblib")
             model = model.load(file_name)
-            tasks[k] = model.predict_proba(X)
+            tasks[t] = model.predict_proba(X)
         for t in self._get_reg_tasks():
             model = FlamlRegressor()
             file_name = os.path.join(self.trained_path, t+".joblib")
             model = model.load(file_name)
-            tasks[k] = model.predict(X)
+            tasks[t] = model.predict(X)
         return tasks
 
 
