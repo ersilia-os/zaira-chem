@@ -166,7 +166,9 @@ class FlamlClassifier(object):
 
     def load(self, file_name):
         model = joblib.load(file_name)
-        threshold = data
+        with open(file_name.split(".")[0] + ".json", "r") as f:
+            data = json.load(f)
+        threshold = data["threshold"]
         return FlamlClassifierArtifact(model, threshold)
 
 
@@ -176,7 +178,7 @@ class FlamlClassifierArtifact(object):
         self.threshold = threshold
 
     def predict_proba(self, X):
-        self.model.predict_proba(X)[:, 1]
+        return self.model.predict_proba(X)[:, 1]
 
     def predict(self, X):
         y_hat = self.predict_proba(X)
@@ -210,7 +212,9 @@ class FlamlRegressor(object):
 
     def load(self, file_name):
         model = joblib.load(file_name)
-        return FlamlRegressorArtifcat(model)
+        with open(file_name.split(".")[0] + ".json", "r") as f:
+            data = json.load(f)
+        return FlamlRegressorArtifact(model)
 
 
 class FlamlRegressorArtifact(object):
@@ -218,4 +222,4 @@ class FlamlRegressorArtifact(object):
         self.model = model
 
     def predict(self, X):
-        self.model.predict(X)
+        return self.model.predict(X)
