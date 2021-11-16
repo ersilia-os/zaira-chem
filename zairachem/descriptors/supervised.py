@@ -95,12 +95,18 @@ class SupervisedTransformations(DescriptorBase):
             )
         ).load()
         X = data.values()
-        y = self.load_y()
+        if not self._is_predict:
+            y = self.load_y()
+            trained_path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER)
+        else:
+            y = None
+            trained_path = os.path.join(self.trained_path, DESCRIPTORS_SUBFOLDER)
         algo = LolliPop()
-        algo.fit(X, y)
-        algo.save(
-            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, algo._name + ".joblib")
-        )
+        if not self._is_predict:
+            algo.fit(X, y)
+            algo.save(os.path.join(trained_path, algo._name + ".joblib"))
+        else:
+            algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
         X = algo.transform(X)
         data_ = Data()
         data_.set(inputs=data.inputs(), keys=data.keys(), values=X, features=None)

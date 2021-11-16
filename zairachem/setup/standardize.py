@@ -40,5 +40,7 @@ class Standardize(object):
         values_file = os.path.join(self.path, VALUES_FILENAME)
         if os.path.exists(values_file):
             dfv = pd.read_csv(values_file)
-            dfv = dfv[dfv[COMPOUND_IDENTIFIER_COLUMN].isin(dfc[COMPOUND_IDENTIFIER_COLUMN])]
+            dfv = dfv[
+                dfv[COMPOUND_IDENTIFIER_COLUMN].isin(dfc[COMPOUND_IDENTIFIER_COLUMN])
+            ]
             dfv.to_csv(os.path.join(self.path, VALUES_FILENAME), index=False)

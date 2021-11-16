@@ -26,7 +26,7 @@ class PredictSetup(object):
         self.input_file = os.path.abspath(input_file)
         self.output_dir = os.path.abspath(output_dir)
         self.model_dir = os.path.abspath(model_dir)
-        self.time_budget = time_budget # TODO
+        self.time_budget = time_budget  # TODO
         assert os.path.exists(self.model_dir)
 
     def _open_session(self):
@@ -48,15 +48,22 @@ class PredictSetup(object):
         self._make_subfolder(MODELS_SUBFOLDER)
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
-        os.symlink(self.model_dir, os.path.join(self.output_dir, TRAINED_MODEL_SUBFOLDER))
-        shutil.copyfile(os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE), os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE))
+        os.symlink(
+            self.model_dir, os.path.join(self.output_dir, TRAINED_MODEL_SUBFOLDER)
+        )
+        shutil.copyfile(
+            os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE),
+            os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE),
+        )
 
     def _normalize_input(self):
         f = SingleFileForPrediction(self.input_file)
         f.process()
 
     def _melloddy_tuner_run(self):
-        MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        MelloddyTunerPredictPipeline(
+            os.path.join(self.output_dir, DATA_SUBFOLDER)
+        ).run()
 
     def _standardize(self):
         Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()

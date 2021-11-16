@@ -3,14 +3,14 @@ import click
 from . import zairachem_cli
 from ..echo import echo
 
-from ...fit.fit import Fitter
+from ...estimators.estimate import Estimator
 
 
-def fit_cmd():
-    @zairachem_cli.command(help="Fit the data")
+def estimate_cmd():
+    @zairachem_cli.command(help="Run estimators")
     @click.option("--dir", "-d", type=click.STRING)
-    def fit(dir):
-        echo("Fitting from {0}".format(dir))
-        ft = Fitter(path=dir)
+    def estimate(dir):
+        echo("Estimator".format(dir))
+        ft = Estimator(path=dir)
         ft.run()
         echo("Done", fg="green")
