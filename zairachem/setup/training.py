@@ -27,7 +27,7 @@ class TrainSetup(object):
         self.params = self._load_params(parameters)
         self.input_file = os.path.abspath(input_file)
         self.output_dir = os.path.abspath(output_dir)
-        self.time_budget = time_budget
+        self.time_budget = time_budget # TODO
 
     def _load_params(self, params):
         if params is None:
