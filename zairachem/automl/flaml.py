@@ -48,6 +48,7 @@ class FlamlSettings(object):
             "log_file_name": "automl.log",
             "log_training_metric": True,
             "verbose": 3,
+            "early_stop": True,
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
