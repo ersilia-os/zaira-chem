@@ -1,29 +1,11 @@
 {
-    "assay_id": "AID0",
-    "assay_type": null,
-    "credibility_range": {
-        "min": null,
-        "max": null
-    },
-    "thresholds": {
-        "expert_1": null,
-        "expert_2": null,
-        "expert_3": null,
-        "expert_4": null,
-        "expert_5": null
-    },
+    "threshold": 0.8,
     "direction": "high",
     "ersilia_hub": [
-        "avalon",
         "morgan-counts",
         "cc-signaturizer",
-        "chembl-multitask-descriptor",
-        "continuous-data-driven",
         "grover-embedding",
         "molbert",
-        "mordred",
-        "rdkit-descriptors",
-        "rdkit-fingerprint",
-        "whales-descriptor"
+        "mordred"
     ]
 }

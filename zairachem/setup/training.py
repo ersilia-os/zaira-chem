@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 
+from .files import ParametersFile
 from .files import SingleFile
 from .standardize import Standardize
 from .folding import Folds
@@ -30,11 +31,7 @@ class TrainSetup(object):
         self.time_budget = time_budget  # TODO
 
     def _load_params(self, params):
-        if params is None:
-            return None
-        with open(params, "r") as f:
-            params = json.load(f)
-        return params
+        return ParametersFile(full_path=params).load()
 
     def _save_params(self):
         with open(

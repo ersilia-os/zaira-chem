@@ -24,7 +24,7 @@ REG_SUBFOLDER = "reg"
 
 CLF_PERCENTILES = [1, 10, 25]
 
-MIN_CLASS = 10
+MIN_CLASS = 30
 N_FOLDS = 5
 
 _CONFIG_FILENAME = "config.json"

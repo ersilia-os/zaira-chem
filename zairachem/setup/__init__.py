@@ -6,6 +6,7 @@ ASSAYS_FILENAME = "assays.csv"
 PARAMETERS_FILE = "parameters.json"
 MAPPING_FILENAME = "mapping.csv"
 
+INPUT_SCHEMA_FILENAME = "input_schema.json"
 SCHEMA_MERGE_FILENAME = "data_schema.json"
 
 TASKS_FILENAME = "tasks.csv"
