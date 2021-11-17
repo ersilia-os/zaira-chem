@@ -99,6 +99,8 @@ class FlamlEstimator(object):
         automl_settings["time_budget"] = 10  # TODO
         folds = sorted(set(groups))
         best_models = self.main_mdl.best_config_per_estimator
+        best_estimator = self.main_mdl.best_estimator
+        starting_point = {best_estimator: best_models[best_estimator]}
         for fold in folds:
             tag = "fold_{0}".format(fold)
             tr_idxs = []
@@ -121,11 +123,12 @@ class FlamlEstimator(object):
                 groups_mapping[g] = i
             automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
             automl_settings["n_splits"] = len(unique_groups)
+            automl_settings["estimator_list"] = [best_estimator]
             model = AutoML()
             model.fit(
                 X_train=X_tr,
                 y_train=y_tr,
-                starting_points=best_models,
+                starting_points=starting_point,
                 **automl_settings
             )
             if self.is_clf:
