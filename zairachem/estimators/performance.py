@@ -1,4 +1,5 @@
 import os
+import json
 import numpy as np
 import pandas as pd
 
@@ -92,9 +93,14 @@ class RegressionPerformance(BasePerformance):
         return report
 
 
-class PerformanceReporter(object):
+class PerformanceReporter(ZairaBase):
 
     def __init__(self, path=None):
+        ZairaBase.__init__(self)
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
         self.clf = ClassificationPerformance(path=path)
         self.reg = RegressionPerformance(path=path)
 
