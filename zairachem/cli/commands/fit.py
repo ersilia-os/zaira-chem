@@ -6,6 +6,8 @@ from ..echo import echo
 from ...setup.training import TrainSetup
 from ...descriptors.describe import Describer
 from ...estimators.estimate import Estimator
+from ...estimators.assemble import OutcomeAssembler
+from ...estimators.performance import PerformanceReporter
 
 
 def fit_cmd():
@@ -30,4 +32,12 @@ def fit_cmd():
             path=output_dir
         )
         e.run()
+        o = OutcomeAssembler(
+            path=output_dir
+        )
+        o.run()
+        p = PerformanceReporter(
+            path=output_dir
+        )
+        p.run()
         echo("Done", fg="green")
