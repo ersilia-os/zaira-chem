@@ -24,14 +24,21 @@ from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 
 
 class TrainSetup(object):
-    def __init__(self, input_file, output_dir, time_budget, parameters):
-        self.params = self._load_params(parameters)
+    def __init__(self, input_file, output_dir, time_budget, threshold, direction, parameters):
+        if output_dir is None:
+            output_dir = input_file.split(".")[0]
+        passed_params = {
+            "time_budget": time_budget,
+            "threshold": threshold,
+            "direction": direction
+        }
+        self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
 
-    def _load_params(self, params):
-        return ParametersFile(full_path=params).load()
+    def _load_params(self, params, passed_params):
+        return ParametersFile(full_path=params, passed_params=passed_params).load()
 
     def _save_params(self):
         with open(

@@ -7,6 +7,7 @@ import collections
 from rdkit import Chem
 
 from ..vars import DATA_SUBFOLDER
+from ..vars import ERSILIA_HUB_DEFAULT_MODELS
 from .schema import InputSchema
 from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME, MAPPING_FILENAME, INPUT_SCHEMA_FILENAME
 from . import (
@@ -28,9 +29,13 @@ from . import (
 
 
 class ParametersFile(object):
-    def __init__(self, path=None, full_path=None):
+    def __init__(self, path=None, full_path=None, passed_params=None):
+        if passed_params is not None:
+            self.params = dict((k,v) for k,v in passed_params.items() if v is not None)
+        else:
+            self.params = {}
         if path is None and full_path is None:
-            self.params = None
+            self.filename = None
         else:
             if full_path is None:
                 self.filename = os.path.join(path, PARAMETERS_FILE)
@@ -40,8 +45,13 @@ class ParametersFile(object):
 
     # TODO Improve readibility
     def load(self):
-        with open(self.filename, "r") as f:
-            data = json.load(f)
+        if self.filename is not None:
+            with open(self.filename, "r") as f:
+                data = json.load(f)
+        else:
+            data = {}
+        for k,v in self.params.items():
+            data[k] = v
         if "assay_id" not in data:
             data["assay_id"] = "ASSAY"
         if "assay_type" not in data:
@@ -73,6 +83,8 @@ class ParametersFile(object):
             del data["threshold"]
         if "direction" not in data:
             data["direction"] = "high"
+        if "ersilia_hub" not in data:
+            data["ersilia_hub"] = ERSILIA_HUB_DEFAULT_MODELS
         return data
 
 
