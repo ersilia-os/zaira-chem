@@ -109,5 +109,5 @@ class PerformanceReporter(ZairaBase):
         with open(os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w") as f:
             json.dump(clf_rep, f, indent=4)
         reg_rep = self.reg.calculate()
-        with open(os.path.join(self.path, MODELS_SUBFOlder, REG_REPORT_FILENAME), "w") as f:
+        with open(os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w") as f:
             json.dump(reg_rep, f, indent=4)
