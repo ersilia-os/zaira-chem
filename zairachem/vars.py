@@ -31,7 +31,7 @@ _CONFIG_FILENAME = "config.json"
 
 # Performance
 
-AUTOML_DEFAULT_TIME_BUDGET_MIN = 10
+AUTOML_DEFAULT_TIME_BUDGET_MIN = 60
 
 # Ersilia Model Hub
 
