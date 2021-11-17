@@ -10,9 +10,10 @@ from flaml import AutoML
 from ..tools.ghost.ghost import GhostLight
 
 from ..vars import N_FOLDS
+from ..vars import AUTOML_DEFAULT_TIME_BUDGET_MIN
 
 
-DEFAULT_TIME_BUDGET_MIN = 0.1
+DEFAULT_TIME_BUDGET_RETRAIN_SECONDS = 60
 
 
 class FlamlSettings(object):
@@ -96,7 +97,7 @@ class FlamlEstimator(object):
         y = np.array(y)
         y_hat = np.zeros(y.shape)
         groups = np.array(automl_settings["groups"])
-        automl_settings["time_budget"] = 10  # TODO
+        automl_settings["time_budget"] = DEFAULT_TIME_BUDGET_RETRAIN_SECONDS
         folds = sorted(set(groups))
         best_models = self.main_mdl.best_config_per_estimator
         best_estimator = self.main_mdl.best_estimator
@@ -153,7 +154,7 @@ class FlamlClassifier(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
+        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         threshold = GhostLight().get_threshold(y, y_hat)
@@ -201,7 +202,7 @@ class FlamlRegressor(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
+        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         self.y_hat = y_hat

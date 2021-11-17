@@ -15,7 +15,7 @@ from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME
 from . import Y_HAT_FILE
 
 
-ESTIMATORS = ["lgbm", "rf"]
+ESTIMATORS = None
 
 
 class BaseEstimator(ZairaBase):
