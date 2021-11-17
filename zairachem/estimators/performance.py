@@ -53,16 +53,16 @@ class ClassificationPerformance(BasePerformance):
         b_pred = np.array(self.df_prd[self._prefix+"_bin"])
         confu = metrics.confusion_matrix(y_true, b_pred, labels=[0,1])
         report = {
-            "roc_auc_score": metrics.roc_auc_score(y_true, y_pred),
-            "precision_score": metrics.precision_score(y_true, b_pred),
-            "recall_score": metrics.recall_score(y_true, b_pred),
-            "tp": confu[1,1],
-            "tn": confu[0,0],
-            "fp": confu[0,1],
-            "fn": confu[1,0],
-            "y_true": list(y_true),
-            "y_pred": list(y_pred),
-            "b_pred": list(b_pred),
+            "roc_auc_score": float(metrics.roc_auc_score(y_true, y_pred)),
+            "precision_score": float(metrics.precision_score(y_true, b_pred)),
+            "recall_score": float(metrics.recall_score(y_true, b_pred)),
+            "tp": int(confu[1,1]),
+            "tn": int(confu[0,0]),
+            "fp": int(confu[0,1]),
+            "fn": int(confu[1,0]),
+            "y_true": [int(y) for y in y_true],
+            "y_pred": [float(y) for y in y_pred],
+            "b_pred": [int(y) for y in b_pred],
         }
         return report
 
@@ -84,11 +84,11 @@ class RegressionPerformance(BasePerformance):
         y_true = np.array(self.df_obs[self._prefix])
         y_pred = np.array(self.df_prd[self._prefix])
         report = {
-            "r2_score": metrics.r2_score(y_true, y_pred),
-            "mean_absolute_error": metrics.mean_absolute_error(y_true, y_pred),
-            "mean_squared_error": metrics.mean_squared_error(y_true, y_pred),
-            "y_true": list(y_true),
-            "y_pred": list(y_pred),
+            "r2_score": float(metrics.r2_score(y_true, y_pred)),
+            "mean_absolute_error": float(metrics.mean_absolute_error(y_true, y_pred)),
+            "mean_squared_error": float(metrics.mean_squared_error(y_true, y_pred)),
+            "y_true": [float(y) for y in y_true],
+            "y_pred": [float(y) for y in y_pred],
         }
         return report
 
