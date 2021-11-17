@@ -29,4 +29,16 @@ N_FOLDS = 5
 
 _CONFIG_FILENAME = "config.json"
 
+# Performance
+
 AUTOML_DEFAULT_TIME_BUDGET_MIN = 10
+
+# Ersilia Model Hub
+
+ERSILIA_HUB_DEFAULT_MODELS = [
+    "morgan-counts",
+    "cc-signaturizer",
+    "grover-embedding",
+    "molbert",
+    "mordred"
+]
