@@ -16,6 +16,8 @@ from .files import ParametersFile
 from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER
 from ..vars import CLF_PERCENTILES, MIN_CLASS
 
+from .. import ZairaBase
+
 
 class RegTasks(object):
     def __init__(self, data, params):
@@ -45,8 +47,8 @@ class RegTasks(object):
     def as_dict(self):
         res = OrderedDict()
         res["reg_raw"] = self.raw()
-        res["reg_log"] = self.log()
-        res["reg_rnk"] = self.rnk()
+        #res["reg_log"] = self.log()
+        #res["reg_rnk"] = self.rnk()
         return res
 
 
@@ -113,32 +115,45 @@ class ClfTasks(object):
             v = self._binarize(cut)
             if self._has_enough_min_class(v):
                 res[k] = v
+                return res # At the moment only one clf is done. TODO
         for p, cut in zip(CLF_PERCENTILES, pcuts):
             k = "clf_p{0}".format(str(p).zfill(2))
             v = self._binarize(cut)
             if self._has_enough_min_class(v):
                 res[k] = v
+                return res # At the moment only one clf is done. TODO
         return res
 
 
 class AuxiliaryBinaryTask(object):
     def __init__(self, data):
         self.df = data
-        self.reference = "clf_p10"
+        for c in list(self.df.columns):
+            if "clf_" in c:
+                self.reference = c # At the moment only one clf is done. TODO
+                break
+        # TODO
 
     def get(self):
         # TODO: Work with multitask
         return self.df[self.reference]
 
 
-class SingleTasks(object):
+class SingleTasks(ZairaBase):
     def __init__(self, path):
-        self.path = path
-        os.makedirs(os.path.join(self.path, CLF_SUBFOLDER), exist_ok=True)
-        os.makedirs(os.path.join(self.path, REG_SUBFOLDER), exist_ok=True)
+        ZairaBase.__init__(self)
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
+        if self.is_predict():
+            self.trained_path = self.get_trained_dir()
+        else:
+            self.trained_path = self.path
 
     def _get_params(self):
-        return ParametersFile(self.path).params
+        params = ParametersFile(path=self.trained_path)
+        return params.params
 
     def _get_data(self):
         df = pd.read_csv(os.path.join(self.path, VALUES_FILENAME))

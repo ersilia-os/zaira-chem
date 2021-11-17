@@ -44,8 +44,6 @@ class RawDescriptors(ZairaBase):
     def run(self):
         done_eos = []
         for eos_id in self.eos_ids():
-            if eos_id != "morgan-counts":
-                continue
             output_h5 = self.output_h5_filename(eos_id)
             run_command(
                 "ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}".format(

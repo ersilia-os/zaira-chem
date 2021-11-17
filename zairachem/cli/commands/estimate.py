@@ -4,6 +4,8 @@ from . import zairachem_cli
 from ..echo import echo
 
 from ...estimators.estimate import Estimator
+from ...estimators.assemble import OutcomeAssembler
+from ...estimators.performance import PerformanceReporter
 
 
 def estimate_cmd():
@@ -11,6 +13,10 @@ def estimate_cmd():
     @click.option("--dir", "-d", type=click.STRING)
     def estimate(dir):
         echo("Estimator".format(dir))
-        ft = Estimator(path=dir)
-        ft.run()
+        e = Estimator(path=dir)
+        e.run()
+        o = OutcomeAssembler(path=dir)
+        o.run()
+        p = PerformanceReporter(path=dir)
+        p.run()
         echo("Done", fg="green")

@@ -8,7 +8,7 @@ from rdkit import Chem
 
 from ..vars import DATA_SUBFOLDER
 from .schema import InputSchema
-from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME, MAPPING_FILENAME
+from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME, MAPPING_FILENAME, INPUT_SCHEMA_FILENAME
 from . import (
     MAPPING_ORIGINAL_COLUMN,
     MAPPING_DEDUPE_COLUMN,
@@ -28,13 +28,52 @@ from . import (
 
 
 class ParametersFile(object):
-    def __init__(self, path):
-        self.filename = os.path.join(path, PARAMETERS_FILE)
-        self.params = self.load()
+    def __init__(self, path=None, full_path=None):
+        if path is None and full_path is None:
+            self.params = None
+        else:
+            if full_path is None:
+                self.filename = os.path.join(path, PARAMETERS_FILE)
+            else:
+                self.filename = full_path
+            self.params = self.load()
 
+    # TODO Improve readibility
     def load(self):
         with open(self.filename, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+        if "assay_id" not in data:
+            data["assay_id"] = "ASSAY"
+        if "assay_type" not in data:
+            data["assay_type"] = None
+        if "credibility_range" not in data:
+            data["credibility_range"] = {
+                "min": None,
+                "max": None
+            }
+        if "threshold" not in data:
+            if "thresholds" in data:
+                pass
+            else:
+                data["thresholds"] = {
+                    "expert_1": None,
+                    "expert_2": None,
+                    "expert_3": None,
+                    "expert_4": None,
+                    "expert_5": None
+                }
+        else:
+            data["thresholds"] = {
+                "expert_1": data["threshold"],
+                "expert_2": None,
+                "expert_3": None,
+                "expert_4": None,
+                "expert_5": None
+            }
+            del data["threshold"]
+        if "direction" not in data:
+            data["direction"] = "high"
+        return data
 
 
 class SingleFile(InputSchema):
@@ -105,15 +144,47 @@ class SingleFile(InputSchema):
             df[GROUP_COLUMN] = self.df[self.group_column]
         else:
             df[GROUP_COLUMN] = None
-
+        assert (df.shape[0] == self.df.shape[0])
         return df
 
-    def compounds_table(self, df):
-        dfc = (
-            df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN, GROUP_COLUMN]]
-            .drop_duplicates(inplace=False)
-            .reset_index(drop=True)
+    def dedupe(self, df, path):
+        mapping = collections.defaultdict(list)
+        cid2smiles = {}
+        for i, r in enumerate(df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]].values):
+            cid = r[0]
+            smi = r[1]
+            mol = Chem.MolFromSmiles(smi)
+            if mol is None:
+                continue
+            mapping[cid] += [i]
+            cid2smiles[cid] = smi
+        unique_cids = sorted(set(mapping.keys()))
+        unique_cids_idx = dict((k, i) for i, k in enumerate(unique_cids))
+        mapping = dict((x, k) for k, v in mapping.items() for x in v)
+        R = []
+        for i in range(df.shape[0]):
+            if i in mapping:
+                cid = mapping[i]
+                R += [[i, unique_cids_idx[cid], cid]]
+            else:
+                R += [[i, None, None]]
+        dfm = pd.DataFrame(
+            R,
+            columns=[
+                MAPPING_ORIGINAL_COLUMN,
+                MAPPING_DEDUPE_COLUMN,
+                COMPOUND_IDENTIFIER_COLUMN,
+            ],
         )
+        dfm.to_csv(os.path.join(path, MAPPING_FILENAME), index=False)
+        R = []
+        for cid in unique_cids:
+            R += [[cid, cid2smiles[cid]]]
+        dfc = pd.DataFrame(R, columns=[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN])
+        return dfc
+
+    def compounds_table(self, df, path):
+        dfc = self.dedupe(df, path)
         return dfc
 
     def assays_table(self, df):
@@ -163,15 +234,30 @@ class SingleFile(InputSchema):
         )
         return dfv
 
+    def input_schema(self):
+        sc = {
+            "input_file": self.input_file,
+            "identifier_column": self.identifier_column,
+            "smiles_column": self.smiles_column,
+            "qualifier_column": self.qualifier_column,
+            "values_column": self.values_column,
+            "date_column": self.date_column,
+            "group_column": self.group_column
+        }
+        return sc
+
     def process(self):
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
         df = self.normalize_dataframe()
-        dfc = self.compounds_table(df)
+        dfc = self.compounds_table(df, path)
         dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
         dfa = self.assays_table(df)
         dfa.to_csv(os.path.join(path, ASSAYS_FILENAME), index=False)
         dfv = self.values_table(df)
         dfv.to_csv(os.path.join(path, VALUES_FILENAME), index=False)
+        schema = self.input_schema()
+        with open(os.path.join(path, INPUT_SCHEMA_FILENAME), "w") as f:
+            json.dump(schema, f, indent=4)
 
 
 class SingleFileForPrediction(SingleFile):
@@ -187,45 +273,25 @@ class SingleFileForPrediction(SingleFile):
             identifiers = list(self.df[self.identifier_column])
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         df[SMILES_COLUMN] = self.df[self.smiles_column]
+        assert (df.shape[0] == self.df.shape[0])
         return df
+
+    def input_schema(self):
+        sc = {
+            "input_file": self.input_file,
+            "identifier_column": self.identifier_column,
+            "smiles_column": self.smiles_column
+        }
+        return sc
 
     def process(self):
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
         df = self.normalize_dataframe()
-        mapping = collections.defaultdict(list)
-        cid2smiles = {}
-        for i, r in enumerate(df[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]].values):
-            cid = r[0]
-            smi = r[1]
-            mol = Chem.MolFromSmiles(smi)
-            if mol is None:
-                continue
-            mapping[cid] += [i]
-            cid2smiles[cid] = smi
-        unique_cids = sorted(set(mapping.keys()))
-        unique_cids_idx = dict((k, i) for i, k in enumerate(unique_cids))
-        mapping = dict((x, k) for k, v in mapping.items() for x in v)
-        R = []
-        for i in range(df.shape[0]):
-            if i in mapping:
-                cid = mapping[i]
-                R += [[i, unique_cids_idx[cid], cid]]
-            else:
-                R += [[i, None, None]]
-        dfm = pd.DataFrame(
-            R,
-            columns=[
-                MAPPING_ORIGINAL_COLUMN,
-                MAPPING_DEDUPE_COLUMN,
-                COMPOUND_IDENTIFIER_COLUMN,
-            ],
-        )
-        dfm.to_csv(os.path.join(path, MAPPING_FILENAME), index=False)
-        R = []
-        for cid in unique_cids:
-            R += [[cid, cid2smiles[cid]]]
-        dfc = pd.DataFrame(R, columns=[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN])
+        dfc = self.dedupe(df, path)
         dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
+        schema = self.input_schema()
+        with open(os.path.join(path, INPUT_SCHEMA_FILENAME), "w") as f:
+            json.dump(schema, f, indent=4)
 
 
 # TODO: When three files are given, use the following
