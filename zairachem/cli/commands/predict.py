@@ -6,6 +6,7 @@ from ..echo import echo
 from ...setup.prediction import PredictSetup
 from ...descriptors.describe import Describer
 from ...estimators.estimate import Estimator
+from ...estimators.assemble import OutcomeAssembler
 
 
 def predict_cmd():
@@ -30,4 +31,8 @@ def predict_cmd():
             path=output_dir
         )
         e.run()
+        o = OutcomeAssembler(
+            path=output_dir
+        )
+        o.run()
         echo("Done", fg="green")
