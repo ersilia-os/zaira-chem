@@ -84,7 +84,6 @@ class FlamlSettings(object):
             "early_stop": True,
             "max_iter": min(len(self.y), 1000000), # TODO better heuristic based on sample size
         }
-        automl_settings["max_iter"] = 1 # TODO remove
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
         groups = self.cast_groups(groups)
