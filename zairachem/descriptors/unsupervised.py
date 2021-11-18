@@ -7,6 +7,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.decomposition import PCA
 from umap import UMAP
 
+from . import GLOBAL_UNSUPERVISED_FILE_NAME
 from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
 from . import DescriptorBase
 from ..utils.matrices import Hdf5, Data
@@ -14,7 +15,6 @@ from ..utils.matrices import Hdf5, Data
 MAX_NA = 0.2
 
 INDIVIDUAL_UNSUPERVISED_FILE_NAME = "individual_unsupervised.h5"
-GLOBAL_UNSUPERVISED_FILE_NAME = "global_unsupervised.h5"
 
 MAX_COMPONENTS = 1024
 

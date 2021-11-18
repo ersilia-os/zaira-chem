@@ -7,6 +7,7 @@ from ...setup.prediction import PredictSetup
 from ...descriptors.describe import Describer
 from ...estimators.estimate import Estimator
 from ...estimators.assemble import OutcomeAssembler
+from ...estimators.performance import PerformanceReporter
 
 
 def predict_cmd():
@@ -35,4 +36,8 @@ def predict_cmd():
             path=output_dir
         )
         o.run()
+        p = PerformanceReporter(
+            path=output_dir
+        )
+        p.run()
         echo("Done", fg="green")

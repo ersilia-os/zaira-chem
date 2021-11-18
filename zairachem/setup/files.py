@@ -273,8 +273,13 @@ class SingleFile(InputSchema):
 
 
 class SingleFileForPrediction(SingleFile):
-    def __init__(self, input_file):
-        SingleFile.__init__(self, input_file, params=None)
+    def __init__(self, input_file, params):
+        SingleFile.__init__(self, input_file, params)
+        self.trained_path = self.get_trained_dir()
+
+    def get_trained_values_column(self):
+        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r") as f:
+            return json.load(f)["values_column"]
 
     def normalize_dataframe(self):
         self.identifier_column = self.find_identifier_column()
@@ -283,24 +288,51 @@ class SingleFileForPrediction(SingleFile):
             identifiers = self._make_identifiers()
         else:
             identifiers = list(self.df[self.identifier_column])
+        self.qualifier_column = self.find_qualifier_column()
+        self.values_column = self.find_values_column()
+        if self.values_column is not None:
+            trained_values_column = self.get_trained_values_column()
+            assert(self.values_column == trained_values_column)
+
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         df[SMILES_COLUMN] = self.df[self.smiles_column]
         assert (df.shape[0] == self.df.shape[0])
+
+        if self.values_column is not None:
+            if self.qualifier_column is None:
+                qualifiers = ["="] * self.df.shape[0]
+            else:
+                qualifiers = self._impute_qualifiers()
+            df[QUALIFIER_COLUMN] = qualifiers
+            df[VALUES_COLUMN] = self.df[self.values_column]
+            self.has_tasks = True
+        else:
+            self.has_tasks = False
+
         return df
 
     def input_schema(self):
         sc = {
             "input_file": self.input_file,
             "identifier_column": self.identifier_column,
-            "smiles_column": self.smiles_column
+            "smiles_column": self.smiles_column,
+            "qualifier_column": self.qualifier_column,
+            "values_column": self.values_column,
         }
         return sc
 
     def process(self):
+        print("PARAMETERS")
+        print(self.params)
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
         df = self.normalize_dataframe()
         dfc = self.dedupe(df, path)
         dfc.to_csv(os.path.join(path, COMPOUNDS_FILENAME), index=False)
+        if self.has_tasks:
+            dfa = self.assays_table(df)
+            dfa.to_csv(os.path.join(path, ASSAYS_FILENAME), index=False)
+            dfv = self.values_table(df)
+            dfv.to_csv(os.path.join(path, VALUES_FILENAME), index=False)
         schema = self.input_schema()
         with open(os.path.join(path, INPUT_SCHEMA_FILENAME), "w") as f:
             json.dump(schema, f, indent=4)

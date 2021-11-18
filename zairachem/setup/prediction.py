@@ -6,9 +6,11 @@ from time import time
 
 from .. import ZairaBase
 
-from .files import SingleFileForPrediction
+from .files import SingleFileForPrediction, ParametersFile
+from .tasks import SingleTasksForPrediction
 from .standardize import Standardize
 from .merge import DataMergerForPrediction
+from .clean import SetupCleaner
 
 from . import PARAMETERS_FILE
 
@@ -66,19 +68,27 @@ class PredictSetup(object):
         )
 
     def _normalize_input(self):
-        f = SingleFileForPrediction(self.input_file)
+        params = ParametersFile(full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)).load()
+        f = SingleFileForPrediction(self.input_file, params)
         f.process()
+        self.has_tasks = f.has_tasks
 
     def _melloddy_tuner_run(self):
         MelloddyTunerPredictPipeline(
             os.path.join(self.output_dir, DATA_SUBFOLDER)
-        ).run()
+        ).run(has_tasks=self.has_tasks)
 
     def _standardize(self):
         Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def _tasks(self):
+        SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
     def _merge(self):
-        DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(self.has_tasks)
+
+    def _clean(self):
+        SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
@@ -90,5 +100,8 @@ class PredictSetup(object):
         self._normalize_input()
         self._melloddy_tuner_run()
         self._standardize()
+        if self.has_tasks:
+            self._tasks()
         self._merge()
+        self._clean()
         self.update_elapsed_time()
