@@ -1,5 +1,4 @@
 class DescriptorsCleaner(object):
-
     def __init__(self):
         pass
 

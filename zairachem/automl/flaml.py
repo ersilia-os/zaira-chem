@@ -38,12 +38,15 @@ class FlamlSettings(object):
         group_idxs = collections.defaultdict(list)
         for i, g in enumerate(groups):
             group_idxs[g] += [i]
-        for k,v in group_idxs.items():
+        for k, v in group_idxs.items():
             v = np.array(v)
             y_ = self.y[v]
-            n_0 = np.sum(y_==0)
-            n_1 = np.sum(y_==1)
-            if n_0 < MIN_SAMPLES_TO_ALLOW_EVALUATION or n_1 < MIN_SAMPLES_TO_ALLOW_EVALUATION:
+            n_0 = np.sum(y_ == 0)
+            n_1 = np.sum(y_ == 1)
+            if (
+                n_0 < MIN_SAMPLES_TO_ALLOW_EVALUATION
+                or n_1 < MIN_SAMPLES_TO_ALLOW_EVALUATION
+            ):
                 return False
         return True
 
@@ -75,14 +78,16 @@ class FlamlSettings(object):
 
     def get_automl_settings(self, task, time_budget, estimators, groups):
         automl_settings = {
-            "time_budget": max(time_budget, 60), # Do at least 1 minute
+            "time_budget": max(time_budget, 60),  # Do at least 1 minute
             "metric": self.get_metric(task),
             "task": task,
             "log_file_name": "automl.log",
             "log_training_metric": True,
             "verbose": 3,
             "early_stop": True,
-            "max_iter": min(len(self.y), 1000000), # TODO better heuristic based on sample size
+            "max_iter": min(
+                len(self.y), 1000000
+            ),  # TODO better heuristic based on sample size
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
@@ -160,7 +165,10 @@ class FlamlEstimator(object):
             automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
             automl_settings["n_splits"] = len(unique_groups)
             automl_settings["estimator_list"] = [best_estimator]
-            automl_settings["max_iter"] = min(int(self.main_automl_settings["max_iter"]*0.25)+1, DEFAULT_MAX_ITER_RETRAIN)
+            automl_settings["max_iter"] = min(
+                int(self.main_automl_settings["max_iter"] * 0.25) + 1,
+                DEFAULT_MAX_ITER_RETRAIN,
+            )
             model = AutoML()
             model.fit(
                 X_train=X_tr,
@@ -190,7 +198,12 @@ class FlamlClassifier(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC, estimators=None, groups=None
+        self,
+        X,
+        y,
+        time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC,
+        estimators=None,
+        groups=None,
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         threshold = GhostLight().get_threshold(y, y_hat)
@@ -238,7 +251,12 @@ class FlamlRegressor(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC, estimators=None, groups=None
+        self,
+        X,
+        y,
+        time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC,
+        estimators=None,
+        groups=None,
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         self.y_hat = y_hat

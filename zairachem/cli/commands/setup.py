@@ -13,11 +13,30 @@ def setup_cmd():
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default="output", type=click.STRING)
     @click.option("--model_dir", "-m", default=None, type=click.STRING)
-    @click.option("--time_budget", "-t", default=60, type=click.INT, help="Time budget in minutes")
-    @click.option("--threshold", "-c", default=None, type=click.FLOAT, help="Binary cutoff")
-    @click.option("--direction", "-d", default=None, type=click.STRING, help="Direction of the outcome ('high' or 'low').")
+    @click.option(
+        "--time_budget", "-t", default=60, type=click.INT, help="Time budget in minutes"
+    )
+    @click.option(
+        "--threshold", "-c", default=None, type=click.FLOAT, help="Binary cutoff"
+    )
+    @click.option(
+        "--direction",
+        "-d",
+        default=None,
+        type=click.STRING,
+        help="Direction of the outcome ('high' or 'low').",
+    )
     @click.option("--parameters", "-p", default=None, type=click.STRING)
-    def setup(task, input_file, output_dir, model_dir, time_budget, threshold, direction, parameters):
+    def setup(
+        task,
+        input_file,
+        output_dir,
+        model_dir,
+        time_budget,
+        threshold,
+        direction,
+        parameters,
+    ):
         echo("Reading from {0}".format(input_file))
         if task == "train":
             s = TrainSetup(

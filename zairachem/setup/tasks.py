@@ -76,7 +76,10 @@ class RegTasks(object):
         for y_col in y_cols:
             y = res[y_col]
             interpolator = interpolate.interp1d(x, y)
-            joblib.dump(interpolator, os.path.join(path, DATA_SUBFOLDER, y_col+"_interpolator.joblib"))
+            joblib.dump(
+                interpolator,
+                os.path.join(path, DATA_SUBFOLDER, y_col + "_interpolator.joblib"),
+            )
 
 
 class RegTasksForPrediction(RegTasks):
@@ -86,7 +89,8 @@ class RegTasksForPrediction(RegTasks):
     def load(self, path):
         self.interpolators = {}
         for f in os.listdir(os.path.join(path, DATA_SUBFOLDER)):
-            if "_interpolator.joblib" not in f: continue
+            if "_interpolator.joblib" not in f:
+                continue
             interpolator = joblib.load(os.path.join(path, DATA_SUBFOLDER, f))
             y_col = f.split("_interpolator.joblib")[0]
             self.interpolators[y_col] = interpolator
@@ -189,7 +193,7 @@ class ClfTasks(object):
                     res[k] = v
                     do_skip = True
                 else:
-                    k = k+"_skip"
+                    k = k + "_skip"
                     res[k] = v
                 self._ecuts[k] = float(cut)
                 self._columns += [k]
@@ -208,11 +212,7 @@ class ClfTasks(object):
         return res
 
     def save(self, path):
-        data = {
-            "columns": self._columns,
-            "ecuts": self._ecuts,
-            "pcuts": self._pcuts
-        }
+        data = {"columns": self._columns, "ecuts": self._ecuts, "pcuts": self._pcuts}
         with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "w") as f:
             json.dump(data, f)
 
@@ -245,7 +245,7 @@ class AuxiliaryBinaryTask(object):
         self.df = data
         for c in list(self.df.columns):
             if "clf_" in c:
-                self.reference = c # At the moment only one clf is done. TODO
+                self.reference = c  # At the moment only one clf is done. TODO
                 break
         # TODO
 
@@ -303,7 +303,6 @@ class SingleTasks(ZairaBase):
 
 
 class SingleTasksForPrediction(SingleTasks):
-
     def __init__(self, path):
         SingleTasks.__init__(self, path=path)
 
@@ -316,12 +315,12 @@ class SingleTasksForPrediction(SingleTasks):
             reg_tasks = RegTasksForPrediction(df, params)
             reg_tasks.load(self.trained_path)
             reg = reg_tasks.as_dict()
-            for k,v in reg.items():
+            for k, v in reg.items():
                 df[k] = v
             clf_tasks = ClfTasksForPrediction(df, params)
             clf_tasks.load(self.trained_path)
             clf = clf_tasks.as_dict()
-            for k,v in clf.items():
+            for k, v in clf.items():
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)

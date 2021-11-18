@@ -14,7 +14,9 @@ def fit_cmd():
     @zairachem_cli.command(help="Fit an ML-based QSAR model")
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default=None, type=click.STRING)
-    @click.option("--time_budget", "-t", default=60, type=click.INT, help="Time budget in minutes")
+    @click.option(
+        "--time_budget", "-t", default=60, type=click.INT, help="Time budget in minutes"
+    )
     @click.option("--threshold", "-c", default=None, type=click.FLOAT)
     @click.option("--direction", "-d", default=None, type=click.STRING)
     @click.option("--parameters", "-p", default=None, type=click.STRING)
@@ -26,23 +28,15 @@ def fit_cmd():
             parameters=parameters,
             time_budget=time_budget,
             direction=direction,
-            threshold=threshold
+            threshold=threshold,
         )
         s.setup()
-        d = Describer(
-            path=output_dir
-        )
+        d = Describer(path=output_dir)
         d.run()
-        e = Estimator(
-            path=output_dir
-        )
+        e = Estimator(path=output_dir)
         e.run()
-        o = OutcomeAssembler(
-            path=output_dir
-        )
+        o = OutcomeAssembler(path=output_dir)
         o.run()
-        p = PerformanceReporter(
-            path=output_dir
-        )
+        p = PerformanceReporter(path=output_dir)
         p.run()
         echo("Done", fg="green")

@@ -21,23 +21,15 @@ def predict_cmd():
             input_file=input_file,
             output_dir=output_dir,
             model_dir=model_dir,
-            time_budget=60, # TODO
+            time_budget=60,  # TODO
         )
         s.setup()
-        d = Describer(
-            path=output_dir
-        )
+        d = Describer(path=output_dir)
         d.run()
-        e = Estimator(
-            path=output_dir
-        )
+        e = Estimator(path=output_dir)
         e.run()
-        o = OutcomeAssembler(
-            path=output_dir
-        )
+        o = OutcomeAssembler(path=output_dir)
         o.run()
-        p = PerformanceReporter(
-            path=output_dir
-        )
+        p = PerformanceReporter(path=output_dir)
         p.run()
         echo("Done", fg="green")
