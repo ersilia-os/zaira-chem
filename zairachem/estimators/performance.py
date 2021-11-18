@@ -101,13 +101,45 @@ class PerformanceReporter(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
-        self.clf = ClassificationPerformance(path=path)
-        self.reg = RegressionPerformance(path=path)
+        self.has_tasks = self._has_tasks()
+        if self._has_clf_tasks():
+            self.clf = ClassificationPerformance(path=path)
+        else:
+            self.clf = None
+        if self._has_reg_tasks():
+            self.reg = RegressionPerformance(path=path)
+        else:
+            self.reg = None
+
+    def _has_tasks(self):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        for c in list(df.columns):
+            if "clf_" in c or "reg_" in c:
+                return True
+        return False
+
+    def _has_reg_tasks(self):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        for c in list(df.columns):
+            if "reg_" in c:
+                return True
+        return False
+
+    def _has_clf_tasks(self):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        for c in list(df.columns):
+            if "clf_" in c:
+                return True
+        return False
 
     def run(self):
-        clf_rep = self.clf.calculate()
-        with open(os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w") as f:
-            json.dump(clf_rep, f, indent=4)
-        reg_rep = self.reg.calculate()
-        with open(os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w") as f:
-            json.dump(reg_rep, f, indent=4)
+        if not self.has_tasks:
+            return
+        if self.clf is not None:
+            clf_rep = self.clf.calculate()
+            with open(os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w") as f:
+                json.dump(clf_rep, f, indent=4)
+        if self.reg is not None:
+            reg_rep = self.reg.calculate()
+            with open(os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w") as f:
+                json.dump(reg_rep, f, indent=4)

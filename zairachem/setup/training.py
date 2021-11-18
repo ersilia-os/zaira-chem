@@ -12,6 +12,7 @@ from .standardize import Standardize
 from .folding import Folds
 from .tasks import SingleTasks
 from .merge import DataMerger
+from .clean import SetupCleaner
 
 from . import PARAMETERS_FILE
 
@@ -89,6 +90,9 @@ class TrainSetup(object):
     def _merge(self):
         DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def _clean(self):
+        SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
 
@@ -103,4 +107,5 @@ class TrainSetup(object):
         self._folds()
         self._tasks()
         self._merge()
+        self._clean()
         self.update_elapsed_time()

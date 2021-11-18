@@ -4,7 +4,8 @@ import uuid
 import shutil
 import joblib
 import json
-from sklearn.model_selection import KFold
+import collections
+from sklearn.model_selection import KFold, StratifiedKFold
 
 from flaml import AutoML
 from ..tools.ghost.ghost import GhostLight
@@ -16,23 +17,54 @@ from . import AUTOML_DEFAULT_TIME_BUDGET_SEC
 DEFAULT_TIME_BUDGET_RETRAIN_SECONDS = 60
 DEFAULT_MAX_ITER_RETRAIN = 100
 
+MIN_SAMPLES_TO_ALLOW_EVALUATION = 1
+
 
 class FlamlSettings(object):
     def __init__(self, y):
         # TODO: This will help elucidate best metric, or use multitasking if necessary
         self.y = np.array(y)
+        self.is_clf = self._is_binary()
+
+    def _is_binary(self):
+        if len(set(self.y)) == 2:
+            return True
+        else:
+            return False
+
+    def _has_enough_samples_per_group(self, groups):
+        if not self.is_clf:
+            return True
+        group_idxs = collections.defaultdict(list)
+        for i, g in enumerate(groups):
+            group_idxs[g] += [i]
+        for k,v in group_idxs.items():
+            v = np.array(v)
+            y_ = self.y[v]
+            n_0 = np.sum(y_==0)
+            n_1 = np.sum(y_==1)
+            if n_0 < MIN_SAMPLES_TO_ALLOW_EVALUATION or n_1 < MIN_SAMPLES_TO_ALLOW_EVALUATION:
+                return False
+        return True
 
     def cast_groups(self, groups):
         if groups is not None:
-            return groups
-        else:
-            splitter = KFold(n_splits=N_FOLDS, shuffle=True)
-            groups = np.zeros(len(self.y), dtype=int)
+            if self._has_enough_samples_per_group(groups):
+                return groups
+        groups = np.zeros(len(self.y), dtype=int)
+        if self.is_clf:
+            splitter = StratifiedKFold(n_splits=N_FOLDS, shuffle=True)
             i = 0
-            for _, test_idx in splitter.split(folds):
+            for _, test_idx in splitter.split(self.y, self.y):
                 groups[test_idx] = i
                 i += 1
-            return list(groups)
+        else:
+            splitter = KFold(n_splits=N_FOLDS, shuffle=True)
+            i = 0
+            for _, test_idx in splitter.split(self.y):
+                groups[test_idx] = i
+                i += 1
+        return np.array([int(x) for x in groups])
 
     def get_metric(self, task):
         # TODO: Adapt to imbalanced learning
@@ -50,8 +82,9 @@ class FlamlSettings(object):
             "log_training_metric": True,
             "verbose": 3,
             "early_stop": True,
-            "max_iter": min(len(self.y), 1000000), # TODO heuristic based on sample size
+            "max_iter": min(len(self.y), 1000000), # TODO better heuristic based on sample size
         }
+        automl_settings["max_iter"] = 1 # TODO remove
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
         groups = self.cast_groups(groups)
@@ -128,7 +161,7 @@ class FlamlEstimator(object):
             automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
             automl_settings["n_splits"] = len(unique_groups)
             automl_settings["estimator_list"] = [best_estimator]
-            automl_settings["max_iter"] = min(self.main_automl_settings["max_iter"], DEFAULT_MAX_ITER_RETRAIN)
+            automl_settings["max_iter"] = min(int(self.main_automl_settings["max_iter"]*0.25)+1, DEFAULT_MAX_ITER_RETRAIN)
             model = AutoML()
             model.fit(
                 X_train=X_tr,

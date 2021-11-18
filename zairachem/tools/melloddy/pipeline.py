@@ -25,6 +25,8 @@ class MelloddyTunerPredictPipeline(object):
     def __init__(self, path):
         self.path = path
 
-    def run(self):
+    def run(self, has_tasks):
+        if has_tasks:
+            PrepareTrain(self.path).run()
         PreparePredict(self.path).run()
         Standardize(self.path).run()

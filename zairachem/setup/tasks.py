@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 from collections import OrderedDict
 from scipy.stats import rankdata, gumbel_r
+from scipy import interpolate
+import joblib
+import json
 
 from . import (
     VALUES_FILENAME,
@@ -12,7 +15,7 @@ from . import (
     AUXILIARY_TASK_COLUMN,
 )
 from .files import ParametersFile
-from ..vars import CLF_PERCENTILES, MIN_CLASS
+from ..vars import CLF_PERCENTILES, MIN_CLASS, DATA_SUBFOLDER
 from .. import ZairaBase
 
 
@@ -60,6 +63,59 @@ class RegTasks(object):
         rnk = self.rnk()
         res["reg_rnk_skip"] = rnk
         res["reg_gum"] = self.gum(rnk)
+        return res
+
+    def save(self, res, path):
+        y_cols = []
+        for k in res.keys():
+            if "raw" in k:
+                x_col = k
+            else:
+                y_cols += [k]
+        x = np.array(res[x_col])
+        for y_col in y_cols:
+            y = res[y_col]
+            interpolator = interpolate.interp1d(x, y)
+            joblib.dump(interpolator, os.path.join(path, DATA_SUBFOLDER, y_col+"_interpolator.joblib"))
+
+
+class RegTasksForPrediction(RegTasks):
+    def __init__(self, data, params):
+        RegTasks.__init__(self, data, params)
+
+    def load(self, path):
+        self.interpolators = {}
+        for f in os.listdir(os.path.join(path, DATA_SUBFOLDER)):
+            if "_interpolator.joblib" not in f: continue
+            interpolator = joblib.load(os.path.join(path, DATA_SUBFOLDER, f))
+            y_col = f.split("_interpolator.joblib")[0]
+            self.interpolators[y_col] = interpolator
+
+    def log(self, raw):
+        for k in self.interpolators.keys():
+            if "log" in k:
+                break
+        return self.interpolators[k](raw)
+
+    def rnk(self, raw):
+        for k in self.interpolators.keys():
+            if "rnk" in k:
+                break
+        return self.interpolators[k](raw)
+
+    def gum(self, raw):
+        for k in self.interpolators.keys():
+            if "gum" in k:
+                break
+        return self.interpolators[k](raw)
+
+    def as_dict(self):
+        res = OrderedDict()
+        raw = self.raw()
+        res["reg_raw_skip"] = raw
+        res["reg_log_skip"] = self.log(raw)
+        res["reg_rnk_skip"] = self.rnk(raw)
+        res["reg_gum"] = self.gum(raw)
         return res
 
 
@@ -122,6 +178,9 @@ class ClfTasks(object):
         pcuts = self.percentiles()
         res = OrderedDict()
         do_skip = False
+        self._ecuts = {}
+        self._pcuts = {}
+        self._columns = []
         for i, cut in enumerate(ecuts):
             k = "clf_ex{0}".format(i + 1)
             v = self._binarize(cut)
@@ -130,7 +189,10 @@ class ClfTasks(object):
                     res[k] = v
                     do_skip = True
                 else:
-                    res[k+"_skip"] = v
+                    k = k+"_skip"
+                    res[k] = v
+                self._ecuts[k] = float(cut)
+                self._columns += [k]
         for p, cut in zip(CLF_PERCENTILES, pcuts):
             k = "clf_p{0}".format(str(p).zfill(2))
             v = self._binarize(cut)
@@ -139,7 +201,42 @@ class ClfTasks(object):
                     res[k] = v
                     do_skip = True
                 else:
-                    res[k+"_skip"] = v
+                    k = k + "_skip"
+                    res[k] = v
+                self._pcuts[k] = float(cut)
+                self._columns += [k]
+        return res
+
+    def save(self, path):
+        data = {
+            "columns": self._columns,
+            "ecuts": self._ecuts,
+            "pcuts": self._pcuts
+        }
+        with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "w") as f:
+            json.dump(data, f)
+
+
+class ClfTasksForPrediction(ClfTasks):
+    def __init__(self, data, params):
+        ClfTasks.__init__(self, data, params)
+
+    def load(self, path):
+        with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "r") as f:
+            data = json.load(f)
+        self._columns = data["columns"]
+        self._ecuts = data["ecuts"]
+        self._pcuts = data["pcuts"]
+
+    def as_dict(self):
+        res = OrderedDict()
+        for col in self._columns:
+            if col in self._ecuts:
+                cut = self._ecuts[col]
+            if col in self._pcuts:
+                cut = self._pcuts[col]
+            v = self._binarize(cut)
+            res[col] = v
         return res
 
 
@@ -167,10 +264,10 @@ class SingleTasks(ZairaBase):
         if self.is_predict():
             self.trained_path = self.get_trained_dir()
         else:
-            self.trained_path = self.path
+            self.trained_path = self.get_output_dir()
 
     def _get_params(self):
-        params = ParametersFile(path=self.trained_path)
+        params = ParametersFile(path=os.path.join(self.trained_path, DATA_SUBFOLDER))
         return params.params
 
     def _get_data(self):
@@ -186,16 +283,45 @@ class SingleTasks(ZairaBase):
     def run(self):
         df = self._get_data()
         if self._is_simply_binary_classification(df):
-            df["clf_raw"] = df[VALUES_COLUMN]
+            df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
             params = self._get_params()
-            reg = RegTasks(df, params).as_dict()
+            reg_tasks = RegTasks(df, params)
+            reg = reg_tasks.as_dict()
+            reg_tasks.save(reg, self.trained_path)
             for k, v in reg.items():
                 df[k] = v
-            clf = ClfTasks(df, params).as_dict()
+            clf_tasks = ClfTasks(df, params)
+            clf = clf_tasks.as_dict()
+            clf_tasks.save(self.trained_path)
             for k, v in clf.items():
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         auxiliary = AuxiliaryBinaryTask(df)
         df[AUXILIARY_TASK_COLUMN] = auxiliary.get()
+        df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)
+
+
+class SingleTasksForPrediction(SingleTasks):
+
+    def __init__(self, path):
+        SingleTasks.__init__(self, path=path)
+
+    def run(self):
+        df = self._get_data()
+        if self._is_simply_binary_classification(df):
+            df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
+        else:
+            params = self._get_params()
+            reg_tasks = RegTasksForPrediction(df, params)
+            reg_tasks.load(self.trained_path)
+            reg = reg_tasks.as_dict()
+            for k,v in reg.items():
+                df[k] = v
+            clf_tasks = ClfTasksForPrediction(df, params)
+            clf_tasks.load(self.trained_path)
+            clf = clf_tasks.as_dict()
+            for k,v in clf.items():
+                df[k] = v
+        df = df.drop(columns=[VALUES_COLUMN])
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)

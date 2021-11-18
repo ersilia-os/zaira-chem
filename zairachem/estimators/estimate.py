@@ -10,10 +10,12 @@ from ..automl.flaml import FlamlClassifier, FlamlRegressor
 
 from ..vars import DESCRIPTORS_SUBFOLDER, DATA_SUBFOLDER, DATA_FILENAME, MODELS_SUBFOLDER
 from ..setup import SCHEMA_MERGE_FILENAME, PARAMETERS_FILE
-from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME
+from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME, GLOBAL_UNSUPERVISED_FILE_NAME
 
 from . import Y_HAT_FILE
 
+
+# TODO Select best between supervised and unsupervised (head-to-head, same number of dimensions)
 
 ESTIMATORS = None
 
@@ -39,7 +41,14 @@ class BaseEstimator(ZairaBase):
         ) as f:
             self.schema = json.load(f)
 
-    def _get_X(self):
+    def _get_X_unsupervised(self):
+        # for now only use supervised processing
+        f = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME)
+        with h5py.File(f, "r") as f:
+            X = f["Values"][:]
+        return X
+
+    def _get_X_supervised(self):
         # for now only use supervised processing
         f = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_SUPERVISED_FILE_NAME)
         with h5py.File(f, "r") as f:
@@ -86,8 +95,8 @@ class Fitter(BaseEstimator):
     def run(self):
         self.reset_time()
         groups = self._get_flds()
-        X = self._get_X()
         tasks = collections.OrderedDict()
+        X = self._get_X_supervised()
         for t in self._get_reg_tasks():
             y = self._get_y(t)
             model = FlamlRegressor()
@@ -95,6 +104,7 @@ class Fitter(BaseEstimator):
             file_name = os.path.join(self.trained_path, t+".joblib")
             model.save(file_name)
             tasks[t] = model.y_hat
+        X = self._get_X_supervised()
         for t in self._get_clf_tasks():
             y = self._get_y(t)
             model = FlamlClassifier()
@@ -113,13 +123,14 @@ class Predictor(BaseEstimator):
 
     def run(self):
         self.reset_time()
-        X = self._get_X()
         tasks = collections.OrderedDict()
+        X = self._get_X_supervised()
         for t in self._get_reg_tasks():
             model = FlamlRegressor()
             file_name = os.path.join(self.trained_path, t+".joblib")
             model = model.load(file_name)
             tasks[t] = model.predict(X)
+        X = self._get_X_supervised()
         for t in self._get_clf_tasks():
             model = FlamlClassifier()
             file_name = os.path.join(self.trained_path, t+".joblib")
