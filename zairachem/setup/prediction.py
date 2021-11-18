@@ -2,6 +2,10 @@ import os
 import shutil
 import json
 
+from time import time
+
+from .. import ZairaBase
+
 from .files import SingleFileForPrediction
 from .standardize import Standardize
 from .merge import DataMergerForPrediction
@@ -24,15 +28,20 @@ from ..tools.melloddy.pipeline import MelloddyTunerPredictPipeline
 class PredictSetup(object):
     def __init__(self, input_file, output_dir, model_dir, time_budget):
         self.input_file = os.path.abspath(input_file)
-        self.output_dir = os.path.abspath(output_dir)
+        if output_dir is None:
+            self.output_dir = os.path.abspath(self.input_file.split(".")[0])
+        else:
+            self.output_dir = os.path.abspath(output_dir)
+        assert not os.path.exists(self.output_dir)
+        assert model_dir is not None
         self.model_dir = os.path.abspath(model_dir)
         self.time_budget = time_budget  # TODO
         assert os.path.exists(self.model_dir)
 
     def _open_session(self):
-        data = {"output_dir": self.output_dir, "model_dir": self.model_dir}
+        data = {"output_dir": self.output_dir, "model_dir": self.model_dir, "time_stamp": int(time()), "elapsed_time": 0}
         with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
 
     def _make_output_dir(self):
         if os.path.exists(self.output_dir):
@@ -71,6 +80,9 @@ class PredictSetup(object):
     def _merge(self):
         DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def update_elapsed_time(self):
+        ZairaBase().update_elapsed_time()
+
     def setup(self):
         self._make_output_dir()
         self._open_session()
@@ -79,3 +91,4 @@ class PredictSetup(object):
         self._melloddy_tuner_run()
         self._standardize()
         self._merge()
+        self.update_elapsed_time()

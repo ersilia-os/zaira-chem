@@ -19,9 +19,6 @@ LITE_SUBFOLDER = "lite"
 
 TRAINED_MODEL_SUBFOLDER = "trained"
 
-CLF_SUBFOLDER = "clf"
-REG_SUBFOLDER = "reg"
-
 CLF_PERCENTILES = [1, 10, 25]
 
 MIN_CLASS = 30
@@ -29,9 +26,6 @@ N_FOLDS = 5
 
 _CONFIG_FILENAME = "config.json"
 
-# Performance
-
-AUTOML_DEFAULT_TIME_BUDGET_MIN = 60
 
 # Ersilia Model Hub
 

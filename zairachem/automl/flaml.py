@@ -10,10 +10,11 @@ from flaml import AutoML
 from ..tools.ghost.ghost import GhostLight
 
 from ..vars import N_FOLDS
-from ..vars import AUTOML_DEFAULT_TIME_BUDGET_MIN
+from . import AUTOML_DEFAULT_TIME_BUDGET_SEC
 
 
 DEFAULT_TIME_BUDGET_RETRAIN_SECONDS = 60
+DEFAULT_MAX_ITER_RETRAIN = 100
 
 
 class FlamlSettings(object):
@@ -42,13 +43,14 @@ class FlamlSettings(object):
 
     def get_automl_settings(self, task, time_budget, estimators, groups):
         automl_settings = {
-            "time_budget": int(time_budget * 60) + 1,  #  in seconds
+            "time_budget": max(time_budget, 60), # Do at least 1 minute
             "metric": self.get_metric(task),
             "task": task,
             "log_file_name": "automl.log",
             "log_training_metric": True,
             "verbose": 3,
             "early_stop": True,
+            "max_iter": min(len(self.y), 1000000), # TODO heuristic based on sample size
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
@@ -126,6 +128,7 @@ class FlamlEstimator(object):
             automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
             automl_settings["n_splits"] = len(unique_groups)
             automl_settings["estimator_list"] = [best_estimator]
+            automl_settings["max_iter"] = min(self.main_automl_settings["max_iter"], DEFAULT_MAX_ITER_RETRAIN)
             model = AutoML()
             model.fit(
                 X_train=X_tr,
@@ -155,7 +158,7 @@ class FlamlClassifier(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
+        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC, estimators=None, groups=None
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         threshold = GhostLight().get_threshold(y, y_hat)
@@ -203,7 +206,7 @@ class FlamlRegressor(object):
         self.name = self.estimator.name
 
     def fit(
-        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_MIN, estimators=None, groups=None
+        self, X, y, time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC, estimators=None, groups=None
     ):
         y_hat = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
         self.y_hat = y_hat
