@@ -13,7 +13,7 @@ from ...estimators.performance import PerformanceReporter
 def predict_cmd():
     @zairachem_cli.command(help="Make predictions")
     @click.option("--input_file", "-i", type=click.STRING)
-    @click.option("--output_dir", "-o", default="output", type=click.STRING)
+    @click.option("--output_dir", "-o", default=None, type=click.STRING)
     @click.option("--model_dir", "-m", default=None, type=click.STRING)
     def predict(input_file, output_dir, model_dir):
         echo("Results will be stored at {0}".format(output_dir))
