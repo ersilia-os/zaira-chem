@@ -55,17 +55,20 @@ class InputSchema(ZairaBase):
             return cols[0]
 
     def _is_values_column(self, col):
-        values = list(self.df_[self.df_[col].notnull()][col])
-        c = 0
-        for v in values:
-            try:
-                float(v)
-            except:
-                continue
-            c += 1
-        if c == len(values):
-            return True
-        else:
+        try:
+            values = list(self.df_[self.df_[col].notnull()][col])
+            c = 0
+            for v in values:
+                try:
+                    float(v)
+                except:
+                    continue
+                c += 1
+            if c == len(values):
+                return True
+            else:
+                return False
+        except:
             return False
 
     def find_values_column(self):
@@ -77,9 +80,9 @@ class InputSchema(ZairaBase):
                 continue
         if len(cols) == 0:
             return None
-        if len(cols) == 1:
+        else:
             return cols[0]
-        if len(cols) > 1:
+        if len(cols) > 1: # TODO
             raise Exception
 
     def _is_qualifier_column(self, col):
