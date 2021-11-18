@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from collections import OrderedDict
-from scipy.stats import rankdata
+from scipy.stats import rankdata, gumbel_r
 
 from . import (
     VALUES_FILENAME,
@@ -12,10 +12,7 @@ from . import (
     AUXILIARY_TASK_COLUMN,
 )
 from .files import ParametersFile
-
-from ..vars import CLF_SUBFOLDER, REG_SUBFOLDER
 from ..vars import CLF_PERCENTILES, MIN_CLASS
-
 from .. import ZairaBase
 
 
@@ -44,11 +41,25 @@ class RegTasks(object):
             ranked = rankdata(-self.values, method="ordinal")
         return ranked / np.max(ranked)
 
+    def gum(self, rnk):
+        rnk = np.array(rnk)
+        sampled = gumbel_r.rvs(size=len(rnk))
+        idxs = np.argsort(sampled)
+        sampled = sampled[idxs]
+        idxs = np.argsort(rnk)
+        gum = np.zeros(len(rnk))
+        for i, idx in enumerate(idxs):
+            gum[idx] = sampled[i]
+        gum = np.array(gum)
+        return gum
+
     def as_dict(self):
         res = OrderedDict()
-        res["reg_raw"] = self.raw()
-        #res["reg_log"] = self.log()
-        #res["reg_rnk"] = self.rnk()
+        res["reg_raw_skip"] = self.raw()
+        res["reg_log_skip"] = self.log()
+        rnk = self.rnk()
+        res["reg_rnk_skip"] = rnk
+        res["reg_gum"] = self.gum(rnk)
         return res
 
 
@@ -110,18 +121,25 @@ class ClfTasks(object):
         ecuts = self.experts()
         pcuts = self.percentiles()
         res = OrderedDict()
+        do_skip = False
         for i, cut in enumerate(ecuts):
             k = "clf_ex{0}".format(i + 1)
             v = self._binarize(cut)
             if self._has_enough_min_class(v):
-                res[k] = v
-                return res # At the moment only one clf is done. TODO
+                if not do_skip:
+                    res[k] = v
+                    do_skip = True
+                else:
+                    res[k+"_skip"] = v
         for p, cut in zip(CLF_PERCENTILES, pcuts):
             k = "clf_p{0}".format(str(p).zfill(2))
             v = self._binarize(cut)
             if self._has_enough_min_class(v):
-                res[k] = v
-                return res # At the moment only one clf is done. TODO
+                if not do_skip:
+                    res[k] = v
+                    do_skip = True
+                else:
+                    res[k+"_skip"] = v
         return res
 
 

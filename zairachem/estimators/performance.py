@@ -23,7 +23,7 @@ class BasePerformance(ZairaBase):
             self.path = path
 
     def _relevant_columns(self, df):
-        return [c for c in list(df.columns) if "clf_" in c or "reg_" in c]
+        return [c for c in list(df.columns) if ("clf_" in c or "reg_" in c) and ("skip" not in c)]
 
     def get_obs_data(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))

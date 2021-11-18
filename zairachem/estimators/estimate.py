@@ -9,7 +9,7 @@ from .. import ZairaBase
 from ..automl.flaml import FlamlClassifier, FlamlRegressor
 
 from ..vars import DESCRIPTORS_SUBFOLDER, DATA_SUBFOLDER, DATA_FILENAME, MODELS_SUBFOLDER
-from ..setup import SCHEMA_MERGE_FILENAME
+from ..setup import SCHEMA_MERGE_FILENAME, PARAMETERS_FILE
 from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME
 
 from . import Y_HAT_FILE
@@ -47,11 +47,25 @@ class BaseEstimator(ZairaBase):
         return X
 
     def _get_clf_tasks(self):
-        return [t for t in self.schema["tasks"] if "clf_" in t and "_aux" not in t]
+        return [t for t in self.schema["tasks"] if "clf_" in t and "_aux" not in t and "skip" not in t]
 
     def _get_reg_tasks(self):
-        return [t for t in self.schema["tasks"] if "reg_" in t and "_aux" not in t]
+        return [t for t in self.schema["tasks"] if "reg_" in t and "_aux" not in t and "skip" not in t]
 
+    def _get_total_time_budget_sec(self):
+        with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
+            time_budget = json.load(f)["time_budget"]
+        return int(time_budget)*60+1
+
+    def _estimate_time_budget(self):
+        elapsed_time = self.get_elapsed_time()
+        total_time_budget = self._get_total_time_budget_sec()
+        available_time = total_time_budget - elapsed_time
+        # Assuming classification and regression will be done
+        available_time = available_time/2.
+        # Substract retraining and subsequent tasks
+        available_time = available_time*0.8
+        return int(available_time)+1
 
 class Fitter(BaseEstimator):
     def __init__(self, path):
@@ -70,23 +84,25 @@ class Fitter(BaseEstimator):
         return np.array(df[task])
 
     def run(self):
+        self.reset_time()
         groups = self._get_flds()
         X = self._get_X()
         tasks = collections.OrderedDict()
-        for t in self._get_clf_tasks():
-            y = self._get_y(t)
-            model = FlamlClassifier()
-            model.fit(X, y, estimators=ESTIMATORS, groups=groups)
-            file_name = os.path.join(self.trained_path, t+".joblib")
-            model.save(file_name)
-            tasks[t] = model.y_hat
         for t in self._get_reg_tasks():
             y = self._get_y(t)
             model = FlamlRegressor()
-            model.fit(X, y, estimators=ESTIMATORS, groups=groups)
+            model.fit(X, y, time_budget=self._estimate_time_budget(), estimators=ESTIMATORS, groups=groups)
             file_name = os.path.join(self.trained_path, t+".joblib")
             model.save(file_name)
             tasks[t] = model.y_hat
+        for t in self._get_clf_tasks():
+            y = self._get_y(t)
+            model = FlamlClassifier()
+            model.fit(X, y, time_budget=self._estimate_time_budget(), estimators=ESTIMATORS, groups=groups)
+            file_name = os.path.join(self.trained_path, t+".joblib")
+            model.save(file_name)
+            tasks[t] = model.y_hat
+        self.update_elapsed_time()
         return tasks
 
 
@@ -96,18 +112,20 @@ class Predictor(BaseEstimator):
         self.trained_path = os.path.join(self.get_trained_dir(), MODELS_SUBFOLDER)
 
     def run(self):
+        self.reset_time()
         X = self._get_X()
         tasks = collections.OrderedDict()
-        for t in self._get_clf_tasks():
-            model = FlamlClassifier()
-            file_name = os.path.join(self.trained_path, t+".joblib")
-            model = model.load(file_name)
-            tasks[t] = model.predict_proba(X)
         for t in self._get_reg_tasks():
             model = FlamlRegressor()
             file_name = os.path.join(self.trained_path, t+".joblib")
             model = model.load(file_name)
             tasks[t] = model.predict(X)
+        for t in self._get_clf_tasks():
+            model = FlamlClassifier()
+            file_name = os.path.join(self.trained_path, t+".joblib")
+            model = model.load(file_name)
+            tasks[t] = model.predict_proba(X)
+        self.update_elapsed_time()
         return tasks
 
 

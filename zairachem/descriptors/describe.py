@@ -37,6 +37,8 @@ class Describer(ZairaBase):
         SupervisedTransformations().run()
 
     def run(self):
+        self.reset_time()
         self._raw_descriptions()
         self._unsupervised()
         self._supervised()
+        self.update_elapsed_time()
