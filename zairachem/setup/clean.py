@@ -3,7 +3,6 @@ import os
 
 
 class SetupCleaner(object):
-
     def __init__(self, path):
         self.path = path
 

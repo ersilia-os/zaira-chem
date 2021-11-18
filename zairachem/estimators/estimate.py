@@ -8,7 +8,12 @@ import collections
 from .. import ZairaBase
 from ..automl.flaml import FlamlClassifier, FlamlRegressor
 
-from ..vars import DESCRIPTORS_SUBFOLDER, DATA_SUBFOLDER, DATA_FILENAME, MODELS_SUBFOLDER
+from ..vars import (
+    DESCRIPTORS_SUBFOLDER,
+    DATA_SUBFOLDER,
+    DATA_FILENAME,
+    MODELS_SUBFOLDER,
+)
 from ..setup import SCHEMA_MERGE_FILENAME, PARAMETERS_FILE
 from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME, GLOBAL_UNSUPERVISED_FILE_NAME
 
@@ -43,7 +48,9 @@ class BaseEstimator(ZairaBase):
 
     def _get_X_unsupervised(self):
         # for now only use supervised processing
-        f = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME)
+        f = os.path.join(
+            self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
+        )
         with h5py.File(f, "r") as f:
             X = f["Values"][:]
         return X
@@ -56,25 +63,34 @@ class BaseEstimator(ZairaBase):
         return X
 
     def _get_clf_tasks(self):
-        return [t for t in self.schema["tasks"] if "clf_" in t and "_aux" not in t and "skip" not in t]
+        return [
+            t
+            for t in self.schema["tasks"]
+            if "clf_" in t and "_aux" not in t and "skip" not in t
+        ]
 
     def _get_reg_tasks(self):
-        return [t for t in self.schema["tasks"] if "reg_" in t and "_aux" not in t and "skip" not in t]
+        return [
+            t
+            for t in self.schema["tasks"]
+            if "reg_" in t and "_aux" not in t and "skip" not in t
+        ]
 
     def _get_total_time_budget_sec(self):
         with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
             time_budget = json.load(f)["time_budget"]
-        return int(time_budget)*60+1
+        return int(time_budget) * 60 + 1
 
     def _estimate_time_budget(self):
         elapsed_time = self.get_elapsed_time()
         total_time_budget = self._get_total_time_budget_sec()
         available_time = total_time_budget - elapsed_time
         # Assuming classification and regression will be done
-        available_time = available_time/2.
+        available_time = available_time / 2.0
         # Substract retraining and subsequent tasks
-        available_time = available_time*0.8
-        return int(available_time)+1
+        available_time = available_time * 0.8
+        return int(available_time) + 1
+
 
 class Fitter(BaseEstimator):
     def __init__(self, path):
@@ -100,16 +116,28 @@ class Fitter(BaseEstimator):
         for t in self._get_reg_tasks():
             y = self._get_y(t)
             model = FlamlRegressor()
-            model.fit(X, y, time_budget=self._estimate_time_budget(), estimators=ESTIMATORS, groups=groups)
-            file_name = os.path.join(self.trained_path, t+".joblib")
+            model.fit(
+                X,
+                y,
+                time_budget=self._estimate_time_budget(),
+                estimators=ESTIMATORS,
+                groups=groups,
+            )
+            file_name = os.path.join(self.trained_path, t + ".joblib")
             model.save(file_name)
             tasks[t] = model.y_hat
         X = self._get_X_supervised()
         for t in self._get_clf_tasks():
             y = self._get_y(t)
             model = FlamlClassifier()
-            model.fit(X, y, time_budget=self._estimate_time_budget(), estimators=ESTIMATORS, groups=groups)
-            file_name = os.path.join(self.trained_path, t+".joblib")
+            model.fit(
+                X,
+                y,
+                time_budget=self._estimate_time_budget(),
+                estimators=ESTIMATORS,
+                groups=groups,
+            )
+            file_name = os.path.join(self.trained_path, t + ".joblib")
             model.save(file_name)
             tasks[t] = model.y_hat
         self.update_elapsed_time()
@@ -127,13 +155,13 @@ class Predictor(BaseEstimator):
         X = self._get_X_supervised()
         for t in self._get_reg_tasks():
             model = FlamlRegressor()
-            file_name = os.path.join(self.trained_path, t+".joblib")
+            file_name = os.path.join(self.trained_path, t + ".joblib")
             model = model.load(file_name)
             tasks[t] = model.predict(X)
         X = self._get_X_supervised()
         for t in self._get_clf_tasks():
             model = FlamlClassifier()
-            file_name = os.path.join(self.trained_path, t+".joblib")
+            file_name = os.path.join(self.trained_path, t + ".joblib")
             model = model.load(file_name)
             tasks[t] = model.predict_proba(X)
         self.update_elapsed_time()
@@ -155,10 +183,4 @@ class Estimator(ZairaBase):
     def run(self):
         results = self.estimator.run()
         df = pd.DataFrame(results)
-        df.to_csv(
-            os.path.join(
-                self.path,
-                MODELS_SUBFOLDER,
-                Y_HAT_FILE
-            ), index=False
-        )
+        df.to_csv(os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE), index=False)

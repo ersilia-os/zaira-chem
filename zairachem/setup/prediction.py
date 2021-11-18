@@ -41,7 +41,12 @@ class PredictSetup(object):
         assert os.path.exists(self.model_dir)
 
     def _open_session(self):
-        data = {"output_dir": self.output_dir, "model_dir": self.model_dir, "time_stamp": int(time()), "elapsed_time": 0}
+        data = {
+            "output_dir": self.output_dir,
+            "model_dir": self.model_dir,
+            "time_stamp": int(time()),
+            "elapsed_time": 0,
+        }
         with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
             json.dump(data, f, indent=4)
 
@@ -68,15 +73,17 @@ class PredictSetup(object):
         )
 
     def _normalize_input(self):
-        params = ParametersFile(full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)).load()
+        params = ParametersFile(
+            full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
+        ).load()
         f = SingleFileForPrediction(self.input_file, params)
         f.process()
         self.has_tasks = f.has_tasks
 
     def _melloddy_tuner_run(self):
-        MelloddyTunerPredictPipeline(
-            os.path.join(self.output_dir, DATA_SUBFOLDER)
-        ).run(has_tasks=self.has_tasks)
+        MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
+            has_tasks=self.has_tasks
+        )
 
     def _standardize(self):
         Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
@@ -85,7 +92,9 @@ class PredictSetup(object):
         SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
     def _merge(self):
-        DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(self.has_tasks)
+        DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
+            self.has_tasks
+        )
 
     def _clean(self):
         SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()

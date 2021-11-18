@@ -14,7 +14,6 @@ from . import CLF_REPORT_FILENAME, REG_REPORT_FILENAME
 
 
 class BasePerformance(ZairaBase):
-
     def __init__(self, path=None):
         ZairaBase.__init__(self)
         if path is None:
@@ -23,19 +22,24 @@ class BasePerformance(ZairaBase):
             self.path = path
 
     def _relevant_columns(self, df):
-        return [c for c in list(df.columns) if ("clf_" in c or "reg_" in c) and ("skip" not in c)]
+        return [
+            c
+            for c in list(df.columns)
+            if ("clf_" in c or "reg_" in c) and ("skip" not in c)
+        ]
 
     def get_obs_data(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         return df[self._relevant_columns(df)]
 
     def get_prd_data(self):
-        df = pd.read_csv(os.path.join(self.path, MODELS_SUBFOLDER, RESULTS_UNMAPPED_FILENAME))
+        df = pd.read_csv(
+            os.path.join(self.path, MODELS_SUBFOLDER, RESULTS_UNMAPPED_FILENAME)
+        )
         return df[self._relevant_columns(df)]
 
 
 class ClassificationPerformance(BasePerformance):
-
     def __init__(self, path):
         BasePerformance.__init__(self, path=path)
         self.df_obs = self.get_obs_data()
@@ -50,16 +54,16 @@ class ClassificationPerformance(BasePerformance):
     def calculate(self):
         y_true = np.array(self.df_obs[self._prefix])
         y_pred = np.array(self.df_prd[self._prefix])
-        b_pred = np.array(self.df_prd[self._prefix+"_bin"])
-        confu = metrics.confusion_matrix(y_true, b_pred, labels=[0,1])
+        b_pred = np.array(self.df_prd[self._prefix + "_bin"])
+        confu = metrics.confusion_matrix(y_true, b_pred, labels=[0, 1])
         report = {
             "roc_auc_score": float(metrics.roc_auc_score(y_true, y_pred)),
             "precision_score": float(metrics.precision_score(y_true, b_pred)),
             "recall_score": float(metrics.recall_score(y_true, b_pred)),
-            "tp": int(confu[1,1]),
-            "tn": int(confu[0,0]),
-            "fp": int(confu[0,1]),
-            "fn": int(confu[1,0]),
+            "tp": int(confu[1, 1]),
+            "tn": int(confu[0, 0]),
+            "fp": int(confu[0, 1]),
+            "fn": int(confu[1, 0]),
             "y_true": [int(y) for y in y_true],
             "y_pred": [float(y) for y in y_pred],
             "b_pred": [int(y) for y in b_pred],
@@ -68,7 +72,6 @@ class ClassificationPerformance(BasePerformance):
 
 
 class RegressionPerformance(BasePerformance):
-
     def __init__(self, path):
         BasePerformance.__init__(self, path=path)
         self.df_obs = self.get_obs_data()
@@ -94,7 +97,6 @@ class RegressionPerformance(BasePerformance):
 
 
 class PerformanceReporter(ZairaBase):
-
     def __init__(self, path=None):
         ZairaBase.__init__(self)
         if path is None:
@@ -137,9 +139,13 @@ class PerformanceReporter(ZairaBase):
             return
         if self.clf is not None:
             clf_rep = self.clf.calculate()
-            with open(os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w") as f:
+            with open(
+                os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w"
+            ) as f:
                 json.dump(clf_rep, f, indent=4)
         if self.reg is not None:
             reg_rep = self.reg.calculate()
-            with open(os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w") as f:
+            with open(
+                os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w"
+            ) as f:
                 json.dump(reg_rep, f, indent=4)

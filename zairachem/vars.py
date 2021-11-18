@@ -34,5 +34,5 @@ ERSILIA_HUB_DEFAULT_MODELS = [
     "cc-signaturizer",
     "grover-embedding",
     "molbert",
-    "mordred"
+    "mordred",
 ]

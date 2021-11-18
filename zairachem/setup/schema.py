@@ -102,7 +102,7 @@ class InputSchema(ZairaBase):
             raise Exception
 
     def _is_date_column(self, col):
-        return False # TODO: Debug
+        return False  # TODO: Debug
         if "date" in col.lower():
             return True
         else:

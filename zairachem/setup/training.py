@@ -29,13 +29,15 @@ from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 
 
 class TrainSetup(object):
-    def __init__(self, input_file, output_dir, time_budget, threshold, direction, parameters):
+    def __init__(
+        self, input_file, output_dir, time_budget, threshold, direction, parameters
+    ):
         if output_dir is None:
             output_dir = input_file.split(".")[0]
         passed_params = {
             "time_budget": time_budget,
             "threshold": threshold,
-            "direction": direction
+            "direction": direction,
         }
         self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
@@ -57,7 +59,12 @@ class TrainSetup(object):
         os.makedirs(self.output_dir)
 
     def _open_session(self):
-        data = {"output_dir": self.output_dir, "model_dir": self.output_dir, "time_stamp": int(time()), "elapsed_time": 0}
+        data = {
+            "output_dir": self.output_dir,
+            "model_dir": self.output_dir,
+            "time_stamp": int(time()),
+            "elapsed_time": 0,
+        }
         with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
             json.dump(data, f, indent=4)
 

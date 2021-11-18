@@ -9,7 +9,13 @@ from rdkit import Chem
 from ..vars import DATA_SUBFOLDER
 from ..vars import ERSILIA_HUB_DEFAULT_MODELS
 from .schema import InputSchema
-from . import COMPOUNDS_FILENAME, ASSAYS_FILENAME, VALUES_FILENAME, MAPPING_FILENAME, INPUT_SCHEMA_FILENAME
+from . import (
+    COMPOUNDS_FILENAME,
+    ASSAYS_FILENAME,
+    VALUES_FILENAME,
+    MAPPING_FILENAME,
+    INPUT_SCHEMA_FILENAME,
+)
 from . import (
     MAPPING_ORIGINAL_COLUMN,
     MAPPING_DEDUPE_COLUMN,
@@ -31,7 +37,9 @@ from . import (
 class ParametersFile(object):
     def __init__(self, path=None, full_path=None, passed_params=None):
         if passed_params is not None:
-            self.params = dict((k,v) for k,v in passed_params.items() if v is not None)
+            self.params = dict(
+                (k, v) for k, v in passed_params.items() if v is not None
+            )
         else:
             self.params = {}
         if path is None and full_path is None:
@@ -50,17 +58,14 @@ class ParametersFile(object):
                 data = json.load(f)
         else:
             data = {}
-        for k,v in self.params.items():
+        for k, v in self.params.items():
             data[k] = v
         if "assay_id" not in data:
             data["assay_id"] = "ASSAY"
         if "assay_type" not in data:
             data["assay_type"] = None
         if "credibility_range" not in data:
-            data["credibility_range"] = {
-                "min": None,
-                "max": None
-            }
+            data["credibility_range"] = {"min": None, "max": None}
         if "threshold" not in data:
             if "thresholds" in data:
                 pass
@@ -70,7 +75,7 @@ class ParametersFile(object):
                     "expert_2": None,
                     "expert_3": None,
                     "expert_4": None,
-                    "expert_5": None
+                    "expert_5": None,
                 }
         else:
             data["thresholds"] = {
@@ -78,7 +83,7 @@ class ParametersFile(object):
                 "expert_2": None,
                 "expert_3": None,
                 "expert_4": None,
-                "expert_5": None
+                "expert_5": None,
             }
             del data["threshold"]
         if "direction" not in data:
@@ -156,7 +161,7 @@ class SingleFile(InputSchema):
             df[GROUP_COLUMN] = self.df[self.group_column]
         else:
             df[GROUP_COLUMN] = None
-        assert (df.shape[0] == self.df.shape[0])
+        assert df.shape[0] == self.df.shape[0]
         return df
 
     def dedupe(self, df, path):
@@ -254,7 +259,7 @@ class SingleFile(InputSchema):
             "qualifier_column": self.qualifier_column,
             "values_column": self.values_column,
             "date_column": self.date_column,
-            "group_column": self.group_column
+            "group_column": self.group_column,
         }
         return sc
 
@@ -278,7 +283,9 @@ class SingleFileForPrediction(SingleFile):
         self.trained_path = self.get_trained_dir()
 
     def get_trained_values_column(self):
-        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r") as f:
+        with open(
+            os.path.join(self.trained_path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r"
+        ) as f:
             return json.load(f)["values_column"]
 
     def normalize_dataframe(self):
@@ -292,11 +299,11 @@ class SingleFileForPrediction(SingleFile):
         self.values_column = self.find_values_column()
         if self.values_column is not None:
             trained_values_column = self.get_trained_values_column()
-            assert(self.values_column == trained_values_column)
+            assert self.values_column == trained_values_column
 
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         df[SMILES_COLUMN] = self.df[self.smiles_column]
-        assert (df.shape[0] == self.df.shape[0])
+        assert df.shape[0] == self.df.shape[0]
 
         if self.values_column is not None:
             if self.qualifier_column is None:
