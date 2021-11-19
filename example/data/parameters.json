@@ -1,0 +1,24 @@
+{
+    "time_budget": 60,
+    "direction": "high",
+    "assay_id": "ASSAY",
+    "assay_type": null,
+    "credibility_range": {
+        "min": null,
+        "max": null
+    },
+    "thresholds": {
+        "expert_1": 0.8,
+        "expert_2": null,
+        "expert_3": null,
+        "expert_4": null,
+        "expert_5": null
+    },
+    "ersilia_hub": [
+        "morgan-counts",
+        "cc-signaturizer",
+        "grover-embedding",
+        "molbert",
+        "mordred"
+    ]
+}
