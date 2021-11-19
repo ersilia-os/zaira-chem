@@ -46,7 +46,7 @@ class RawDescriptors(ZairaBase):
         for eos_id in self.eos_ids():
             output_h5 = self.output_h5_filename(eos_id)
             run_command(
-                "ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}".format(
+                "ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}; ersilia close {0}".format(
                     eos_id, self.input_csv, output_h5
                 )
             )

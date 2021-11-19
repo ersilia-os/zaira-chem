@@ -16,6 +16,12 @@ class InputSchema(ZairaBase):
         self.input_file = os.path.abspath(input_file)
         self.df_ = pd.read_csv(self.input_file, nrows=_SNIFF_SAMPLE_SIZE)
         self.columns = list(self.df_.columns)
+        self.assigned_columns = set()
+
+    def columns_iter(self)
+
+    def add_explored_column(self, col):
+        self.assigned_columns.update([col])
 
     def _prop_correct_smiles(self, col):
         values = list(self.df_[col])
@@ -132,11 +138,31 @@ class InputSchema(ZairaBase):
         return None
 
     def _is_identifier_column(self, col):
-        # TODO
         if "identifier" in col.lower():
             return True
         else:
-            return False
+            values = list(self.df_[self.df_[col].notnull()][col])
+            for v in values:
+                try:
+                    float(v)
+                    return False
+                except:
+                    continue
+            if len(set(values))/len(values) > 0.8:
+                return True
+            else:
+                return False
+
+    def find_identifier_column(self):
+        cols = []
+        for col in self.columns:
+            if self._is_identifier_column(col):
+                cols += [col]
+        if len(cols) > 1:
+            raise Exception
+        if len(cols) == 1:
+            return cols[0]
+        return None
 
     def _is_group_column(self, col):
         # TODO
@@ -156,14 +182,3 @@ class InputSchema(ZairaBase):
             return None
         if len(cols) == 1:
             return cols[0]
-
-    def find_identifier_column(self):
-        cols = []
-        for col in self.columns:
-            if self._is_identifier_column(col):
-                cols += [col]
-        if len(cols) > 1:
-            raise Exception
-        if len(cols) == 1:
-            return cols[0]
-        return None
