@@ -3,8 +3,8 @@ import os
 import csv
 
 from .. import ZairaBase
-from ..utils.terminal import run_command
 from ..utils.matrices import Hdf5
+from ersilia import ErsiliaModel
 
 from ..setup import PARAMETERS_FILE
 from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
@@ -45,12 +45,10 @@ class RawDescriptors(ZairaBase):
         done_eos = []
         for eos_id in self.eos_ids():
             output_h5 = self.output_h5_filename(eos_id)
-            run_command(
-                "ersilia -v serve {0}; ersilia -v api {0} -i {1} -o {2}; ersilia close {0}".format(
-                    eos_id, self.input_csv, output_h5
-                )
-            )
+            with ErsiliaModel(eos_id) as em:
+                em.api(input=self.input_csv, output=output_h5)
             done_eos += [eos_id]
+            Hdf5(output_h5).save_summary_as_csv()
         with open(
             os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w"
         ) as f:

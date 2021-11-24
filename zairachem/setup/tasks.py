@@ -18,12 +18,15 @@ from .files import ParametersFile
 from ..vars import CLF_PERCENTILES, MIN_CLASS, DATA_SUBFOLDER
 from .. import ZairaBase
 
+from sklearn.preprocessing import PowerTransformer, QuantileTransformer
+
 
 class RegTasks(object):
-    def __init__(self, data, params):
+    def __init__(self, data, params, path):
         self.values = np.array(data[VALUES_COLUMN])
         self.direction = params["direction"]
         self.range = params["credibility_range"]
+        self.path = path
 
     def raw(self):
         min_cred = self.range["min"]
@@ -32,102 +35,71 @@ class RegTasks(object):
             return self.values
         return np.clip(self.values, min_cred, max_cred)
 
-    def log(self):
-        raw = self.raw()
-        return -np.log10(raw)
+    def pwr(self):
+        raw = self.raw().reshape(-1,1)
+        tr = PowerTransformer(method="yeo-johnson")
+        tr.fit(raw)
+        joblib.dump(tr, os.path.join(self.path, "pwr_transformer.joblib"))
+        return tr.transform(raw).ravel()
 
     def rnk(self):
-        assert self.direction in ["high", "low"]
-        if self.direction == "high":
-            ranked = rankdata(self.values, method="ordinal")
-        if self.direction == "low":
-            ranked = rankdata(-self.values, method="ordinal")
-        return ranked / np.max(ranked)
+        raw = self.raw().reshape(-1,1)
+        tr = QuantileTransformer(output_distribution="uniform")
+        tr.fit(raw)
+        joblib.dump(tr, os.path.join(self.path, "rnk_transformer.joblib"))
+        return tr.transform(raw).ravel()
 
-    def gum(self, rnk):
-        rnk = np.array(rnk)
-        sampled = gumbel_r.rvs(size=len(rnk))
-        idxs = np.argsort(sampled)
-        sampled = sampled[idxs]
-        idxs = np.argsort(rnk)
-        gum = np.zeros(len(rnk))
-        for i, idx in enumerate(idxs):
-            gum[idx] = sampled[i]
-        gum = np.array(gum)
-        return gum
+    def qnt(self):
+        raw = self.raw().reshape(-1,1)
+        tr = QuantileTransformer(output_distribution="normal")
+        tr.fit(raw)
+        joblib.dump(tr, os.path.join(self.path, "qnt_transformer.joblib"))
+        return tr.transform(raw).ravel()
 
     def as_dict(self):
         res = OrderedDict()
         res["reg_raw_skip"] = self.raw()
-        res["reg_log_skip"] = self.log()
-        rnk = self.rnk()
-        res["reg_rnk_skip"] = rnk
-        res["reg_gum"] = self.gum(rnk)
+        res["reg_pwr_skip"] = self.pwr()
+        res["reg_rnk_skip"] = self.rnk()
+        res["reg_qnt"] = self.qnt()
         return res
-
-    def save(self, res, path):
-        y_cols = []
-        for k in res.keys():
-            if "raw" in k:
-                x_col = k
-            else:
-                y_cols += [k]
-        x = np.array(res[x_col])
-        for y_col in y_cols:
-            y = res[y_col]
-            interpolator = interpolate.interp1d(x, y)
-            joblib.dump(
-                interpolator,
-                os.path.join(path, DATA_SUBFOLDER, y_col + "_interpolator.joblib"),
-            )
 
 
 class RegTasksForPrediction(RegTasks):
-    def __init__(self, data, params):
-        RegTasks.__init__(self, data, params)
+    def __init__(self, data, params, path):
+        RegTasks.__init__(self, data, params, path)
 
     def load(self, path):
-        self.interpolators = {}
-        for f in os.listdir(os.path.join(path, DATA_SUBFOLDER)):
-            if "_interpolator.joblib" not in f:
-                continue
-            interpolator = joblib.load(os.path.join(path, DATA_SUBFOLDER, f))
-            y_col = f.split("_interpolator.joblib")[0]
-            self.interpolators[y_col] = interpolator
+        self._load_path = path
 
-    def log(self, raw):
-        for k in self.interpolators.keys():
-            if "log" in k:
-                break
-        return self.interpolators[k](raw)
+    def pwr(self, raw):
+        tr = joblib.dump(os.path.join(_load_path, "pwr_transformer.joblib"))
+        return tr.transform(raw.reshape(-1,1)).ravel()
 
     def rnk(self, raw):
-        for k in self.interpolators.keys():
-            if "rnk" in k:
-                break
-        return self.interpolators[k](raw)
+        tr = joblib.dump(os.path.join(_load_path, "rnk_transformer.joblib"))
+        return tr.transform(raw.reshape(-1,1)).ravel()
 
-    def gum(self, raw):
-        for k in self.interpolators.keys():
-            if "gum" in k:
-                break
-        return self.interpolators[k](raw)
+    def qnt(self, raw):
+        tr = joblib.dump(os.path.join(_load_path, "qnt_transformer.joblib"))
+        return tr.transform(raw.reshape(-1,1)).ravel()
 
     def as_dict(self):
         res = OrderedDict()
         raw = self.raw()
         res["reg_raw_skip"] = raw
-        res["reg_log_skip"] = self.log(raw)
+        res["reg_pwr_skip"] = self.pwr(raw)
         res["reg_rnk_skip"] = self.rnk(raw)
-        res["reg_gum"] = self.gum(raw)
+        res["reg_qnt"] = self.qnt(raw)
         return res
 
 
 class ClfTasks(object):
-    def __init__(self, data, params):
+    def __init__(self, data, params, path):
         self.values = np.array(data[VALUES_COLUMN])
         self.direction = params["direction"]
         self.thresholds = params["thresholds"]
+        self.path = path
 
     def _is_high(self):
         if self.direction == "high":
@@ -218,8 +190,8 @@ class ClfTasks(object):
 
 
 class ClfTasksForPrediction(ClfTasks):
-    def __init__(self, data, params):
-        ClfTasks.__init__(self, data, params)
+    def __init__(self, data, params, path):
+        ClfTasks.__init__(self, data, params, path)
 
     def load(self, path):
         with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "r") as f:
@@ -286,12 +258,11 @@ class SingleTasks(ZairaBase):
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
             params = self._get_params()
-            reg_tasks = RegTasks(df, params)
+            reg_tasks = RegTasks(df, params, path=self.trained_path)
             reg = reg_tasks.as_dict()
-            reg_tasks.save(reg, self.trained_path)
             for k, v in reg.items():
                 df[k] = v
-            clf_tasks = ClfTasks(df, params)
+            clf_tasks = ClfTasks(df, params, path=self.trained_path)
             clf = clf_tasks.as_dict()
             clf_tasks.save(self.trained_path)
             for k, v in clf.items():
@@ -312,12 +283,12 @@ class SingleTasksForPrediction(SingleTasks):
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
             params = self._get_params()
-            reg_tasks = RegTasksForPrediction(df, params)
+            reg_tasks = RegTasksForPrediction(df, params, self.path)
             reg_tasks.load(self.trained_path)
             reg = reg_tasks.as_dict()
             for k, v in reg.items():
                 df[k] = v
-            clf_tasks = ClfTasksForPrediction(df, params)
+            clf_tasks = ClfTasksForPrediction(df, params, self.path)
             clf_tasks.load(self.trained_path)
             clf = clf_tasks.as_dict()
             for k, v in clf.items():

@@ -2,13 +2,15 @@ import joblib
 import h5py
 import json
 import numpy as np
+import pandas as pd
+import collections
 
 SNIFF_N = 100000
 
 
 class Data(object):
     def __init__(self):
-        pass
+        self._is_sparse = None
 
     def _arbitrary_features(self, n):
         return ["f{0}".format(i) for i in range(n)]
@@ -34,6 +36,9 @@ class Data(object):
     def features(self):
         return self._features
 
+    def is_sparse(self):
+        return self._is_sparse
+
     def save(self, file_name):
         joblib.dump(self, file_name)
 
@@ -46,6 +51,7 @@ class Data(object):
             "inputs": len(self._inputs),
             "features": len(self._features),
             "values": np.array(self._values).shape,
+            "is_sparse": self._is_sparse
         }
         with open(file_name, "w") as f:
             json.dump(info, f, indent=4)
@@ -79,7 +85,7 @@ class Hdf5(object):
     def is_sparse(self):
         V = self._sniff_ravel()
         n_zeroes = np.sum(V == 0)
-        if n_zeroes / len(V) > 0.5:
+        if n_zeroes / len(V) > 0.8:
             return True
         return False
 
@@ -101,6 +107,7 @@ class Hdf5(object):
             values=self.values(),
             features=self.features(),
         )
+        data._is_sparse = self.is_sparse()
         return data
 
     def save(self, data):
@@ -109,3 +116,20 @@ class Hdf5(object):
             f.create_dataset("Keys", data=data.keys())
             f.create_dataset("Inputs", data=data.inputs())
             f.create_dataset("Features", data=data.features())
+
+    def save_summary_as_csv(self):
+        file_name = self.file_name.split(".h5")[0] + "_summary.csv"
+        keys = self.keys()
+        values = self.values()
+        features = self.features()
+        f_row = [float(x) for x in values[0]]
+        l_row = [float(x) for x in values[-1]]
+        means = [np.nanmean(values[:,j]) for j in range(values.shape[1])]
+        stds = [np.nanstd(values[:,j]) for j in range(values.shape[1])]
+        columns = ["keys"] + features
+        data = collections.defaultdict(list)
+        data["keys"] = ["first", "last", "mean", "std"]
+        for i, f in enumerate(features):
+            data[f] += [f_row[i], l_row[i], means[i], stds[i]]
+        df = pd.DataFrame(data, columns=columns)
+        df.to_csv(file_name, index=False)

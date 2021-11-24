@@ -33,6 +33,7 @@ class NanFilter(object):
             else:
                 idxs += [j]
         self.col_idxs = idxs
+        print("Nan filtering, original columns {0}, final columns {1}".format(X.shape[1], len(self.col_idxs)))
 
     def transform(self, X):
         return X[:, self.col_idxs]
@@ -48,12 +49,20 @@ class Scaler(object):
     def __init__(self):
         self._name = "scaler"
         self.abs_limit = 10
+        self.skip = False
+
+    def set_skip(self):
+        self.skip = True
 
     def fit(self, X):
+        if self.skip:
+            return
         self.scaler = RobustScaler()
         self.scaler.fit(X)
 
     def transform(self, X):
+        if self.skip:
+            return X
         X = self.scaler.transform(X)
         X = np.clip(X, -self.abs_limit, self.abs_limit)
         return X
@@ -133,17 +142,6 @@ class Pca(object):
         return joblib.load(file_name)
 
 
-class OptSne(object):
-    def __init__(self):
-        self._name = "opt_tsne"
-
-    def fit(self):
-        pass
-
-    def transform(self):
-        pass
-
-
 class UnsupervisedUmap(object):
     def __init__(self):
         self._name = "unsupervised_umap"
@@ -166,11 +164,11 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
     def __init__(self):
         DescriptorBase.__init__(self)
         self.pipeline = [
-            NanFilter(),
-            Imputer(),
-            VarianceFilter(),
-            Scaler(),
-            Pca(),
+            NanFilter,
+            Imputer,
+            VarianceFilter,
+            Scaler,
+            Pca,
         ]
         self._name = INDIVIDUAL_UNSUPERVISED_FILE_NAME
         self._is_predict = self.is_predict()
@@ -197,6 +195,11 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
             data = data.load()
             X = data.values()
             for algo in self.pipeline:
+                algo = algo()
+                if algo._name == "scaler":
+                    if data.is_sparse():
+                        print("Skipping normalization of {0} as it is sparse".format(eos_id))
+                        algo.set_skip()
                 if not self._is_predict:
                     algo.fit(X)
                     algo.save(os.path.join(trained_path, algo._name + ".joblib"))
