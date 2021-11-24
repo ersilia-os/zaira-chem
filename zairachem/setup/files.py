@@ -129,12 +129,13 @@ class SingleFile(InputSchema):
         return qualifiers
 
     def normalize_dataframe(self):
-        self.identifier_column = self.find_identifier_column()
-        self.smiles_column = self.find_smiles_column()
-        self.qualifier_column = self.find_qualifier_column()
-        self.values_column = self.find_values_column()
-        self.date_column = self.find_date_column()
-        self.group_column = self.find_group_column()
+        resolved_columns = self.resolve_columns()
+        self.identifier_column = resolved_columns["identifier_column"]
+        self.smiles_column = resolved_columns["smiles_column"]
+        self.qualifier_column = resolved_columns["qualifier_column"]
+        self.values_column = resolved_columns["values_column"]
+        self.date_column = resolved_columns["date_column"]
+        self.group_column = resolved_columns["group_column"]
 
         if self.identifier_column is None:
             identifiers = self._make_identifiers()
@@ -289,17 +290,18 @@ class SingleFileForPrediction(SingleFile):
             return json.load(f)["values_column"]
 
     def normalize_dataframe(self):
-        self.identifier_column = self.find_identifier_column()
-        self.smiles_column = self.find_smiles_column()
+        resolved_columns = self.resolve_columns()
+        self.identifier_column = resolved_columns["identifier_column"]
+        self.smiles_column = resolved_columns["smiles_column"]
         if self.identifier_column is None:
             identifiers = self._make_identifiers()
         else:
             identifiers = list(self.df[self.identifier_column])
-        self.qualifier_column = self.find_qualifier_column()
-        self.values_column = self.find_values_column()
+        self.qualifier_column = resolved_columns["qualifier_column"]
+        self.values_column = resolved_columns["values_column"]
         if self.values_column is not None:
             trained_values_column = self.get_trained_values_column()
-            assert self.values_column == trained_values_column
+            assert self.values_column == trained_values_column, "Inconsistent values column, {0} vs {1}".format(self.values_column, trained_values_column)
 
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         df[SMILES_COLUMN] = self.df[self.smiles_column]

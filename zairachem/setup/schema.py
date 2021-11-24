@@ -18,7 +18,10 @@ class InputSchema(ZairaBase):
         self.columns = list(self.df_.columns)
         self.assigned_columns = set()
 
-    def columns_iter(self)
+    def columns_iter(self):
+        for c in columns:
+            if c not in self.assigned_columns:
+                yield c
 
     def add_explored_column(self, col):
         self.assigned_columns.update([col])
@@ -53,12 +56,7 @@ class InputSchema(ZairaBase):
                 cols += [col]
             else:
                 continue
-        if len(cols) == 0:
-            return None
-        if len(cols) > 1:
-            raise Exception
-        else:
-            return cols[0]
+        return cols
 
     def _is_values_column(self, col):
         try:
@@ -84,12 +82,7 @@ class InputSchema(ZairaBase):
                 cols += [col]
             else:
                 continue
-        if len(cols) == 0:
-            return None
-        else:
-            return cols[0]
-        if len(cols) > 1: # TODO
-            raise Exception
+        return cols
 
     def _is_qualifier_column(self, col):
         # TODO
@@ -103,12 +96,7 @@ class InputSchema(ZairaBase):
         for col in cols:
             if self._is_qualifier_column(col):
                 cols += [col]
-        if len(cols) == 0:
-            return None
-        if len(cols) == 1:
-            return cols[0]
-        if len(cols) > 1:
-            raise Exception
+        return cols
 
     def _is_date_column(self, col):
         return False  # TODO: Debug
@@ -127,15 +115,11 @@ class InputSchema(ZairaBase):
             return False
 
     def find_date_column(self):
-        datecols = []
+        cols = []
         for col in self.columns:
             if self._is_date_column(col):
-                datecols += [col]
-        if len(datecols) > 1:
-            raise Exception
-        if len(datecols) == 1:
-            return datecols[0]
-        return None
+                cols += [col]
+        return cols
 
     def _is_identifier_column(self, col):
         if "identifier" in col.lower():
@@ -158,11 +142,7 @@ class InputSchema(ZairaBase):
         for col in self.columns:
             if self._is_identifier_column(col):
                 cols += [col]
-        if len(cols) > 1:
-            raise Exception
-        if len(cols) == 1:
-            return cols[0]
-        return None
+        return cols
 
     def _is_group_column(self, col):
         # TODO
@@ -176,9 +156,40 @@ class InputSchema(ZairaBase):
         for col in self.columns:
             if self._is_group_column(col):
                 cols += [col]
-        if len(cols) > 1:
-            raise Exception
-        if len(cols) == 0:
-            return None
-        if len(cols) == 1:
-            return cols[0]
+        return cols
+
+    def resolve_columns(self):
+        smiles_column = self.find_smiles_column()
+        assert len(smiles_column) > 0, "No SMILES column found!"
+        assert len(smiles_column) == 1, "More than one SMILES column found! {0}".format(smiles_column)
+        smiles_column = smiles_column[0]
+        identifier_column = [x for x in self.find_identifier_column() if x != smiles_column]
+        if len(identifier_column) == 0:
+            identifier_column = None
+        else:
+            identifier_column = identifier_column[0]
+        data = {"smiles_column": smiles_column, "identifier_column": identifier_column}
+        qualifier_column = self.find_qualifier_column()
+        if len(qualifier_column) == 0:
+            qualifier_column = None
+        else:
+            qualifier_column = qualifier_column[0]
+        values_column = self.find_values_column()
+        assert len(values_column) > 0, "No values column found!"
+        assert len(values_column) == 1, "More than one values column found! {0}".format(values_column)
+        values_column = values_column[0]
+        group_column = self.find_group_column()
+        if len(group_column) == 0:
+            group_column = None
+        else:
+            group_column = group_column[0]
+        date_column = self.find_date_column()
+        if len(date_column) == 0:
+            date_column = None
+        else:
+            date_column = date_column[0]
+        data["qualifier_column"] = qualifier_column
+        data["values_column"] = values_column
+        data["group_column"]=group_column
+        data["date_column"]=date_column
+        return data

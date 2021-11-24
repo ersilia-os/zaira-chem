@@ -27,7 +27,10 @@ class Logger(object):
 
     def _unlog_from_console(self):
         if self._console is not None:
-            self.logger.remove(self._console)
+            try:
+                self.logger.remove(self._console)
+            except:
+                pass
             self._console = None
 
     def set_verbosity(self, verbose):

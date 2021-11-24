@@ -92,13 +92,13 @@ class FlamlSettings(object):
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
         groups = self.cast_groups(groups)
-        automl_settings["split_type"] = "group"
+        automl_settings["split_type"] = "auto"
         automl_settings["groups"] = groups
         return automl_settings
 
 
 class FlamlEstimator(object):
-    def __init__(self, task, name=None):
+    def __init__(self, task, name=None, fit_with_groups=False):
         if name is None:
             name = str(uuid.uuid4())
         self.name = name
@@ -108,16 +108,17 @@ class FlamlEstimator(object):
             self.is_clf = True
         else:
             self.is_clf = False
+        self.fit_with_groups = fit_with_groups
 
     def _clean_log(self, automl_settings):
-        log_file = automl_settings["log_file_name"]
-        # remove catboost info folder if generated
         cwd = os.getcwd()
+        log_file = os.path.join(cwd, automl_settings["log_file_name"])
+        if os.path.exists(log_file):
+            os.remove(log_file)
+        # remove catboost info folder if generated
         catboost_info = os.path.join(cwd, "catboost_info")
         if os.path.exists(catboost_info):
             shutil.rmtree(catboost_info)
-        if os.path.exists(log_file):
-            os.remove(log_file)
 
     def fit_main(self, X, y, time_budget, estimators, groups):
         automl_settings = FlamlSettings(y).get_automl_settings(
@@ -128,12 +129,16 @@ class FlamlEstimator(object):
         )
         self.main_groups = groups
         self.main_mdl = AutoML()
-        self.main_mdl.fit(X_train=X, y_train=y, **automl_settings)
+        _automl_settings = dict((k,v) for k,v in automl_settings.items())
+        if not self._fit_with_groups:
+            _automl_settings["eval_method"] = "auto"
+            _automl_settings["groups"] = None
+        self.main_mdl.fit(X_train=X, y_train=y, **_automl_settings)
         self.main_automl_settings = automl_settings
 
     def fit_predict_by_group(self, X, y):
         assert self.main_mdl is not None
-        automl_settings = self.main_automl_settings
+        automl_settings = self.main_automl_settings.copy()
         y = np.array(y)
         y_hat = np.zeros(y.shape)
         groups = np.array(automl_settings["groups"])
@@ -144,6 +149,7 @@ class FlamlEstimator(object):
         starting_point = {best_estimator: best_models[best_estimator]}
         for fold in folds:
             tag = "fold_{0}".format(fold)
+            automl_settings["log_file_name"] = "{0}_automl.log".format(tag)
             tr_idxs = []
             te_idxs = []
             for i, g in enumerate(groups):
@@ -157,13 +163,17 @@ class FlamlEstimator(object):
             X_te = X[te_idxs]
             y_tr = y[tr_idxs]
             y_te = y[te_idxs]
-            groups_tr = groups[tr_idxs]
-            unique_groups = list(set(groups_tr))
-            groups_mapping = {}
-            for i, g in enumerate(unique_groups):
-                groups_mapping[g] = i
-            automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
-            automl_settings["n_splits"] = len(unique_groups)
+            if self._fit_with_groups:
+                groups_tr = groups[tr_idxs]
+                unique_groups = list(set(groups_tr))
+                groups_mapping = {}
+                for i, g in enumerate(unique_groups):
+                    groups_mapping[g] = i
+                automl_settings["groups"] = np.array([groups_mapping[g] for g in groups_tr])
+                automl_settings["n_splits"] = len(unique_groups)
+            else:
+                automl_settings["groups"] = None
+                automl_settings["eval_method"] = "auto"
             automl_settings["estimator_list"] = [best_estimator]
             automl_settings["max_iter"] = min(
                 int(self.main_automl_settings["max_iter"] * 0.25) + 1,
