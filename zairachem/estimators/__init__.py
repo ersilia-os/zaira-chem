@@ -1,4 +1,4 @@
-Y_HAT_FILE = "y_hat.csv"
+Y_HAT_FILE = "y_hat.joblib"
 
 RESULTS_UNMAPPED_FILENAME = "results_unmapped.csv"
 RESULTS_MAPPED_FILENAME = "results_mapped.csv"

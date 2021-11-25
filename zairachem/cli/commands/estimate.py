@@ -11,10 +11,17 @@ from ...estimators.performance import PerformanceReporter
 def estimate_cmd():
     @zairachem_cli.command(help="Run estimators")
     @click.option("--dir", "-d", type=click.STRING)
-    def estimate(dir):
+    @click.option(
+        "--time-budget",
+        "-t",
+        default=None,
+        type=click.INT,
+        help="Time budget in seconds for each of the two models.",
+    )
+    def estimate(dir, time_budget):
         echo("Estimator".format(dir))
         e = Estimator(path=dir)
-        e.run()
+        e.run(time_budget_sec=time_budget)
         o = OutcomeAssembler(path=dir)
         o.run()
         p = PerformanceReporter(path=dir)
