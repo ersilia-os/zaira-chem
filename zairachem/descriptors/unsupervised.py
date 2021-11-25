@@ -33,7 +33,11 @@ class NanFilter(object):
             else:
                 idxs += [j]
         self.col_idxs = idxs
-        print("Nan filtering, original columns {0}, final columns {1}".format(X.shape[1], len(self.col_idxs)))
+        print(
+            "Nan filtering, original columns {0}, final columns {1}".format(
+                X.shape[1], len(self.col_idxs)
+            )
+        )
 
     def transform(self, X):
         return X[:, self.col_idxs]
@@ -129,10 +133,12 @@ class Pca(object):
 
     def fit(self, X):
         n_components = np.min([MAX_COMPONENTS, X.shape[0], X.shape[1]])
-        self.pca = PCA(n_components=n_components, whiten=True)
-        self.pca.fit(X)
+        # self.pca = PCA(n_components=n_components, whiten=True)
+        # self.pca.fit(X)
+        self.pca = None
 
     def transform(self, X):
+        return X
         return self.pca.transform(X)
 
     def save(self, file_name):
@@ -147,10 +153,12 @@ class UnsupervisedUmap(object):
         self._name = "unsupervised_umap"
 
     def fit(self, X):
-        self.reducer = UMAP(densmap=False)
-        self.reducer.fit(X)
+        # self.reducer = UMAP(densmap=False)
+        # self.reducer.fit(X)
+        self.reducer = None
 
     def transform(self, X):
+        return X
         return self.reducer.transform(X)
 
     def save(self, file_name):
@@ -164,11 +172,11 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
     def __init__(self):
         DescriptorBase.__init__(self)
         self.pipeline = [
-            NanFilter,
-            Imputer,
-            VarianceFilter,
-            Scaler,
-            Pca,
+            (0, -1, NanFilter),
+            (1, 0, Imputer),
+            (2, 1, VarianceFilter),
+            (3, 2, Scaler),
+            (4, 3, Pca),
         ]
         self._name = INDIVIDUAL_UNSUPERVISED_FILE_NAME
         self._is_predict = self.is_predict()
@@ -193,23 +201,29 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
                 )
             data = rl.open(eos_id)
             data = data.load()
-            X = data.values()
-            for algo in self.pipeline:
-                algo = algo()
+            X = {}
+            X[-1] = data.values()
+            for step in self.pipeline:
+                curr, prev = step[0], step[1]
+                algo = step[-1]()
                 if algo._name == "scaler":
                     if data.is_sparse():
-                        print("Skipping normalization of {0} as it is sparse".format(eos_id))
+                        print(
+                            "Skipping normalization of {0} as it is sparse".format(
+                                eos_id
+                            )
+                        )
                         algo.set_skip()
                 if not self._is_predict:
-                    algo.fit(X)
+                    algo.fit(X[prev])
                     algo.save(os.path.join(trained_path, algo._name + ".joblib"))
                 else:
                     algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
-                X = algo.transform(X)
+                X[curr] = algo.transform(X[prev])
             file_name = os.path.join(
                 self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name
             )
-            data._values = X
+            data._values = X[4]
             Hdf5(file_name).save(data)
             data.save_info(file_name.split(".")[0] + ".json")
 
@@ -241,6 +255,7 @@ class StackedUnsupervisedTransformations(DescriptorBase):
         else:
             trained_path = os.path.join(self.trained_path, DESCRIPTORS_SUBFOLDER)
         X = np.hstack(Xs)
+        print("Working on PCA. Shape", X.shape)
         algo = Pca()
         if not self._is_predict:
             algo.fit(X)
@@ -255,3 +270,22 @@ class StackedUnsupervisedTransformations(DescriptorBase):
         data.set(inputs=inputs, keys=keys, values=X, features=None)
         Hdf5(file_name).save(data)
         data.save_info(file_name.split(".")[0] + ".json")
+        print("Working on unsupervised Umap. Shape", X.shape)
+        algo = UnsupervisedUmap()
+        if not self._is_predict:
+            algo.fit(X)
+            algo.save(os.path.join(trained_path, algo._name + ".joblib"))
+        else:
+            algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
+        try:
+            X = algo.transform(X)
+            file_name = os.path.join(
+                self.path,
+                DESCRIPTORS_SUBFOLDER,
+                GLOBAL_UNSUPERVISED_FILE_NAME.split(".h5")[0] + "_unsupervised_umap.h5",
+            )
+            data = Data()
+            data.set(inputs=inputs, keys=keys, values=X, features=None)
+            Hdf5(file_name).save(data)
+        except:
+            pass

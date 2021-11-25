@@ -2,10 +2,12 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import joblib
+import collections
 
 from sklearn import metrics
 
-from . import RESULTS_UNMAPPED_FILENAME
+from . import Y_HAT_FILE
 from .. import ZairaBase
 
 from ..vars import DATA_SUBFOLDER, MODELS_SUBFOLDER, DATA_FILENAME
@@ -21,45 +23,44 @@ class BasePerformance(ZairaBase):
         else:
             self.path = path
 
-    def _relevant_columns(self, df):
-        return [
-            c
-            for c in list(df.columns)
-            if ("clf_" in c or "reg_" in c) and ("skip" not in c)
-        ]
-
-    def get_obs_data(self):
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
-        return df[self._relevant_columns(df)]
-
-    def get_prd_data(self):
-        df = pd.read_csv(
-            os.path.join(self.path, MODELS_SUBFOLDER, RESULTS_UNMAPPED_FILENAME)
-        )
-        return df[self._relevant_columns(df)]
+    def _get_y_hat_dict(self):
+        return joblib.load(os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE))
 
 
 class ClassificationPerformance(BasePerformance):
     def __init__(self, path):
         BasePerformance.__init__(self, path=path)
-        self.df_obs = self.get_obs_data()
-        self.df_prd = self.get_prd_data()
+        self.results = self._get_y_hat_dict()
         self._prefix = self._get_prefix()
+        self.results = self.results[self._prefix]
 
     def _get_prefix(self):
-        for c in list(self.df_obs.columns):
+        for c in list(self.results.keys()):
             if "clf_" in c:
                 return c
 
-    def calculate(self):
-        y_true = np.array(self.df_obs[self._prefix])
-        y_pred = np.array(self.df_prd[self._prefix])
-        b_pred = np.array(self.df_prd[self._prefix + "_bin"])
-        confu = metrics.confusion_matrix(y_true, b_pred, labels=[0, 1])
+    def _try_metric(self, fun, t, p):
+        try:
+            return float(fun(t, p))
+        except:
+            return None
+
+    def _calculate(self, key):
+        r = self.results[key]
+        print(r)
+        y_true = np.array(r["y"])
+        y_pred = np.array(r["y_hat"])
+        b_pred = np.array(r["b_hat"])
+        try:
+            confu = metrics.confusion_matrix(y_true, b_pred, labels=[0, 1])
+        except:
+            confu = np.array([[-1, -1], [-1, -1]])
         report = {
-            "roc_auc_score": float(metrics.roc_auc_score(y_true, y_pred)),
-            "precision_score": float(metrics.precision_score(y_true, b_pred)),
-            "recall_score": float(metrics.recall_score(y_true, b_pred)),
+            "roc_auc_score": self._try_metric(metrics.roc_auc_score, y_true, y_pred),
+            "precision_score": self._try_metric(
+                metrics.precision_score, y_true, b_pred
+            ),
+            "recall_score": self._try_metric(metrics.recall_score, y_true, b_pred),
             "tp": int(confu[1, 1]),
             "tn": int(confu[0, 0]),
             "fp": int(confu[0, 1]),
@@ -70,22 +71,29 @@ class ClassificationPerformance(BasePerformance):
         }
         return report
 
+    def calculate(self):
+        report = collections.OrderedDict()
+        for k in self.results.keys():
+            report[k] = self._calculate(k)
+        return report
+
 
 class RegressionPerformance(BasePerformance):
     def __init__(self, path):
         BasePerformance.__init__(self, path=path)
-        self.df_obs = self.get_obs_data()
-        self.df_prd = self.get_prd_data()
+        self.results = self._get_y_hat_dict()
         self._prefix = self._get_prefix()
+        self.results = self.results[self._prefix]
 
     def _get_prefix(self):
-        for c in list(self.df_obs.columns):
+        for c in list(self.results.keys()):
             if "reg_" in c:
                 return c
 
-    def calculate(self):
-        y_true = np.array(self.df_obs[self._prefix])
-        y_pred = np.array(self.df_prd[self._prefix])
+    def _calculate(self, key):
+        r = self.results[key]
+        y_true = np.array(r["y"])
+        y_pred = np.array(r["y_hat"])
         report = {
             "r2_score": float(metrics.r2_score(y_true, y_pred)),
             "mean_absolute_error": float(metrics.mean_absolute_error(y_true, y_pred)),
@@ -93,6 +101,13 @@ class RegressionPerformance(BasePerformance):
             "y_true": [float(y) for y in y_true],
             "y_pred": [float(y) for y in y_pred],
         }
+        return report
+
+    def calculate(self):
+        report = collections.OrderedDict()
+        for k in self.results.keys():
+            print(k)
+            report[k] = self._calculate(k)
         return report
 
 

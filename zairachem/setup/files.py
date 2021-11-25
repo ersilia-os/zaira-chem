@@ -301,7 +301,11 @@ class SingleFileForPrediction(SingleFile):
         self.values_column = resolved_columns["values_column"]
         if self.values_column is not None:
             trained_values_column = self.get_trained_values_column()
-            assert self.values_column == trained_values_column, "Inconsistent values column, {0} vs {1}".format(self.values_column, trained_values_column)
+            assert (
+                self.values_column == trained_values_column
+            ), "Inconsistent values column, {0} vs {1}".format(
+                self.values_column, trained_values_column
+            )
 
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         df[SMILES_COLUMN] = self.df[self.smiles_column]

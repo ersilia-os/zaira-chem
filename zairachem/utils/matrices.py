@@ -51,7 +51,7 @@ class Data(object):
             "inputs": len(self._inputs),
             "features": len(self._features),
             "values": np.array(self._values).shape,
-            "is_sparse": self._is_sparse
+            "is_sparse": self._is_sparse,
         }
         with open(file_name, "w") as f:
             json.dump(info, f, indent=4)
@@ -124,8 +124,8 @@ class Hdf5(object):
         features = self.features()
         f_row = [float(x) for x in values[0]]
         l_row = [float(x) for x in values[-1]]
-        means = [np.nanmean(values[:,j]) for j in range(values.shape[1])]
-        stds = [np.nanstd(values[:,j]) for j in range(values.shape[1])]
+        means = [np.nanmean(values[:, j]) for j in range(values.shape[1])]
+        stds = [np.nanstd(values[:, j]) for j in range(values.shape[1])]
         columns = ["keys"] + features
         data = collections.defaultdict(list)
         data["keys"] = ["first", "last", "mean", "std"]

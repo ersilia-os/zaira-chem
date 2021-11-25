@@ -15,7 +15,11 @@ def fit_cmd():
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default=None, type=click.STRING)
     @click.option(
-        "--time_budget", "-t", default=60, type=click.INT, help="Time budget in minutes"
+        "--time_budget",
+        "-t",
+        default=120,
+        type=click.INT,
+        help="Time budget in minutes",
     )
     @click.option("--threshold", "-c", default=None, type=click.FLOAT)
     @click.option("--direction", "-d", default=None, type=click.STRING)

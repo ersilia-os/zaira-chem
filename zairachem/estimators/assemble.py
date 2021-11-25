@@ -1,6 +1,8 @@
 import pandas as pd
 import json
 import os
+import joblib
+import collections
 
 from .. import ZairaBase
 from ..vars import DATA_SUBFOLDER, MODELS_SUBFOLDER, DATA_FILENAME
@@ -34,28 +36,14 @@ class OutcomeAssembler(ZairaBase):
         ]
 
     def _get_y_hat(self):
-        return pd.read_csv(os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE))
-
-    def _binarize_y_hat(self, y_hat):
-        df = y_hat.copy()
-        for c in list(y_hat.columns):
-            if "clf_" not in c:
-                continue
-            with open(
-                os.path.join(self.trained_path, MODELS_SUBFOLDER, c + ".json"), "r"
-            ) as f:
-                data = json.load(f)
-                threshold = data["threshold"]
-            y_raw = list(y_hat[c])
-            y_bin = []
-            for y in y_raw:
-                if y > threshold:
-                    y_bin += [1]
-                else:
-                    y_bin += [0]
-            new_c = c + "_bin"
-            df[new_c] = y_bin
-        return df
+        results = joblib.load(os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE))
+        data = collections.OrderedDict()
+        for c, r in results.items():
+            r = r["main"]
+            data[c] = r["y_hat"]
+            if "b_hat" in r:
+                data[c + "_bin"] = r["b_hat"]
+        return pd.DataFrame(data)
 
     def _get_original_input_size(self):
         with open(
@@ -80,7 +68,6 @@ class OutcomeAssembler(ZairaBase):
     def run(self):
         df_c = self._get_compounds()
         df_y = self._get_y_hat()
-        df_y = self._binarize_y_hat(df_y)
         df_y = self._projections(df_y)
         df = pd.concat([df_c, df_y], axis=1)
         df.to_csv(

@@ -36,24 +36,30 @@ class RegTasks(object):
         return np.clip(self.values, min_cred, max_cred)
 
     def pwr(self):
-        raw = self.raw().reshape(-1,1)
+        raw = self.raw().reshape(-1, 1)
         tr = PowerTransformer(method="yeo-johnson")
         tr.fit(raw)
-        joblib.dump(tr, os.path.join(self.path, "pwr_transformer.joblib"))
+        joblib.dump(
+            tr, os.path.join(self.path, DATA_SUBFOLDER, "pwr_transformer.joblib")
+        )
         return tr.transform(raw).ravel()
 
     def rnk(self):
-        raw = self.raw().reshape(-1,1)
+        raw = self.raw().reshape(-1, 1)
         tr = QuantileTransformer(output_distribution="uniform")
         tr.fit(raw)
-        joblib.dump(tr, os.path.join(self.path, "rnk_transformer.joblib"))
+        joblib.dump(
+            tr, os.path.join(self.path, DATA_SUBFOLDER, "rnk_transformer.joblib")
+        )
         return tr.transform(raw).ravel()
 
     def qnt(self):
-        raw = self.raw().reshape(-1,1)
+        raw = self.raw().reshape(-1, 1)
         tr = QuantileTransformer(output_distribution="normal")
         tr.fit(raw)
-        joblib.dump(tr, os.path.join(self.path, "qnt_transformer.joblib"))
+        joblib.dump(
+            tr, os.path.join(self.path, DATA_SUBFOLDER, "qnt_transformer.joblib")
+        )
         return tr.transform(raw).ravel()
 
     def as_dict(self):
@@ -73,16 +79,22 @@ class RegTasksForPrediction(RegTasks):
         self._load_path = path
 
     def pwr(self, raw):
-        tr = joblib.dump(os.path.join(_load_path, "pwr_transformer.joblib"))
-        return tr.transform(raw.reshape(-1,1)).ravel()
+        tr = joblib.load(
+            os.path.join(self._load_path, DATA_SUBFOLDER, "pwr_transformer.joblib")
+        )
+        return tr.transform(raw.reshape(-1, 1)).ravel()
 
     def rnk(self, raw):
-        tr = joblib.dump(os.path.join(_load_path, "rnk_transformer.joblib"))
-        return tr.transform(raw.reshape(-1,1)).ravel()
+        tr = joblib.load(
+            os.path.join(self._load_path, DATA_SUBFOLDER, "rnk_transformer.joblib")
+        )
+        return tr.transform(raw.reshape(-1, 1)).ravel()
 
     def qnt(self, raw):
-        tr = joblib.dump(os.path.join(_load_path, "qnt_transformer.joblib"))
-        return tr.transform(raw.reshape(-1,1)).ravel()
+        tr = joblib.load(
+            os.path.join(self._load_path, DATA_SUBFOLDER, "qnt_transformer.joblib")
+        )
+        return tr.transform(raw.reshape(-1, 1)).ravel()
 
     def as_dict(self):
         res = OrderedDict()
@@ -194,8 +206,11 @@ class ClfTasksForPrediction(ClfTasks):
         ClfTasks.__init__(self, data, params, path)
 
     def load(self, path):
-        with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "r") as f:
+        json_file = os.path.join(path, DATA_SUBFOLDER, "used_cuts.json")
+        print(json_file)
+        with open(json_file, "r") as f:
             data = json.load(f)
+        print(data)
         self._columns = data["columns"]
         self._ecuts = data["ecuts"]
         self._pcuts = data["pcuts"]
