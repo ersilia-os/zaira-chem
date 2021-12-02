@@ -8,6 +8,9 @@ import joblib
 import json
 
 from . import (
+    COMPOUNDS_FILENAME,
+    COMPOUND_IDENTIFIER_COLUMN,
+    SMILES_COLUMN,
     VALUES_FILENAME,
     VALUES_COLUMN,
     QUALIFIER_COLUMN,
@@ -17,23 +20,39 @@ from . import (
 from .files import ParametersFile
 from ..vars import CLF_PERCENTILES, MIN_CLASS, DATA_SUBFOLDER
 from .. import ZairaBase
+from .utils import SmoothenY
 
 from sklearn.preprocessing import PowerTransformer, QuantileTransformer
 
 
 class RegTasks(object):
     def __init__(self, data, params, path):
+        compounds = pd.read_csv(os.path.join(path, DATA_SUBFOLDER, COMPOUNDS_FILENAME))
+        cid2smiles = {}
+        for r in compounds[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]].values:
+            cid2smiles[r[0]] = r[1]
+        self.smiles_list = []
+        for cid in list(data[COMPOUND_IDENTIFIER_COLUMN]):
+            self.smiles_list += [cid2smiles[cid]]
         self.values = np.array(data[VALUES_COLUMN])
         self.direction = params["direction"]
         self.range = params["credibility_range"]
         self.path = path
+        self._raw = None
+
+    def smoothen(self, raw):
+        return SmoothenY(self.smiles_list, raw).run()
 
     def raw(self):
-        min_cred = self.range["min"]
-        max_cred = self.range["max"]
-        if min_cred is None and max_cred is None:
-            return self.values
-        return np.clip(self.values, min_cred, max_cred)
+        if self._raw is None:
+            min_cred = self.range["min"]
+            max_cred = self.range["max"]
+            if min_cred is None and max_cred is None:
+                raw = self.values
+            else:
+                raw = np.clip(self.values, min_cred, max_cred)
+            self._raw = self.smoothen(raw)
+        return self._raw
 
     def pwr(self):
         raw = self.raw().reshape(-1, 1)
@@ -207,10 +226,8 @@ class ClfTasksForPrediction(ClfTasks):
 
     def load(self, path):
         json_file = os.path.join(path, DATA_SUBFOLDER, "used_cuts.json")
-        print(json_file)
         with open(json_file, "r") as f:
             data = json.load(f)
-        print(data)
         self._columns = data["columns"]
         self._ecuts = data["ecuts"]
         self._pcuts = data["pcuts"]

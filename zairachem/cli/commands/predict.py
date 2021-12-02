@@ -8,6 +8,7 @@ from ...descriptors.describe import Describer
 from ...estimators.estimate import Estimator
 from ...estimators.assemble import OutcomeAssembler
 from ...estimators.performance import PerformanceReporter
+from ...plots.plot import Plotter
 
 
 def predict_cmd():
@@ -31,5 +32,7 @@ def predict_cmd():
         o = OutcomeAssembler(path=output_dir)
         o.run()
         p = PerformanceReporter(path=output_dir)
+        p.run()
+        p = Plotter(path=output_dir)
         p.run()
         echo("Done", fg="green")

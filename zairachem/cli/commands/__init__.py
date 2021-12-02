@@ -13,7 +13,7 @@ from ... import logger
 )
 def zairachem_cli(verbose):
     """
-    Ersilia Chemistry AutoML CLI
+    ZairaChem: An automated tool for QSAR based on Ersilia models
     """
     if verbose:
         logger.set_verbosity(1)
