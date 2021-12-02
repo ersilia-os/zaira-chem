@@ -3,7 +3,7 @@ import colorsys
 
 
 def set_style(style=None):
-    """Set basic plotting style andfonts."""
+    """Set basic plotting style and fonts."""
     if style is None:
         style = (
             "ticks",
