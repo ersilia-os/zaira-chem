@@ -1,21 +1,44 @@
-# Out-of-the-Box Supervised Machine Learning for Chemistry Datasets
+# ZairaChem: out-of-the-box QSAR
 
 **WORK IN PROGRESS**
 
-This package provides an automated solution to perform supervised machine learning on chemistry datasets.
+ZairaChem is the first library of Ersilia's family of tools devoted to providing **out-of-the-box** machine learning solutions for biomedical problems. In this case, we have focused on QSAR models. QSAR models have chemical structures as input and as output they have predicted properties, typically pharmacological properties such as bioactivity against a certain target.
 
-We prioritise computational performance for low-resourced settings. Training takes time but is feasible on a conventional computer.
+## Installation
 
-Works on regression and classification. Single task or multitask.
-
-## Fit
+### Create a conda environment
 
 ```bash
-autosml fit --input INPUT_CSV --output MODEL_FOLDER
+conda create -n zairachem python=3.7
+conda activate zairachem
 ```
 
-## Predict
+### Install ersilia
 
 ```bash
-autosml predict --model MODEL_FOLDER --output OUTPUT_FOLDER
+git clone git@github.com:ersilia-os/ersilia.git
+cd ersilia
+python -m pip install -e .
+```
+
+### Install zairachem
+
+```bash
+git clone git@github.com:ersilia-os/zaira-chem.git
+cd zaira-chem
+python -m pip install -e .
+```
+
+## Usage
+
+ZairaChem works as a command line.
+
+```bash
+zairachem --help
+```
+
+### Fit
+
+```bash
+zairachem fit -i input.csv
 ```
