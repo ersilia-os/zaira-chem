@@ -8,3 +8,6 @@ flaml
 dask
 tqdm
 faiss-cpu
+umap-learn
+lolP
+seaborn

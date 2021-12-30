@@ -281,27 +281,19 @@ class ModelWithPredictionInterval:
         if self.point_preds is not None:
             point_preds = self.point_preds
         else:
-            point_preds = self.predict(
-                x_star,
-            )
+            point_preds = self.predict(x_star)
         if self.error_dist == "normal":
-            scale = self.std_on_y_star(
-                x_star,
-            )
+            scale = self.std_on_y_star(x_star)
             dist = norm(loc=point_preds, scale=scale)
         elif self.error_dist == "laplace":
-            scale = self.laplace_scale_on_y_star(
-                x_star,
-            )
+            scale = self.laplace_scale_on_y_star(x_star)
             dist = laplace(loc=point_preds, scale=scale)
         else:
             raise ValueError(f"Unknown distance function: {self.dist_func}")
         return dist
 
     def predict_interval(
-        self,
-        x_star: np.ndarray,
-        conf_level: Union[np.ndarray, int, float] = 90,
+        self, x_star: np.ndarray, conf_level: Union[np.ndarray, int, float] = 90
     ) -> np.ndarray:
         """
         Predict the upper and lower prediction interval bounds for a given confidence level.
@@ -320,9 +312,7 @@ class ModelWithPredictionInterval:
         return np.array([dist.ppf(lower_vec.T), dist.ppf(upper_vec.T)]).T
 
     def calculate_prediction_interval_width(
-        self,
-        x_star: np.ndarray,
-        conf_level: Union[np.ndarray, int, float] = 90,
+        self, x_star: np.ndarray, conf_level: Union[np.ndarray, int, float] = 90
     ) -> np.ndarray:
         """
         Calculate the absolute width of a prediction interval for a given confidence level.
@@ -565,10 +555,7 @@ def picp_loss(
     """
     levels = np.array((90, 70, 50, 30, 10))
 
-    intervals = interval_model.predict_interval(
-        x_test,
-        conf_level=levels,
-    ).T
+    intervals = interval_model.predict_interval(x_test, conf_level=levels).T
 
     lower = intervals[0]
     upper = intervals[1]

@@ -6,6 +6,8 @@ import numpy as np
 import collections
 import joblib
 
+from ..descriptors.treated import TREATED_FILE_NAME
+
 from .. import ZairaBase
 from ..automl.flaml import FlamlClassifier, FlamlRegressor
 
@@ -16,12 +18,9 @@ from ..vars import (
     MODELS_SUBFOLDER,
 )
 from ..setup import SCHEMA_MERGE_FILENAME, PARAMETERS_FILE
-from ..descriptors import GLOBAL_SUPERVISED_FILE_NAME, GLOBAL_UNSUPERVISED_FILE_NAME
 
 from . import Y_HAT_FILE
 
-
-# TODO Select best between supervised and unsupervised (head-to-head, same number of dimensions)
 
 ESTIMATORS = None
 
@@ -39,27 +38,9 @@ class BaseEstimator(ZairaBase):
         else:
             self.trained_path = self.path
         with open(
-            os.path.join(
-                self.trained_path,
-                DATA_SUBFOLDER,
-                SCHEMA_MERGE_FILENAME,
-            )
+            os.path.join(self.trained_path, DATA_SUBFOLDER, SCHEMA_MERGE_FILENAME)
         ) as f:
             self.schema = json.load(f)
-
-    def _get_X_unsupervised(self):
-        f = os.path.join(
-            self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
-        )
-        with h5py.File(f, "r") as f:
-            X = f["Values"][:]
-        return X
-
-    def _get_X_supervised(self):
-        f = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_SUPERVISED_FILE_NAME)
-        with h5py.File(f, "r") as f:
-            X = f["Values"][:]
-        return X
 
     def _get_clf_tasks(self):
         return [
@@ -95,9 +76,27 @@ class BaseEstimator(ZairaBase):
         return available_time
 
 
-class Fitter(BaseEstimator):
-    def __init__(self, path):
+class BaseEstimatorIndividual(BaseEstimator):
+    def __init__(self, path, model_id):
         BaseEstimator.__init__(self, path=path)
+        if not os.path.exists(os.path.join(self.path, MODELS_SUBFOLDER, model_id)):
+            os.makedirs(
+                os.path.join(self.path, MODELS_SUBFOLDER, model_id), exist_ok=True
+            )
+        self.model_id = model_id
+
+    def _get_X(self):
+        f = os.path.join(
+            self.path, DESCRIPTORS_SUBFOLDER, self.model_id, TREATED_FILE_NAME
+        )
+        with h5py.File(f, "r") as f:
+            X = f["Values"][:]
+        return X
+
+
+class Fitter(BaseEstimatorIndividual):
+    def __init__(self, path, model_id):
+        BaseEstimatorIndividual.__init__(self, path=path, model_id=model_id)
         self.trained_path = os.path.join(self.get_output_dir(), MODELS_SUBFOLDER)
 
     def _get_flds(self):
@@ -119,7 +118,7 @@ class Fitter(BaseEstimator):
             time_budget_sec = time_budget_sec
         groups = self._get_flds()
         tasks = collections.OrderedDict()
-        X = self._get_X_unsupervised()
+        X = self._get_X()
         print("Shape", X.shape)
         for t in self._get_reg_tasks():
             y = self._get_y(t)
@@ -131,12 +130,11 @@ class Fitter(BaseEstimator):
                 time_budget=time_budget_sec,
                 estimators=ESTIMATORS,
                 groups=groups,
+                predict_by_group=False,
             )
-            file_name = os.path.join(self.trained_path, t + ".joblib")
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
             model.save(file_name)
             tasks[t] = model.results
-        X = self._get_X_unsupervised()
-        print(X.shape)
         for t in self._get_clf_tasks():
             y = self._get_y(t)
             model = FlamlClassifier()
@@ -146,17 +144,18 @@ class Fitter(BaseEstimator):
                 time_budget=time_budget_sec,
                 estimators=ESTIMATORS,
                 groups=groups,
+                predict_by_group=False,
             )
-            file_name = os.path.join(self.trained_path, t + ".joblib")
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
             model.save(file_name)
             tasks[t] = model.results
         self.update_elapsed_time()
         return tasks
 
 
-class Predictor(BaseEstimator):
-    def __init__(self, path):
-        BaseEstimator.__init__(self, path=path)
+class Predictor(BaseEstimatorIndividual):
+    def __init__(self, path, model_id):
+        BaseEstimatorIndividual.__init__(self, path=path, model_id=model_id)
         self.trained_path = os.path.join(self.get_trained_dir(), MODELS_SUBFOLDER)
 
     def _get_y(self, task):
@@ -170,45 +169,76 @@ class Predictor(BaseEstimator):
             print(task, "not found")
             return None
 
-    def run(self, time_budget_sec=None):
+    def run(self):
         self.reset_time()
         tasks = collections.OrderedDict()
-        X = self._get_X_unsupervised()
+        X = self._get_X()
         for t in self._get_reg_tasks():
             y = self._get_y(t)
-            print("THIS IS THE Y", y)
             model = FlamlRegressor()
-            file_name = os.path.join(self.trained_path, t + ".joblib")
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
             model = model.load(file_name)
             tasks[t] = model.run(X, y)
-        X = self._get_X_unsupervised()
         for t in self._get_clf_tasks():
             y = self._get_y(t)
-            print("THIS IS THE Y", y)
             model = FlamlClassifier()
-            file_name = os.path.join(self.trained_path, t + ".joblib")
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
             model = model.load(file_name)
             tasks[t] = model.run(X, y)
         self.update_elapsed_time()
         return tasks
 
 
-class Estimator(ZairaBase):
-    def __init__(self, path=None):
+class IndividualEstimator(ZairaBase):
+    def __init__(self, path=None, model_id=None):
         ZairaBase.__init__(self)
+        self.model_id = model_id
         if path is None:
             self.path = self.get_output_dir()
         else:
             self.path = path
         if not self.is_predict():
-            self.estimator = Fitter(path=self.path)
+            self.estimator = Fitter(path=self.path, model_id=self.model_id)
         else:
-            self.estimator = Predictor(path=self.path)
+            self.estimator = Predictor(path=self.path, model_id=self.model_id)
 
     def run(self, time_budget_sec=None):
         if time_budget_sec is not None:
             self.time_budget_sec = int(time_budget_sec)
         else:
             self.time_budget_sec = None
-        results = self.estimator.run(time_budget_sec=self.time_budget_sec)
-        joblib.dump(results, os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE))
+        if not self.is_predict():
+            results = self.estimator.run(time_budget_sec=self.time_budget_sec)
+        else:
+            results = self.estimator.run()
+        joblib.dump(
+            results,
+            os.path.join(self.path, MODELS_SUBFOLDER, self.model_id, Y_HAT_FILE),
+        )
+
+
+class Estimator(ZairaBase):
+    def __init__(self, path=None):
+        ZairaBase.__init__(self)
+        self.path = path
+
+    def _get_model_ids(self):
+        if self.path is None:
+            path = self.get_output_dir()
+        else:
+            path = self.path
+        if self.is_predict():
+            path = self.get_trained_dir()
+        with open(os.path.join(path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r") as f:
+            model_ids = list(json.load(f))
+        return model_ids
+
+    def run(self, time_budget_sec=None):
+        model_ids = self._get_model_ids()
+        if time_budget_sec is not None:
+            tbs = max(int(time_budget_sec / len(model_ids)), 1)
+        else:
+            tbs = None
+        for model_id in model_ids:
+            estimator = IndividualEstimator(path=self.path, model_id=model_id)
+            estimator.run(time_budget_sec=tbs)

@@ -1,15 +1,8 @@
-import os
-import pandas as pd
-
 from .raw import RawDescriptors
-from .unsupervised import (
-    IndividualUnsupervisedTransformations,
-    StackedUnsupervisedTransformations,
-)
-from .supervised import SupervisedTransformations
+from .treated import TreatedDescriptors
+from .reference import ReferenceDescriptors
+from .manifolds import Manifolds
 
-from ..setup import COMPOUNDS_FILENAME
-from ..vars import DATA_SUBFOLDER
 from .. import ZairaBase
 
 
@@ -22,23 +15,22 @@ class Describer(ZairaBase):
             self.path = path
         self.logger.debug(self.path)
 
-    def load_inputs(self):
-        self.logger.debug("Reading inputs")
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, COMPOUNDS_FILENAME))
-
     def _raw_descriptions(self):
         RawDescriptors().run()
 
-    def _unsupervised(self):
-        IndividualUnsupervisedTransformations().run()
-        StackedUnsupervisedTransformations().run()
+    def _treated_descriptions(self):
+        TreatedDescriptors().run()
 
-    def _supervised(self):
-        SupervisedTransformations().run()
+    def _reference_descriptors(self):
+        ReferenceDescriptors().run()
+
+    def _manifolds(self):
+        Manifolds().run()
 
     def run(self):
         self.reset_time()
         self._raw_descriptions()
-        self._unsupervised()
-        self._supervised()
+        self._treated_descriptions()
+        self._reference_descriptors()
+        self._manifolds()
         self.update_elapsed_time()

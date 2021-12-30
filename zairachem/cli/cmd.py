@@ -1,7 +1,7 @@
 from .commands.setup import setup_cmd
 from .commands.describe import describe_cmd
 from .commands.estimate import estimate_cmd
-from .commands.plot import plot_cmd
+from .commands.report import report_cmd
 from .commands.pool import pool_cmd
 from .commands.fit import fit_cmd
 from .commands.predict import predict_cmd
@@ -23,8 +23,8 @@ class Command(object):
     def pool(self):
         pool_cmd()
 
-    def plot(self):
-        plot_cmd()
+    def report(self):
+        report_cmd()
 
     def fit(self):
         fit_cmd()

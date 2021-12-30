@@ -11,14 +11,36 @@ from flaml import AutoML
 from ..tools.ghost.ghost import GhostLight
 
 from ..vars import N_FOLDS
-from . import AUTOML_DEFAULT_TIME_BUDGET_SEC
 
 
-ABSOLUTE_MINIMUM_TIME_BUDGET_SECONDS = 60  # 60
-DEFAULT_TIME_BUDGET_RETRAIN_SECONDS = 60  # 60
-DEFAULT_MAX_ITER_RETRAIN = 100
+FLAML_TIME_BUDGET_SECONDS = 60
+
+FLAML_COLD_MINIMUM_TIME_BUDGET_SECONDS = 1 # 30
+FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS = 10 # 600
+FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS = 1 # 10
+FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS = 10 # 60
+
+FLAML_COLD_MAXIMUM_ITERATIONS = 1000
+FLAML_WARM_MAXIMUM_ITERATIONS = 100
 
 MIN_SAMPLES_TO_ALLOW_EVALUATION = 1
+
+SPLITTING_ROUNDS = 3
+
+
+class Splitter(object):
+    def __init__(self, X, y, is_clf):
+        if is_clf:
+            self.splitter = StratifiedKFold(n_splits=N_FOLDS, shuffle=True)
+        else:
+            self.splitter = KFold(n_splits=N_FOLDS, shuffle=True)
+        self.X = X
+        self.y = y
+
+    def split(self):
+        for _ in range(SPLITTING_ROUNDS):
+            for tr_idxs, te_idxs in self.splitter.split(self.X, self.y):
+                yield tr_idxs, te_idxs
 
 
 class FlamlSettings(object):
@@ -79,16 +101,22 @@ class FlamlSettings(object):
 
     def get_automl_settings(self, task, time_budget, estimators, groups):
         automl_settings = {
-            "time_budget": max(time_budget, ABSOLUTE_MINIMUM_TIME_BUDGET_SECONDS),
+            "time_budget": int(
+                np.clip(
+                    time_budget,
+                    FLAML_COLD_MINIMUM_TIME_BUDGET_SECONDS,
+                    FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS,
+                )
+            ),
             "metric": self.get_metric(task),
             "task": task,
             "log_file_name": "automl.log",
             "log_training_metric": True,
             "verbose": 3,
             "early_stop": True,
-            "max_iter": min(
-                len(self.y), 1000000
-            ),  # TODO better heuristic based on sample size
+            "max_iter": int(min(
+                len(self.y)/3, FLAML_COLD_MAXIMUM_ITERATIONS
+            )),  # TODO better heuristic based on sample size
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
@@ -121,7 +149,7 @@ class FlamlEstimator(object):
         if os.path.exists(catboost_info):
             shutil.rmtree(catboost_info)
 
-    def fit_predict_main(self, X, y, time_budget, estimators, groups):
+    def fit_main(self, X, y, time_budget, estimators, groups):
         automl_settings = FlamlSettings(y).get_automl_settings(
             task=self.task,
             time_budget=time_budget,
@@ -144,13 +172,71 @@ class FlamlEstimator(object):
             y_hat = self.main_mdl.predict(X)
         return y_hat
 
+    def fit_predict_out_of_sample(self, X, y):
+        assert self.main_mdl is not None
+        automl_settings = self.main_automl_settings.copy()
+        automl_settings["time_budget"] = int(
+            np.clip(
+                automl_settings["time_budget"] * 0.1,
+                FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS,
+                FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS,
+            )
+        )
+        y = np.array(y)
+        best_models = self.main_mdl.best_config_per_estimator
+        best_estimator = self.main_mdl.best_estimator
+        starting_point = {best_estimator: best_models[best_estimator]}
+        print(starting_point)
+        splitter = Splitter(X, y, is_clf=self.is_clf)
+        k = 0
+        results = collections.defaultdict(list)
+        for tr_idxs, te_idxs in splitter.split():
+            tag = "oos_{0}".format(k)
+            automl_settings["log_file_name"] = "{0}_automl.log".format(tag)
+            X_tr = X[tr_idxs]
+            X_te = X[te_idxs]
+            y_tr = y[tr_idxs]
+            automl_settings["eval_method"] = "auto"
+            automl_settings["split_type"] = None
+            automl_settings["groups"] = None
+            automl_settings["estimator_list"] = [best_estimator]
+            automl_settings["max_iter"] = min(
+                int(self.main_automl_settings["max_iter"] * 0.25) + 1,
+                FLAML_WARM_MAXIMUM_ITERATIONS,
+            )
+            model = AutoML()
+            model.fit(
+                X_train=X_tr,
+                y_train=y_tr,
+                #starting_points=starting_point,
+                **automl_settings
+            )
+            if self.is_clf:
+                y_te_hat = model.predict_proba(X_te)[:, 1]
+            else:
+                y_te_hat = model.predict(X_te)
+            for i, idx in enumerate(te_idxs):
+                results[idx] += [y_te_hat[i]]
+            self._clean_log(automl_settings)
+            k += 1
+        y_hat = []
+        for i in range(len(y)):
+            y_hat += [np.mean(results[i])]
+        return np.array(y_hat)
+
     def fit_predict_by_group(self, X, y):
         assert self.main_mdl is not None
         automl_settings = self.main_automl_settings.copy()
         y = np.array(y)
         results = collections.OrderedDict()
         groups = np.array(automl_settings["groups"])
-        automl_settings["time_budget"] = DEFAULT_TIME_BUDGET_RETRAIN_SECONDS
+        automl_settings["time_budget"] = int(
+            np.clip(
+                automl_settings["time_budget"] * 0.1,
+                FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS,
+                FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS,
+            )
+        )
         folds = sorted(set(groups))
         best_models = self.main_mdl.best_config_per_estimator
         best_estimator = self.main_mdl.best_estimator
@@ -188,14 +274,14 @@ class FlamlEstimator(object):
             automl_settings["estimator_list"] = [best_estimator]
             automl_settings["max_iter"] = min(
                 int(self.main_automl_settings["max_iter"] * 0.25) + 1,
-                DEFAULT_MAX_ITER_RETRAIN,
+                FLAML_WARM_MAXIMUM_ITERATIONS,
             )
             model = AutoML()
             print(automl_settings)
             model.fit(
                 X_train=X_tr,
                 y_train=y_tr,
-                starting_points=starting_point,
+                # starting_points=starting_point,
                 **automl_settings
             )
             if self.is_clf:
@@ -206,9 +292,13 @@ class FlamlEstimator(object):
             results[tag] = {"idxs": te_idxs, "y": y_te, "y_hat": y_te_hat}
         return results
 
-    def fit_predict(self, X, y, time_budget, estimators, groups):
-        y_hat_main = self.fit_predict_main(X, y, time_budget, estimators, groups)
-        group_results = self.fit_predict_by_group(X, y)
+    def fit_predict(self, X, y, time_budget, estimators, groups, predict_by_group):
+        self.fit_main(X, y, time_budget, estimators, groups)
+        y_hat_main = self.fit_predict_out_of_sample(X, y)
+        if predict_by_group:
+            group_results = self.fit_predict_by_group(X, y)
+        else:
+            group_results = {}
         self._clean_log(self.main_automl_settings)
         results = collections.OrderedDict()
         results["main"] = {"idxs": None, "y": y, "y_hat": y_hat_main}
@@ -241,11 +331,14 @@ class FlamlClassifier(object):
         self,
         X,
         y,
-        time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC,
+        time_budget=FLAML_TIME_BUDGET_SECONDS,
         estimators=None,
         groups=None,
+        predict_by_group=False,
     ):
-        self.results = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
+        self.results = self.estimator.fit_predict(
+            X, y, time_budget, estimators, groups, predict_by_group=predict_by_group
+        )
         for k, v in self.results.items():
             threshold = GhostLight().get_threshold(
                 self.results[k]["y"], self.results[k]["y_hat"]
@@ -304,11 +397,14 @@ class FlamlRegressor(object):
         self,
         X,
         y,
-        time_budget=AUTOML_DEFAULT_TIME_BUDGET_SEC,
+        time_budget=FLAML_TIME_BUDGET_SECONDS,
         estimators=None,
         groups=None,
+        predict_by_group=False,
     ):
-        self.results = self.estimator.fit_predict(X, y, time_budget, estimators, groups)
+        self.results = self.estimator.fit_predict(
+            X, y, time_budget, estimators, groups, predict_by_group=predict_by_group
+        )
 
     def save(self, file_name):
         joblib.dump(self.estimator.main_mdl, file_name)
@@ -318,8 +414,6 @@ class FlamlRegressor(object):
 
     def load(self, file_name):
         model = joblib.load(file_name)
-        with open(file_name.split(".")[0] + ".json", "r") as f:
-            data = json.load(f)
         return FlamlRegressorArtifact(model)
 
 

@@ -1,6 +1,5 @@
 import json
 import os
-import csv
 
 from .. import ZairaBase
 from ..utils.matrices import Hdf5
@@ -9,6 +8,8 @@ from ersilia import ErsiliaModel
 from ..setup import PARAMETERS_FILE
 from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
 
+RAW_FILE_NAME = "raw.h5"
+
 
 class RawLoader(ZairaBase):
     def __init__(self):
@@ -16,7 +17,7 @@ class RawLoader(ZairaBase):
         self.path = self.get_output_dir()
 
     def open(self, eos_id):
-        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, "raw.h5")
+        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, RAW_FILE_NAME)
         return Hdf5(path)
 
 
@@ -39,7 +40,7 @@ class RawDescriptors(ZairaBase):
     def output_h5_filename(self, eos_id):
         path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id)
         os.makedirs(path, exist_ok=True)
-        return os.path.join(path, "raw.h5")
+        return os.path.join(path, RAW_FILE_NAME)
 
     def run(self):
         done_eos = []

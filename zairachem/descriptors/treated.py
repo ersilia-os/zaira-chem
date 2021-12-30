@@ -1,22 +1,17 @@
-import joblib
 import os
-import json
 import numpy as np
+import joblib
+import json
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import VarianceThreshold
-from sklearn.decomposition import PCA
-from umap import UMAP
 
-from . import GLOBAL_UNSUPERVISED_FILE_NAME
-from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
 from . import DescriptorBase
-from ..utils.matrices import Hdf5, Data
+from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
+from ..utils.matrices import Hdf5
+from .. import ZairaBase
 
+TREATED_FILE_NAME = "treated.h5"
 MAX_NA = 0.2
-
-INDIVIDUAL_UNSUPERVISED_FILE_NAME = "individual_unsupervised.h5"
-
-MAX_COMPONENTS = 1024
 
 
 class NanFilter(object):
@@ -127,48 +122,17 @@ class VarianceFilter(object):
         return joblib.load(file_name)
 
 
-class Pca(object):
+class TreatedLoader(ZairaBase):
     def __init__(self):
-        self._name = "pca"
+        ZairaBase.__init__(self)
+        self.path = self.get_output_dir()
 
-    def fit(self, X):
-        n_components = np.min([MAX_COMPONENTS, X.shape[0], X.shape[1]])
-        # self.pca = PCA(n_components=n_components, whiten=True)
-        # self.pca.fit(X)
-        self.pca = None
-
-    def transform(self, X):
-        return X
-        return self.pca.transform(X)
-
-    def save(self, file_name):
-        joblib.dump(self, file_name)
-
-    def load(self, file_name):
-        return joblib.load(file_name)
+    def open(self, eos_id):
+        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, eos_id, TREATED_FILE_NAME)
+        return Hdf5(path)
 
 
-class UnsupervisedUmap(object):
-    def __init__(self):
-        self._name = "unsupervised_umap"
-
-    def fit(self, X):
-        # self.reducer = UMAP(densmap=False)
-        # self.reducer.fit(X)
-        self.reducer = None
-
-    def transform(self, X):
-        return X
-        return self.reducer.transform(X)
-
-    def save(self, file_name):
-        joblib.dump(self, file_name)
-
-    def load(self, file_name):
-        return joblib.load(file_name)
-
-
-class IndividualUnsupervisedTransformations(DescriptorBase):
+class TreatedDescriptors(DescriptorBase):
     def __init__(self):
         DescriptorBase.__init__(self)
         self.pipeline = [
@@ -176,9 +140,8 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
             (1, 0, Imputer),
             (2, 1, VarianceFilter),
             (3, 2, Scaler),
-            (4, 3, Pca),
         ]
-        self._name = INDIVIDUAL_UNSUPERVISED_FILE_NAME
+        self._name = TREATED_FILE_NAME
         self._is_predict = self.is_predict()
 
     def done_eos_iter(self):
@@ -223,69 +186,6 @@ class IndividualUnsupervisedTransformations(DescriptorBase):
             file_name = os.path.join(
                 self.path, DESCRIPTORS_SUBFOLDER, eos_id, self._name
             )
-            data._values = X[4]
+            data._values = X[len(self.pipeline) - 1]
             Hdf5(file_name).save(data)
             data.save_info(file_name.split(".")[0] + ".json")
-
-
-class StackedUnsupervisedTransformations(DescriptorBase):
-    def __init__(self):
-        DescriptorBase.__init__(self)
-        self.pipeline = None  # TODO
-
-    def run(self):
-        Xs = []
-        keys = None
-        inputs = None
-        for eos_id in self.done_eos_iter():
-            file_name = os.path.join(
-                self.path,
-                DESCRIPTORS_SUBFOLDER,
-                eos_id,
-                INDIVIDUAL_UNSUPERVISED_FILE_NAME,
-            )
-            data = Hdf5(file_name).load()
-            Xs += [data.values()]
-            if keys is None:
-                keys = data.keys()
-            if inputs is None:
-                inputs = data.inputs()
-        if not self._is_predict:
-            trained_path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER)
-        else:
-            trained_path = os.path.join(self.trained_path, DESCRIPTORS_SUBFOLDER)
-        X = np.hstack(Xs)
-        print("Working on PCA. Shape", X.shape)
-        algo = Pca()
-        if not self._is_predict:
-            algo.fit(X)
-            algo.save(os.path.join(trained_path, algo._name + ".joblib"))
-        else:
-            algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
-        X = algo.transform(X)
-        file_name = os.path.join(
-            self.path, DESCRIPTORS_SUBFOLDER, GLOBAL_UNSUPERVISED_FILE_NAME
-        )
-        data = Data()
-        data.set(inputs=inputs, keys=keys, values=X, features=None)
-        Hdf5(file_name).save(data)
-        data.save_info(file_name.split(".")[0] + ".json")
-        print("Working on unsupervised Umap. Shape", X.shape)
-        algo = UnsupervisedUmap()
-        if not self._is_predict:
-            algo.fit(X)
-            algo.save(os.path.join(trained_path, algo._name + ".joblib"))
-        else:
-            algo = algo.load(os.path.join(trained_path, algo._name + ".joblib"))
-        try:
-            X = algo.transform(X)
-            file_name = os.path.join(
-                self.path,
-                DESCRIPTORS_SUBFOLDER,
-                GLOBAL_UNSUPERVISED_FILE_NAME.split(".h5")[0] + "_unsupervised_umap.h5",
-            )
-            data = Data()
-            data.set(inputs=inputs, keys=keys, values=X, features=None)
-            Hdf5(file_name).save(data)
-        except:
-            pass
