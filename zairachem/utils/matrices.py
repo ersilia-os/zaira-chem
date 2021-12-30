@@ -113,13 +113,16 @@ class Hdf5(object):
     def save(self, data):
         with h5py.File(self.file_name, "w") as f:
             f.create_dataset("Values", data=data.values())
-            f.create_dataset("Keys", data=data.keys())
-            f.create_dataset("Inputs", data=data.inputs())
-            f.create_dataset("Features", data=data.features())
+            f.create_dataset("Keys", data=np.array(data.keys(), h5py.string_dtype()))
+            f.create_dataset(
+                "Inputs", data=np.array(data.inputs(), h5py.string_dtype())
+            )
+            f.create_dataset(
+                "Features", data=np.array(data.features(), h5py.string_dtype())
+            )
 
     def save_summary_as_csv(self):
         file_name = self.file_name.split(".h5")[0] + "_summary.csv"
-        keys = self.keys()
         values = self.values()
         features = self.features()
         f_row = [float(x) for x in values[0]]

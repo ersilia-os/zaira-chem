@@ -25,9 +25,15 @@ from .utils import SmoothenY
 from sklearn.preprocessing import PowerTransformer, QuantileTransformer
 
 
+USED_CUTS_FILE = "used_cuts.json"
+
+
 class RegTasks(object):
     def __init__(self, data, params, path):
-        compounds = pd.read_csv(os.path.join(path, DATA_SUBFOLDER, COMPOUNDS_FILENAME))
+        file_name = os.path.join(path, DATA_SUBFOLDER, COMPOUNDS_FILENAME)
+        if not os.path.exists(file_name):
+            file_name = os.path.join(path, COMPOUNDS_FILENAME)
+        compounds = pd.read_csv(file_name)
         cid2smiles = {}
         for r in compounds[[COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN]].values:
             cid2smiles[r[0]] = r[1]
@@ -216,8 +222,8 @@ class ClfTasks(object):
 
     def save(self, path):
         data = {"columns": self._columns, "ecuts": self._ecuts, "pcuts": self._pcuts}
-        with open(os.path.join(path, DATA_SUBFOLDER, "used_cuts.json"), "w") as f:
-            json.dump(data, f)
+        with open(os.path.join(path, DATA_SUBFOLDER, USED_CUTS_FILE), "w") as f:
+            json.dump(data, f, indent=4)
 
 
 class ClfTasksForPrediction(ClfTasks):
@@ -225,7 +231,7 @@ class ClfTasksForPrediction(ClfTasks):
         ClfTasks.__init__(self, data, params, path)
 
     def load(self, path):
-        json_file = os.path.join(path, DATA_SUBFOLDER, "used_cuts.json")
+        json_file = os.path.join(path, DATA_SUBFOLDER, USED_CUTS_FILE)
         with open(json_file, "r") as f:
             data = json.load(f)
         self._columns = data["columns"]

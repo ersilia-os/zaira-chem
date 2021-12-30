@@ -5,10 +5,9 @@ from ..echo import echo
 
 from ...setup.training import TrainSetup
 from ...descriptors.describe import Describer
-from ...estimators.estimate import Estimator
-from ...estimators.assemble import OutcomeAssembler
-from ...estimators.performance import PerformanceReporter
-from ...plots.plot import Plotter
+from ...estimators.pipe import EstimatorPipeline
+from ...pool.pool import Pooler
+from ...reports.report import Reporter
 
 
 def fit_cmd():
@@ -38,12 +37,10 @@ def fit_cmd():
         s.setup()
         d = Describer(path=output_dir)
         d.run()
-        e = Estimator(path=output_dir)
+        e = EstimatorPipeline(path=output_dir)
         e.run()
-        o = OutcomeAssembler(path=output_dir)
-        o.run()
-        p = PerformanceReporter(path=output_dir)
+        p = Pooler(path=output_dir)
         p.run()
-        p = Plotter(path=output_dir)
-        p.run()
+        r = Reporter(path=output_dir)
+        r.run()
         echo("Done", fg="green")

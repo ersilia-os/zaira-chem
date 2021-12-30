@@ -239,9 +239,7 @@ class ModelWithConfidence:
         return neighbour_info
 
     def calc_linear_distance_error_func(
-        self,
-        local_distance: np.ndarray,
-        local_error: np.ndarray,
+        self, local_distance: np.ndarray, local_error: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Calculate the parametric linear distance function using the local error and distance.
@@ -262,9 +260,7 @@ class ModelWithConfidence:
         return dist, error
 
     def predict_proba(
-        self,
-        x_star: np.ndarray,
-        change_conflicts: bool = False,
+        self, x_star: np.ndarray, change_conflicts: bool = False
     ) -> np.ndarray:
         """
         Compute a confidence score for each class for a given points(s) x_star.
@@ -290,9 +286,7 @@ class ModelWithConfidence:
         return relative_conf
 
     def predict_confidence_of_point_prediction(
-        self,
-        x_star: np.ndarray,
-        change_conflicts: bool = False,
+        self, x_star: np.ndarray, change_conflicts: bool = False
     ) -> np.ndarray:
         """
         Estimate a single confidence score, this represents the confidence of the point prediction
@@ -318,8 +312,7 @@ class ModelWithConfidence:
         return point_prediction_confidence
 
     def _calc_relative_distance_softmax_normalisation(
-        self,
-        average_distance_error_func: np.ndarray,
+        self, average_distance_error_func: np.ndarray
     ) -> np.ndarray:
         """
         Take a vector of distance functions, we then scale these by the mean distance across
@@ -372,12 +365,8 @@ class ModelWithConfidence:
         :param x_star:
         :return:
         """
-        class_confidence = self.predict_proba(
-            x_star,
-        )
-        point_prediction = self.predict(
-            x_star,
-        )
+        class_confidence = self.predict_proba(x_star)
+        point_prediction = self.predict(x_star)
         max_confidence_prediction = np.argmax(class_confidence, axis=1)
         conflicting_predictions = np.argwhere(
             max_confidence_prediction != point_prediction
@@ -527,7 +516,9 @@ class _TrainingHelper(object):
             for k in num_nbrs:
                 dist = max_dist[x_cal_len_array, 0 : int(k)]
                 ind = max_ind[x_cal_len_array, 0 : int(k)]
-                cls_preds = self.model.training_preds_by_class[class_num]  # type: ignore
+                cls_preds = self.model.training_preds_by_class[
+                    class_num
+                ]  # type: ignore
                 error = np.array(
                     [
                         cls_preds[ind[j].astype(int)] != class_num

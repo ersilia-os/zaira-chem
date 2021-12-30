@@ -149,10 +149,7 @@ class TestGHOST(unittest.TestCase):
         self.assertAlmostEqual(auc, 0.951, places=3)
 
         thresh_sub = ghost.optimize_threshold_from_oob_predictions(
-            labels_train,
-            oob_probs,
-            thresholds,
-            ThOpt_metrics="Kappa",
+            labels_train, oob_probs, thresholds, ThOpt_metrics="Kappa"
         )
         self.assertAlmostEqual(thresh_sub, 0.30, places=2)
         scores = [1 if x >= thresh_sub else 0 for x in test_probs]
@@ -160,10 +157,7 @@ class TestGHOST(unittest.TestCase):
         self.assertAlmostEqual(kappa, 0.809, places=3)
 
         thresh_sub = ghost.optimize_threshold_from_oob_predictions(
-            labels_train,
-            oob_probs,
-            thresholds,
-            ThOpt_metrics="ROC",
+            labels_train, oob_probs, thresholds, ThOpt_metrics="ROC"
         )
         self.assertAlmostEqual(thresh_sub, 0.21, places=2)
         scores = [1 if x >= thresh_sub else 0 for x in test_probs]

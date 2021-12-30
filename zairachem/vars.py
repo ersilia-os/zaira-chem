@@ -16,7 +16,7 @@ DESCRIPTORS_SUBFOLDER = "descriptors"
 MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"
 LITE_SUBFOLDER = "lite"
-PLOTS_SUBFOLDER = "plots"
+REPORT_SUBFOLDER = "report"
 
 TRAINED_MODEL_SUBFOLDER = "trained"
 
@@ -30,9 +30,9 @@ _CONFIG_FILENAME = "config.json"
 # Ersilia Model Hub
 
 ERSILIA_HUB_DEFAULT_MODELS = [
-    #    "morgan-counts",
-    #    "cc-signaturizer",
-        "grover-embedding",
-    #"molbert",
-    #"mordred",
+    "morgan-counts",
+    "cc-signaturizer",
+    "grover-embedding",
+    "molbert",
+    "mordred",
 ]

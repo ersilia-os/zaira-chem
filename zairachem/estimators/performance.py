@@ -10,26 +10,34 @@ from sklearn import metrics
 from . import Y_HAT_FILE
 from .. import ZairaBase
 
-from ..vars import DATA_SUBFOLDER, MODELS_SUBFOLDER, DATA_FILENAME
+from ..vars import (
+    DATA_SUBFOLDER,
+    DESCRIPTORS_SUBFOLDER,
+    MODELS_SUBFOLDER,
+    DATA_FILENAME,
+)
 
 from . import CLF_REPORT_FILENAME, REG_REPORT_FILENAME
 
 
 class BasePerformance(ZairaBase):
-    def __init__(self, path=None):
+    def __init__(self, path=None, model_id=None):
         ZairaBase.__init__(self)
         if path is None:
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.model_id = model_id
 
     def _get_y_hat_dict(self):
-        return joblib.load(os.path.join(self.path, MODELS_SUBFOLDER, Y_HAT_FILE))
+        return joblib.load(
+            os.path.join(self.path, MODELS_SUBFOLDER, self.model_id, Y_HAT_FILE)
+        )
 
 
 class ClassificationPerformance(BasePerformance):
-    def __init__(self, path):
-        BasePerformance.__init__(self, path=path)
+    def __init__(self, path, model_id):
+        BasePerformance.__init__(self, path=path, model_id=model_id)
         self.results = self._get_y_hat_dict()
         self._prefix = self._get_prefix()
         self.results = self.results[self._prefix]
@@ -79,8 +87,8 @@ class ClassificationPerformance(BasePerformance):
 
 
 class RegressionPerformance(BasePerformance):
-    def __init__(self, path):
-        BasePerformance.__init__(self, path=path)
+    def __init__(self, path, model_id):
+        BasePerformance.__init__(self, path=path, model_id=model_id)
         self.results = self._get_y_hat_dict()
         self._prefix = self._get_prefix()
         self.results = self.results[self._prefix]
@@ -111,8 +119,8 @@ class RegressionPerformance(BasePerformance):
         return report
 
 
-class PerformanceReporter(ZairaBase):
-    def __init__(self, path=None):
+class IndividualPerformanceReporter(ZairaBase):
+    def __init__(self, path=None, model_id=None):
         ZairaBase.__init__(self)
         if path is None:
             self.path = self.get_output_dir()
@@ -120,13 +128,14 @@ class PerformanceReporter(ZairaBase):
             self.path = path
         self.has_tasks = self._has_tasks()
         if self._has_clf_tasks():
-            self.clf = ClassificationPerformance(path=path)
+            self.clf = ClassificationPerformance(path=path, model_id=model_id)
         else:
             self.clf = None
         if self._has_reg_tasks():
-            self.reg = RegressionPerformance(path=path)
+            self.reg = RegressionPerformance(path=path, model_id=model_id)
         else:
             self.reg = None
+        self.model_id = model_id
 
     def _has_tasks(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
@@ -155,12 +164,41 @@ class PerformanceReporter(ZairaBase):
         if self.clf is not None:
             clf_rep = self.clf.calculate()
             with open(
-                os.path.join(self.path, MODELS_SUBFOLDER, CLF_REPORT_FILENAME), "w"
+                os.path.join(
+                    self.path, MODELS_SUBFOLDER, self.model_id, CLF_REPORT_FILENAME
+                ),
+                "w",
             ) as f:
                 json.dump(clf_rep, f, indent=4)
         if self.reg is not None:
             reg_rep = self.reg.calculate()
             with open(
-                os.path.join(self.path, MODELS_SUBFOLDER, REG_REPORT_FILENAME), "w"
+                os.path.join(
+                    self.path, MODELS_SUBFOLDER, self.model_id, REG_REPORT_FILENAME
+                ),
+                "w",
             ) as f:
                 json.dump(reg_rep, f, indent=4)
+
+
+class PerformanceReporter(ZairaBase):
+    def __init__(self, path=None):
+        ZairaBase.__init__(self)
+        self.path = path
+
+    def _get_model_ids(self):
+        if self.path is None:
+            path = self.get_output_dir()
+        else:
+            path = self.path
+        if self.is_predict():
+            path = self.get_trained_dir()
+        with open(os.path.join(path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r") as f:
+            model_ids = list(json.load(f))
+        return model_ids
+
+    def run(self):
+        model_ids = self._get_model_ids()
+        for model_id in model_ids:
+            p = IndividualPerformanceReporter(path=self.path, model_id=model_id)
+            p.run()

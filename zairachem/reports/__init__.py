@@ -1,5 +1,8 @@
-class BasePlot(object):
+from .utils import set_style
+set_style()
 
+
+class BasePlot(object):
     def __init__(self):
         pass
 

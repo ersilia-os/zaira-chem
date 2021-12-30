@@ -31,8 +31,6 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     keywords="qsar machine-learning chemistry computer-aided-drug-design",
-    project_urls={
-        "Source Code": "https://github.com/ersilia-os/zaira-chem",
-    },
+    project_urls={"Source Code": "https://github.com/ersilia-os/zaira-chem"},
     include_package_data=True,
 )

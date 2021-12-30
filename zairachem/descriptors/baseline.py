@@ -1,6 +1,7 @@
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors as rd
+from ersilia import ErsiliaModel
 
 RADIUS = 3
 NBITS = 2048
@@ -36,3 +37,18 @@ class Fingerprinter(object):
                 continue
             X[i, :] = self.fingerprinter.calc(mol)
         return X
+
+
+class Embedder(object):
+    def __init__(self):
+        self.dim = 5000
+        self.model = "grover-embedding"
+
+    def calculate(self, smiles_list, output_h5=None):
+        if output_h5 is None:
+            with ErsiliaModel(self.model) as mdl:
+                X = mdl.api(api_name=None, input=smiles_list, output="numpy")
+            return X
+        else:
+            with ErsiliaModel(self.model) as mdl:
+                mdl.api(api_name=None, input=smiles_list, output=output_h5)

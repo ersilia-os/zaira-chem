@@ -24,7 +24,7 @@ from ..vars import DESCRIPTORS_SUBFOLDER
 from ..vars import MODELS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
-from ..vars import PLOTS_SUBFOLDER
+from ..vars import REPORT_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 
@@ -78,7 +78,7 @@ class TrainSetup(object):
         self._make_subfolder(MODELS_SUBFOLDER)
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
-        self._make_subfolder(PLOTS_SUBFOLDER)
+        self._make_subfolder(REPORT_SUBFOLDER)
 
     def _normalize_input(self):
         f = SingleFile(self.input_file, self.params)
