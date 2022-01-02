@@ -15,6 +15,7 @@ DATA_FILENAME = "data.csv"
 DESCRIPTORS_SUBFOLDER = "descriptors"
 MODELS_SUBFOLDER = "models"
 POOL_SUBFOLDER = "pool"
+RESULTS_FILENAME = "results_unmapped.csv"
 LITE_SUBFOLDER = "lite"
 REPORT_SUBFOLDER = "report"
 
