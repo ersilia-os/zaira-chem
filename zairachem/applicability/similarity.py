@@ -34,11 +34,11 @@ class FaissSimilarity(object):
         hdf5 = Hdf5(file_name)
         V = hdf5.values()
         m_norm = np.linalg.norm(V, axis=1)
-        D, I = index.search(V / m_norm[:, None], self.n_neighbors)
+        D, I = self.index.search(V / m_norm[:, None], self.n_neighbors)
         return D, I
 
     def save(self, path):
-        faiss.write_index(index, path)
+        faiss.write_index(self.index, path)
 
     def load(self, path):
         self.index = faiss.read_index(path)

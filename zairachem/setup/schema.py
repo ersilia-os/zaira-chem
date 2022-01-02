@@ -1,11 +1,11 @@
 import os
 import pandas as pd
-
+from rdkit import Chem
 
 from .. import ZairaBase
 
 
-_SNIFF_SAMPLE_SIZE = 10000
+_SNIFF_SAMPLE_SIZE = 1000
 _MAX_EMPTY = 0.2
 _MIN_CORRECT = 0.8
 
@@ -18,11 +18,10 @@ class InputSchema(ZairaBase):
         self.columns = [
             c for c in list(self.df_.columns) if not self.df_[c].isnull().all()
         ]
-        print(self.columns)
         self.assigned_columns = set()
 
     def columns_iter(self):
-        for c in columns:
+        for c in self.columns:
             if c not in self.assigned_columns:
                 yield c
 
@@ -30,7 +29,7 @@ class InputSchema(ZairaBase):
         self.assigned_columns.update([col])
 
     def _prop_correct_smiles(self, col):
-        values = list(self.df_[col])
+        values = list(self.df_[col])[:100]
         c = 0
         for v in values:
             try:
@@ -44,9 +43,6 @@ class InputSchema(ZairaBase):
     def _is_smiles_column(self, col):
         if "smiles" in col.lower():
             return True
-        else:
-            return False
-        # TODO
         if self._prop_correct_smiles(col) > _MIN_CORRECT:
             return True
         else:
@@ -59,7 +55,16 @@ class InputSchema(ZairaBase):
                 cols += [col]
             else:
                 continue
-        return cols
+        if len(cols) > 1:
+            can_cols = []
+            for c in cols:
+                c = c.lower()
+                # prioritise canonical smiles column
+                if "can" in c:
+                    can_cols += [c]
+            if len(can_cols) > 0:
+                cols = can_cols
+        return [cols[0]]
 
     def _is_values_column(self, col):
         try:
@@ -164,9 +169,6 @@ class InputSchema(ZairaBase):
     def resolve_columns(self):
         smiles_column = self.find_smiles_column()
         assert len(smiles_column) > 0, "No SMILES column found!"
-        assert len(smiles_column) == 1, "More than one SMILES column found! {0}".format(
-            smiles_column
-        )
         smiles_column = smiles_column[0]
         identifier_column = [
             x for x in self.find_identifier_column() if x != smiles_column

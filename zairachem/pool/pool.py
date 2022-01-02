@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import json
 import h5py
+import joblib
 
 from zairachem.estimators.assemble import BaseOutcomeAssembler
 
@@ -52,6 +53,12 @@ class XGetter(ZairaBase):
             for i in range(X_.shape[1]):
                 self.columns += ["umap-{0}".format(i)]
 
+    def _get_reference_descriptor(self):
+        with h5py.File(os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "reference.h5"), "r") as f:
+            X_ = f["Values"][:]
+            self.X += [X_]
+            self.columns += ["ref-{0}".format(x.decode("utf-8")) for x in f["Features"][:]]
+            
     def _get_out_of_sample_predictions(self):
         with open(
             os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r"
@@ -77,9 +84,10 @@ class XGetter(ZairaBase):
             self._get_folds()
         self._get_manifolds()
         self._get_out_of_sample_predictions()
+        #self._get_reference_descriptor()
         X = np.hstack(self.X)
         df = pd.DataFrame(X, columns=self.columns)
-        df.to_csv(os.path.join(self.path, POOL_SUBFOLDER, "data.csv"), index=False)
+        df.to_csv(os.path.join(self.path, POOL_SUBFOLDER, DATA_FILENAME), index=False)
         return df
 
 
@@ -123,6 +131,7 @@ class Fitter(BaseEstimator):
         df_Y = self._get_Y()
         df = pd.concat([df_X, df_Y], axis=1)
         labels = list(df_Y.columns)
+        self.logger.debug("Staring AutoGluon estimation")
         estimator = AutoGluonEstimator(
             save_path=self.trained_path, time_budget=time_budget_sec
         )
@@ -130,6 +139,7 @@ class Fitter(BaseEstimator):
             groups = "fld_aux"
         else:
             groups = None
+        self.logger.debug("Fitting")
         results = estimator.fit(data=df, labels=labels, groups=groups)
         self.update_elapsed_time()
         return results
@@ -155,7 +165,17 @@ class PoolAssembler(BaseOutcomeAssembler):
     def __init__(self, path=None):
         BaseOutcomeAssembler.__init__(self, path=path)
 
+    def _back_to_raw(self, df):
+        for c in list(df.columns):
+            if "reg_" in c:
+                transformer = joblib.load(os.path.join(self.trained_path, DATA_SUBFOLDER, "{0}_transformer.joblib".format(c.split("_")[1])))
+                trn = np.array(df[c]).reshape(-1,1)
+                raw = transformer.inverse_transform(trn)[:,0]
+                df["reg_raw"] = raw
+        return df
+
     def run(self, df):
+        df = self._back_to_raw(df)
         df_c = self._get_compounds()
         df_y = df
         df = pd.concat([df_c, df_y], axis=1)
@@ -179,8 +199,10 @@ class Pooler(ZairaBase):
         else:
             self.path = path
         if not self.is_predict():
+            self.logger.debug("Starting pooled fitter")
             self.estimator = Fitter(path=self.path)
         else:
+            self.logger.debug("Staring pooled predictor")
             self.estimator = Predictor(path=self.path)
 
     def run(self, time_budget_sec=None):
@@ -189,8 +211,10 @@ class Pooler(ZairaBase):
         else:
             self.time_budget_sec = None
         if not self.is_predict():
+            self.logger.debug("Mode: fit")
             results = self.estimator.run(time_budget_sec=self.time_budget_sec)
         else:
+            self.logger.debug("Mode: predict")
             results = self.estimator.run()
         pa = PoolAssembler(path=self.path)
         pa.run(results)
