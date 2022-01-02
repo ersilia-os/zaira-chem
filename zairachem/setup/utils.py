@@ -53,7 +53,7 @@ class SmoothenY(object):
         for r in repeats:
             ysu = y[y > r]
             ysl = y[y < r]
-            if r > lb and r < ub:
+            if r >= lb and r <= ub:
                 ulim = np.percentile(ysu, alpha * 100)
                 llim = np.percentile(ysl, (1 - alpha) * 100)
                 t = (llim, ulim)
@@ -84,7 +84,6 @@ class SmoothenY(object):
         smiles_list = self.smiles_list
         repeats = self.detect_repeats(y)
         idxs = self.get_nonrepeat_idxs(y, repeats)
-        print(idxs)
         repeats_idxs = self.get_repeats_idxs(y, repeats)
         lb, ub = self.detect_tail_center_region(y[idxs])
         boundaries = self.get_boundaries(y[idxs], repeats, lb, ub)

@@ -1,3 +1,5 @@
+import numpy as np
+
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
 from scipy.stats import gaussian_kde
@@ -5,12 +7,18 @@ from sklearn import metrics
 
 import seaborn as sns
 from . import BasePlot
+from .fetcher import ResultsFetcher
 
 
 class ActivesInactivesPlot(BasePlot):
-    def __init__(self, ax):
-        BasePlot.__init__(self, ax=ax)
+    def __init__(self, ax, path):
+        BasePlot.__init__(self, ax=ax, path=path)
         self.name = "actives-inactives"
+        ax = self.ax
+
+        y = ResultsFetcher(path=path).get_actives_inactives()
+        actives = int(np.sum(y))
+        inactives = len(y) - actives
         ax.bar(
             x=["Actives", "Inactives"],
             height=[actives, inactives],
@@ -23,6 +31,8 @@ class ConfusionPlot(BasePlot):
     def __init__(self, ax):
         BasePlot.__init__(self, ax=ax)
         self.name = "contingency-plot"
+        ax = self.ax
+        
         class_names = ["I (0)", "A (1)"]
         is_train = len(clf.keys()) > 1
         bt = []
