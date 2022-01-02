@@ -55,7 +55,6 @@ class ClassificationPerformance(BasePerformance):
 
     def _calculate(self, key):
         r = self.results[key]
-        print(r)
         y_true = np.array(r["y"])
         y_pred = np.array(r["y_hat"])
         b_pred = np.array(r["b_hat"])

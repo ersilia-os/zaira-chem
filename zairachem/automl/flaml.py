@@ -277,7 +277,6 @@ class FlamlEstimator(object):
                 FLAML_WARM_MAXIMUM_ITERATIONS,
             )
             model = AutoML()
-            print(automl_settings)
             model.fit(
                 X_train=X_tr,
                 y_train=y_tr,
