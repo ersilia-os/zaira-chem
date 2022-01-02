@@ -1,5 +1,17 @@
 import seaborn as sns
 
+ersilia_colors = {
+    "dark": "#50285a",
+    "gray": "#d2d2d0",
+    "mint": "#bee6b4",
+    "white": "#ffffff",
+    "purple": "#aa96fa",
+    "pink": "#dca0dc",
+    "yellow": "#fad782",
+    "blue": "#8cc8fa",
+    "red": "#faa08c"
+}
+
 
 def set_style(style=None):
     """Set basic plotting style and fonts."""
