@@ -21,6 +21,14 @@ cd ersilia
 python -m pip install -e .
 ```
 
+### Install isaura
+
+```bash
+git clone git@github.com:ersilia-os/isaura.git
+cd isaura
+python -m pip install -e .
+```
+
 ### Install zairachem
 
 ```bash
