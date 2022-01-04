@@ -49,7 +49,7 @@ class RegTasks(object):
     def smoothen(self, raw):
         return SmoothenY(self.smiles_list, raw).run()
 
-    def raw(self):
+    def raw(self, smoothen=None):
         if self._raw is None:
             min_cred = self.range["min"]
             max_cred = self.range["max"]
@@ -57,7 +57,10 @@ class RegTasks(object):
                 raw = self.values
             else:
                 raw = np.clip(self.values, min_cred, max_cred)
-            self._raw = self.smoothen(raw)
+            if smoothen:
+                self._raw = self.smoothen(raw)
+            else:
+                self._raw = raw
         return self._raw
 
     def pwr(self):
@@ -89,7 +92,7 @@ class RegTasks(object):
 
     def as_dict(self):
         res = OrderedDict()
-        res["reg_raw_skip"] = self.raw()
+        res["reg_raw_skip"] = self.raw(smoothen=True)
         res["reg_pwr_skip"] = self.pwr()
         res["reg_rnk_skip"] = self.rnk()
         res["reg_qnt"] = self.qnt()
@@ -123,7 +126,7 @@ class RegTasksForPrediction(RegTasks):
 
     def as_dict(self):
         res = OrderedDict()
-        raw = self.raw()
+        raw = self.raw(smoothen=False)
         res["reg_raw_skip"] = raw
         res["reg_pwr_skip"] = self.pwr(raw)
         res["reg_rnk_skip"] = self.rnk(raw)

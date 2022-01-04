@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 from ..tools.autogluon.multilabel import MultilabelPredictor, TabularDataset
 
-AUTOGLUON_TIME_BUDGET_SECONDS = 60
-AUTOGLUON_MINIMUM_TIME_BUDGET_SECONDS = 60
-AUTOGLUON_MAXIMUM_TIME_BUDGET_SECONDS = 600
+AUTOGLUON_TIME_BUDGET_SECONDS = 600
+AUTOGLUON_MINIMUM_TIME_BUDGET_SECONDS = 600
+AUTOGLUON_MAXIMUM_TIME_BUDGET_SECONDS = 1800
 
 
 class AutoGluonEstimator(object):
@@ -37,7 +37,12 @@ class AutoGluonEstimator(object):
             consider_labels_correlation=False,
             groups=groups,
         )
-        self.model.fit(train_data=df, time_limit=self.time_limit)
+        self.model.fit(
+            train_data=df,
+            time_limit=self.time_limit,
+            refit_full=True,
+            presets="best_quality",
+        )
 
     def get_out_of_sample(self):
         O = []
@@ -57,6 +62,9 @@ class AutoGluonEstimator(object):
 
     def fit(self, data, labels, groups):
         self._fit(data=data, labels=labels, groups=groups)
+
+    def fit_predict(self, data, labels, groups):
+        self.fit(data=data, labels=labels, groups=groups)
         df = self.get_out_of_sample()
         return df
 

@@ -21,7 +21,7 @@ from ..vars import SESSION_FILE
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
-from ..vars import MODELS_SUBFOLDER
+from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
@@ -75,7 +75,7 @@ class TrainSetup(object):
     def _make_subfolders(self):
         self._make_subfolder(DATA_SUBFOLDER)
         self._make_subfolder(DESCRIPTORS_SUBFOLDER)
-        self._make_subfolder(MODELS_SUBFOLDER)
+        self._make_subfolder(ESTIMATORS_SUBFOLDER)
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
         self._make_subfolder(REPORT_SUBFOLDER)

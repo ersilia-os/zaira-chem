@@ -1,12 +1,20 @@
-
-from .plots import ActivesInactivesPlot, ConfusionPlot, RocCurvePlot, ProjectionPlot, RegressionPlotRaw, HistogramPlotRaw, RegressionPlotTransf, HistogramPlotTransf, Transformation
+from .plots import (
+    ActivesInactivesPlot,
+    ConfusionPlot,
+    RocCurvePlot,
+    ProjectionPlot,
+    RegressionPlotRaw,
+    HistogramPlotRaw,
+    RegressionPlotTransf,
+    HistogramPlotTransf,
+    Transformation,
+)
 
 from .. import ZairaBase
 from ..vars import REPORT_SUBFOLDER
 
 
 class Reporter(ZairaBase):
-
     def __init__(self, path):
         ZairaBase.__init__(self)
         if path is None:
@@ -19,13 +27,13 @@ class Reporter(ZairaBase):
 
     def _confusion_matrix_plot(self):
         ConfusionPlot(ax=None, path=self.path).save()
-   
+
     def _roc_curve_plot(self):
         RocCurvePlot(ax=None, path=self.path).save()
-    
+
     def _projection_plot(self):
         ProjectionPlot(ax=None, path=self.path).save()
-    
+
     def _regression_plot_raw(self):
         RegressionPlotRaw(ax=None, path=self.path).save()
 
@@ -40,7 +48,6 @@ class Reporter(ZairaBase):
 
     def _transformation_plot(self):
         Transformation(ax=None, path=self.path).save()
-
 
     def run(self):
         self._actives_inactives_plot()

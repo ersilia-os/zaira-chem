@@ -6,83 +6,34 @@ import numpy as np
 import collections
 import joblib
 
-from ..descriptors.treated import TREATED_FILE_NAME
+from ...descriptors.treated import TREATED_FILE_NAME
 
-from .. import ZairaBase
-from ..automl.flaml import FlamlClassifier, FlamlRegressor
+from ... import ZairaBase
+from ...automl.flaml import FlamlClassifier, FlamlRegressor
 
-from ..vars import (
+from ...vars import (
     DESCRIPTORS_SUBFOLDER,
     DATA_SUBFOLDER,
     DATA_FILENAME,
-    MODELS_SUBFOLDER,
+    ESTIMATORS_SUBFOLDER,
 )
-from ..setup import SCHEMA_MERGE_FILENAME, PARAMETERS_FILE
+from ..base import BaseEstimator
 
-from . import Y_HAT_FILE
-
-
-ESTIMATORS = None
+from .. import Y_HAT_FILE
+from . import ESTIMATORS_FAMILY_SUBFOLDER
 
 
-class BaseEstimator(ZairaBase):
-    def __init__(self, path):
-        ZairaBase.__init__(self)
-        if path is None:
-            self.path = self.get_output_dir()
-        else:
-            self.path = path
-        self.logger.debug(self.path)
-        if self.is_predict():
-            self.trained_path = self.get_trained_dir()
-        else:
-            self.trained_path = self.path
-        with open(
-            os.path.join(self.trained_path, DATA_SUBFOLDER, SCHEMA_MERGE_FILENAME)
-        ) as f:
-            self.schema = json.load(f)
-
-    def _get_clf_tasks(self):
-        return [
-            t
-            for t in self.schema["tasks"]
-            if "clf_" in t and "_aux" not in t and "skip" not in t
-        ]
-
-    def _get_reg_tasks(self):
-        return [
-            t
-            for t in self.schema["tasks"]
-            if "reg_" in t and "_aux" not in t and "skip" not in t
-        ]
-
-    def _get_total_time_budget_sec(self):
-        with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
-            time_budget = json.load(f)["time_budget"]
-        return int(time_budget) * 60 + 1
-
-    def _estimate_time_budget(self):
-        elapsed_time = self.get_elapsed_time()
-        print("Elapsed time: {0}".format(elapsed_time))
-        total_time_budget = self._get_total_time_budget_sec()
-        print("Total time budget: {0}".format(total_time_budget))
-        available_time = total_time_budget - elapsed_time
-        # Assuming classification and regression will be done
-        available_time = available_time / 2.0
-        # Substract retraining and subsequent tasks
-        available_time = available_time * 0.8
-        available_time = int(available_time) + 1
-        print("Available time: {0}".format(available_time))
-        return available_time
+ESTIMATORS = None  # None
 
 
 class BaseEstimatorIndividual(BaseEstimator):
     def __init__(self, path, model_id):
         BaseEstimator.__init__(self, path=path)
-        if not os.path.exists(os.path.join(self.path, MODELS_SUBFOLDER, model_id)):
-            os.makedirs(
-                os.path.join(self.path, MODELS_SUBFOLDER, model_id), exist_ok=True
-            )
+        path_ = os.path.join(
+            self.path, ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER, model_id
+        )
+        if not os.path.exists(path_):
+            os.makedirs(path_)
         self.model_id = model_id
 
     def _get_X(self):
@@ -95,9 +46,12 @@ class BaseEstimatorIndividual(BaseEstimator):
 
 
 class Fitter(BaseEstimatorIndividual):
-    def __init__(self, path, model_id):
+    def __init__(self, path, model_id, is_simple):
         BaseEstimatorIndividual.__init__(self, path=path, model_id=model_id)
-        self.trained_path = os.path.join(self.get_output_dir(), MODELS_SUBFOLDER)
+        self.trained_path = os.path.join(
+            self.get_output_dir(), ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER
+        )
+        self.is_simple = is_simple
 
     def _get_flds(self):
         # for now only auxiliary folds are used
@@ -110,7 +64,7 @@ class Fitter(BaseEstimatorIndividual):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         return np.array(df[task])
 
-    def run(self, time_budget_sec=None):
+    def run_heavy(self, time_budget_sec=None):
         self.reset_time()
         if time_budget_sec is None:
             time_budget_sec = self._estimate_time_budget()
@@ -119,12 +73,10 @@ class Fitter(BaseEstimatorIndividual):
         groups = self._get_flds()
         tasks = collections.OrderedDict()
         X = self._get_X()
-        print("Shape", X.shape)
         for t in self._get_reg_tasks():
             y = self._get_y(t)
-            print("Y", y[:100])
             model = FlamlRegressor()
-            model.fit(
+            model.fit_heavy(
                 X,
                 y,
                 time_budget=time_budget_sec,
@@ -138,7 +90,7 @@ class Fitter(BaseEstimatorIndividual):
         for t in self._get_clf_tasks():
             y = self._get_y(t)
             model = FlamlClassifier()
-            model.fit(
+            model.fit_heavy(
                 X,
                 y,
                 time_budget=time_budget_sec,
@@ -152,21 +104,70 @@ class Fitter(BaseEstimatorIndividual):
         self.update_elapsed_time()
         return tasks
 
+    def run_simple(self, time_budget_sec):
+        self.reset_time()
+        if time_budget_sec is None:
+            time_budget_sec = self._estimate_time_budget()
+        else:
+            time_budget_sec = time_budget_sec
+        tasks = collections.OrderedDict()
+        X = self._get_X()
+        train_idxs = self.get_train_indices(path=self.path)
+        valid_idxs = self.get_validation_indices(path=self.path)
+        for t in self._get_reg_tasks():
+            y = self._get_y(t)
+            model = FlamlRegressor()
+            model.fit_simple(
+                X[train_idxs],
+                y[train_idxs],
+                time_budget=time_budget_sec,
+                estimators=ESTIMATORS,
+            )
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
+            model.save(file_name)
+            model = model.load(file_name)
+            tasks[t] = model.run(X, y)
+            _valid_task = model.run(X[valid_idxs], y[valid_idxs])
+            tasks[t]["valid"] = _valid_task["main"]
+        for t in self._get_clf_tasks():
+            y = self._get_y(t)
+            model = FlamlClassifier()
+            model.fit_simple(
+                X[train_idxs],
+                y[train_idxs],
+                time_budget=time_budget_sec,
+                estimators=ESTIMATORS,
+            )
+            file_name = os.path.join(self.trained_path, self.model_id, t + ".joblib")
+            model.save(file_name)
+            model = model.load(file_name)
+            tasks[t] = model.run(X, y)
+            _valid_task = model.run(X[valid_idxs], y[valid_idxs])
+            tasks[t]["valid"] = _valid_task["main"]
+        self.update_elapsed_time()
+        return tasks
+
+    def run(self, time_budget_sec=None):
+        if self.is_simple:
+            return self.run_simple(time_budget_sec=time_budget_sec)
+        else:
+            return self.run_heavy(time_budget_sec=time_budget_sec)
+
 
 class Predictor(BaseEstimatorIndividual):
     def __init__(self, path, model_id):
         BaseEstimatorIndividual.__init__(self, path=path, model_id=model_id)
-        self.trained_path = os.path.join(self.get_trained_dir(), MODELS_SUBFOLDER)
+        self.trained_path = os.path.join(
+            self.get_trained_dir(), ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER
+        )
 
     def _get_y(self, task):
         # for now iterate task by task
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         columns = set(df.columns)
-        print(columns)
         if task in columns:
             return np.array(df[task])
         else:
-            print(task, "not found")
             return None
 
     def run(self):
@@ -190,7 +191,7 @@ class Predictor(BaseEstimatorIndividual):
 
 
 class IndividualEstimator(ZairaBase):
-    def __init__(self, path=None, model_id=None):
+    def __init__(self, path=None, model_id=None, is_simple=True):
         ZairaBase.__init__(self)
         self.model_id = model_id
         if path is None:
@@ -198,7 +199,9 @@ class IndividualEstimator(ZairaBase):
         else:
             self.path = path
         if not self.is_predict():
-            self.estimator = Fitter(path=self.path, model_id=self.model_id)
+            self.estimator = Fitter(
+                path=self.path, model_id=self.model_id, is_simple=is_simple
+            )
         else:
             self.estimator = Predictor(path=self.path, model_id=self.model_id)
 
@@ -213,7 +216,13 @@ class IndividualEstimator(ZairaBase):
             results = self.estimator.run()
         joblib.dump(
             results,
-            os.path.join(self.path, MODELS_SUBFOLDER, self.model_id, Y_HAT_FILE),
+            os.path.join(
+                self.path,
+                ESTIMATORS_SUBFOLDER,
+                ESTIMATORS_FAMILY_SUBFOLDER,
+                self.model_id,
+                Y_HAT_FILE,
+            ),
         )
 
 
