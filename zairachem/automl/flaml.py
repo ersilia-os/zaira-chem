@@ -6,6 +6,7 @@ import joblib
 import json
 import collections
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.calibration import CalibratedClassifierCV
 
 from flaml import AutoML
 from ..tools.ghost.ghost import GhostLight
@@ -15,13 +16,15 @@ from ..vars import N_FOLDS
 
 FLAML_TIME_BUDGET_SECONDS = 60
 
-FLAML_COLD_MINIMUM_TIME_BUDGET_SECONDS = 30 # 30
-FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS = 600 # 600
-FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS = 10 # 10
-FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS = 60 # 60
+FLAML_COLD_MINIMUM_TIME_BUDGET_SECONDS = 60  # 60
+FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS = 600  # 600
+FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS = 10  # 10
+FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS = 60  # 60
 
-FLAML_COLD_MAXIMUM_ITERATIONS = 1000
-FLAML_WARM_MAXIMUM_ITERATIONS = 100
+FLAML_COLD_MINIMUM_ITERATIONS = 100  # 100
+FLAML_COLD_MAXIMUM_ITERATIONS = 1000  # 1000
+FLAML_WARM_MINIMUM_ITERATIONS = 10  # 10
+FLAML_WARM_MAXIMUM_ITERATIONS = 100  # 100
 
 MIN_SAMPLES_TO_ALLOW_EVALUATION = 1
 
@@ -99,7 +102,7 @@ class FlamlSettings(object):
         else:
             return "auto"
 
-    def get_automl_settings(self, task, time_budget, estimators, groups):
+    def get_automl_settings_no_groups(self, task, time_budget, estimators):
         automl_settings = {
             "time_budget": int(
                 np.clip(
@@ -114,12 +117,22 @@ class FlamlSettings(object):
             "log_training_metric": True,
             "verbose": 3,
             "early_stop": True,
-            "max_iter": int(min(
-                len(self.y)/3, FLAML_COLD_MAXIMUM_ITERATIONS
-            )),  # TODO better heuristic based on sample size
+            "max_iter": int(
+                np.clip(
+                    len(self.y) / 3,
+                    FLAML_COLD_MINIMUM_ITERATIONS,
+                    FLAML_COLD_MAXIMUM_ITERATIONS,
+                )
+            ),
         }
         if estimators is not None:
             automl_settings["estimator_list"] = estimators
+        return automl_settings
+
+    def get_automl_settings(self, task, time_budget, estimators, groups):
+        automl_settings = self.get_automl_settings_no_groups(
+            task, time_budget, estimators
+        )
         groups = self.cast_groups(groups)
         automl_settings["split_type"] = "group"
         automl_settings["groups"] = groups
@@ -149,6 +162,13 @@ class FlamlEstimator(object):
         if os.path.exists(catboost_info):
             shutil.rmtree(catboost_info)
 
+    @staticmethod
+    def _get_starting_point(model):
+        best_models = model.best_config_per_estimator
+        best_estimator = model.best_estimator
+        starting_point = {best_estimator: best_models[best_estimator]}
+        return starting_point
+
     def fit_main(self, X, y, time_budget, estimators, groups):
         automl_settings = FlamlSettings(y).get_automl_settings(
             task=self.task,
@@ -163,14 +183,47 @@ class FlamlEstimator(object):
             _automl_settings["eval_method"] = "auto"
             _automl_settings["split_type"] = None
             _automl_settings["groups"] = None
-        print(_automl_settings)
         self.main_mdl.fit(X_train=X, y_train=y, **_automl_settings)
         self.main_automl_settings = automl_settings
+        self.main_mdl = self.refit_main(X, y)
         if self.is_clf:
             y_hat = self.main_mdl.predict_proba(X)[:, 1]
         else:
             y_hat = self.main_mdl.predict(X)
         return y_hat
+
+    def refit_main(self, X, y):
+        assert self.main_mdl is not None
+        automl_settings = self.main_automl_settings.copy()
+        automl_settings["time_budget"] = int(
+            np.clip(
+                automl_settings["time_budget"] * 0.1,
+                FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS,
+                FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS,
+            )
+        )
+        y = np.array(y)
+        best_estimator = self.main_mdl.best_estimator
+        starting_point = self._get_starting_point(self.main_mdl)
+        tag = "refit"
+        automl_settings["log_file_name"] = "{0}_automl.log".format(tag)
+        automl_settings["eval_method"] = "auto"
+        automl_settings["split_type"] = None
+        automl_settings["groups"] = None
+        automl_settings["estimator_list"] = [best_estimator]
+        automl_settings["max_iter"] = int(
+            np.clip(
+                int(self.main_automl_settings["max_iter"] * 0.25) + 1,
+                FLAML_WARM_MINIMUM_ITERATIONS,
+                FLAML_WARM_MAXIMUM_ITERATIONS,
+            )
+        )
+        model = AutoML()
+        model.fit(
+            X_train=X, y_train=y, starting_points=starting_point, **automl_settings
+        )
+        self._clean_log(automl_settings)
+        return model
 
     def fit_predict_out_of_sample(self, X, y):
         assert self.main_mdl is not None
@@ -183,10 +236,8 @@ class FlamlEstimator(object):
             )
         )
         y = np.array(y)
-        best_models = self.main_mdl.best_config_per_estimator
         best_estimator = self.main_mdl.best_estimator
-        starting_point = {best_estimator: best_models[best_estimator]}
-        print(starting_point)
+        starting_point = self._get_starting_point(self.main_mdl)
         splitter = Splitter(X, y, is_clf=self.is_clf)
         k = 0
         results = collections.defaultdict(list)
@@ -200,18 +251,24 @@ class FlamlEstimator(object):
             automl_settings["split_type"] = None
             automl_settings["groups"] = None
             automl_settings["estimator_list"] = [best_estimator]
-            automl_settings["max_iter"] = min(
-                int(self.main_automl_settings["max_iter"] * 0.25) + 1,
-                FLAML_WARM_MAXIMUM_ITERATIONS,
+            automl_settings["max_iter"] = int(
+                np.clip(
+                    int(self.main_automl_settings["max_iter"] * 0.25) + 1,
+                    FLAML_WARM_MINIMUM_ITERATIONS,
+                    FLAML_WARM_MAXIMUM_ITERATIONS,
+                )
             )
             model = AutoML()
             model.fit(
                 X_train=X_tr,
                 y_train=y_tr,
-                #starting_points=starting_point,
+                starting_points=starting_point,
                 **automl_settings
             )
+            model = model.model.estimator
             if self.is_clf:
+                model = CalibratedClassifierCV(base_estimator=model)
+                model.fit(X_tr, y_tr)
                 y_te_hat = model.predict_proba(X_te)[:, 1]
             else:
                 y_te_hat = model.predict(X_te)
@@ -272,18 +329,24 @@ class FlamlEstimator(object):
                 automl_settings["split_type"] = None
                 automl_settings["groups"] = None
             automl_settings["estimator_list"] = [best_estimator]
-            automl_settings["max_iter"] = min(
-                int(self.main_automl_settings["max_iter"] * 0.25) + 1,
-                FLAML_WARM_MAXIMUM_ITERATIONS,
+            automl_settings["max_iter"] = int(
+                np.clip(
+                    int(self.main_automl_settings["max_iter"] * 0.25) + 1,
+                    FLAML_WARM_MINIMUM_ITERATIONS,
+                    FLAML_WARM_MAXIMUM_ITERATIONS,
+                )
             )
             model = AutoML()
             model.fit(
                 X_train=X_tr,
                 y_train=y_tr,
-                # starting_points=starting_point,
+                starting_points=starting_point,
                 **automl_settings
             )
+            model = model.model.estimator
             if self.is_clf:
+                model = CalibratedClassifierCV(base_estimator=model)
+                model.fit(X_tr, y_tr)
                 y_te_hat = model.predict_proba(X_te)[:, 1]
             else:
                 y_te_hat = model.predict(X_te)
@@ -304,6 +367,13 @@ class FlamlEstimator(object):
         for k, v in group_results.items():
             results[k] = v
         return results
+
+    def fit_simple(self, X, y, time_budget, estimators):
+        automl_settings = FlamlSettings(y).get_automl_settings_no_groups(
+            task=self.task, time_budget=time_budget, estimators=estimators
+        )
+        self.model = AutoML()
+        self.model.fit(X_train=X, y_train=y, **automl_settings)
 
 
 class Binarizer(object):
@@ -326,7 +396,7 @@ class FlamlClassifier(object):
         self.estimator = FlamlEstimator(task=self.task, name=name)
         self.name = self.estimator.name
 
-    def fit(
+    def fit_heavy(
         self,
         X,
         y,
@@ -346,18 +416,31 @@ class FlamlClassifier(object):
                 self.threshold = threshold
             binarizer = Binarizer(threshold)
             self.results[k]["b_hat"] = binarizer.binarize(v["y_hat"])
+        self.model = CalibratedClassifierCV(self.estimator.main_mdl.model.estimator)
+        self.model.fit(X, y)
+        self.is_fit_simple = False
+
+    def fit_simple(self, X, y, time_budget=FLAML_TIME_BUDGET_SECONDS, estimators=None):
+        self.estimator.fit_simple(X, y, time_budget=time_budget, estimators=estimators)
+        self.model = self.estimator.model
+        self.is_fit_simple = True
 
     def save(self, file_name):
-        joblib.dump(self.estimator.main_mdl, file_name)
-        data = {"threshold": self.threshold}
-        with open(file_name.split(".")[0] + ".json", "w") as f:
-            json.dump(data, f)
+        joblib.dump(self.model, file_name)
+        if not self.is_fit_simple:
+            data = {"threshold": self.threshold}
+            with open(file_name.split(".")[0] + ".json", "w") as f:
+                json.dump(data, f)
 
     def load(self, file_name):
         model = joblib.load(file_name)
-        with open(file_name.split(".")[0] + ".json", "r") as f:
-            data = json.load(f)
-        threshold = data["threshold"]
+        file_name = file_name.split(".")[0] + ".json"
+        if os.path.exists(file_name):
+            with open(file_name, "r") as f:
+                data = json.load(f)
+            threshold = data["threshold"]
+        else:
+            threshold = None
         return FlamlClassifierArtifact(model, threshold)
 
 
@@ -365,14 +448,20 @@ class FlamlClassifierArtifact(object):
     def __init__(self, model, threshold):
         self.model = model
         self.threshold = threshold
-        self.binarizer = Binarizer(self.threshold)
+        if threshold is not None:
+            self.binarizer = Binarizer(self.threshold)
+        else:
+            self.binarizer = None
 
     def predict_proba(self, X):
         return self.model.predict_proba(X)[:, 1]
 
     def predict(self, X):
-        y_hat = self.predict_proba(X)
-        y_bin = self.binarizer.binarize(y_hat)
+        if self.binarizer is not None:
+            y_hat = self.predict_proba(X)
+            y_bin = self.binarizer.binarize(y_hat)
+        else:
+            y_bin = self.model.predict(X)
         return y_bin
 
     def run(self, X, y=None):
@@ -392,7 +481,7 @@ class FlamlRegressor(object):
         self.estimator = FlamlEstimator(task=self.task, name=name)
         self.name = self.estimator.name
 
-    def fit(
+    def fit_heavy(
         self,
         X,
         y,
@@ -404,15 +493,27 @@ class FlamlRegressor(object):
         self.results = self.estimator.fit_predict(
             X, y, time_budget, estimators, groups, predict_by_group=predict_by_group
         )
+        self.model = self.estimator.main_mdl.model.estimator
+        self.is_fit_simple = False
+
+    def fit_simple(self, X, y, time_budget=FLAML_TIME_BUDGET_SECONDS, estimators=None):
+        self.estimator.fit_simple(X, y, time_budget=time_budget, estimators=estimators)
+        self.model = self.estimator.model
+        self.is_fit_simple = True
 
     def save(self, file_name):
-        joblib.dump(self.estimator.main_mdl, file_name)
-        data = {}
-        with open(file_name.split(".")[0] + ".json", "w") as f:
-            json.dump(data, f)
+        joblib.dump(self.model, file_name)
+        if not self.is_fit_simple:
+            data = {}
+            with open(file_name.split(".")[0] + ".json", "w") as f:
+                json.dump(data, f)
 
     def load(self, file_name):
         model = joblib.load(file_name)
+        file_name = file_name.split(".")[0] + ".json"
+        if os.path.exists(file_name):
+            with open(file_name, "r") as f:
+                data = json.load(f)
         return FlamlRegressorArtifact(model)
 
 

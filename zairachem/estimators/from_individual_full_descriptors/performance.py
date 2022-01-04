@@ -7,17 +7,18 @@ import collections
 
 from sklearn import metrics
 
-from . import Y_HAT_FILE
-from .. import ZairaBase
+from .. import Y_HAT_FILE
+from ... import ZairaBase
 
-from ..vars import (
+from . import ESTIMATORS_FAMILY_SUBFOLDER
+from ...vars import (
     DATA_SUBFOLDER,
     DESCRIPTORS_SUBFOLDER,
-    MODELS_SUBFOLDER,
+    ESTIMATORS_SUBFOLDER,
     DATA_FILENAME,
 )
 
-from . import CLF_REPORT_FILENAME, REG_REPORT_FILENAME
+from .. import CLF_REPORT_FILENAME, REG_REPORT_FILENAME
 
 
 class BasePerformance(ZairaBase):
@@ -31,7 +32,13 @@ class BasePerformance(ZairaBase):
 
     def _get_y_hat_dict(self):
         return joblib.load(
-            os.path.join(self.path, MODELS_SUBFOLDER, self.model_id, Y_HAT_FILE)
+            os.path.join(
+                self.path,
+                ESTIMATORS_SUBFOLDER,
+                ESTIMATORS_FAMILY_SUBFOLDER,
+                self.model_id,
+                Y_HAT_FILE,
+            )
         )
 
 
@@ -113,7 +120,6 @@ class RegressionPerformance(BasePerformance):
     def calculate(self):
         report = collections.OrderedDict()
         for k in self.results.keys():
-            print(k)
             report[k] = self._calculate(k)
         return report
 
@@ -164,7 +170,11 @@ class IndividualPerformanceReporter(ZairaBase):
             clf_rep = self.clf.calculate()
             with open(
                 os.path.join(
-                    self.path, MODELS_SUBFOLDER, self.model_id, CLF_REPORT_FILENAME
+                    self.path,
+                    ESTIMATORS_SUBFOLDER,
+                    ESTIMATORS_FAMILY_SUBFOLDER,
+                    self.model_id,
+                    CLF_REPORT_FILENAME,
                 ),
                 "w",
             ) as f:
@@ -173,7 +183,11 @@ class IndividualPerformanceReporter(ZairaBase):
             reg_rep = self.reg.calculate()
             with open(
                 os.path.join(
-                    self.path, MODELS_SUBFOLDER, self.model_id, REG_REPORT_FILENAME
+                    self.path,
+                    ESTIMATORS_SUBFOLDER,
+                    ESTIMATORS_FAMILY_SUBFOLDER,
+                    self.model_id,
+                    REG_REPORT_FILENAME,
                 ),
                 "w",
             ) as f:

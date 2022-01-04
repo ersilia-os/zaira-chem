@@ -1,17 +1,11 @@
 import os
 import numpy as np
 import pandas as pd
-from ..tools.melloddy import MELLODDY_SUBFOLDER, TAG
-from . import (
-    COMPOUNDS_FILENAME,
-    VALUES_FILENAME,
-    COMPOUND_IDENTIFIER_COLUMN,
-    SMILES_COLUMN,
-    FOLDS_FILENAME,
-)
+from ..tools.melloddy import MELLODDY_SUBFOLDER
+from . import COMPOUNDS_FILENAME, COMPOUND_IDENTIFIER_COLUMN, FOLDS_FILENAME
 
 from sklearn.model_selection import KFold
-from ..vars import N_FOLDS
+from ..vars import DATA_FILENAME, N_FOLDS
 
 
 class RandomFolding(object):
@@ -89,6 +83,8 @@ class GroupFolding(object):
 
 class DateFolding(object):
     def __init__(self, path):
+        self.path = path
+        self.df = pd.read_csv(os.path.join(self.path, DATA_FILENAME))
         pass
 
     def get_folds(self):
@@ -120,6 +116,35 @@ class AuxiliaryFolding(object):
         return folds
 
 
+class ValidationFolding(object):
+    def __init__(self, df):
+        self.df = df.copy()
+
+    def _has_date(self):
+        if "fld_dat" in list(self.df.columns):
+            return True
+        else:
+            return False
+
+    def _reference_column(self):
+        return "fld_rnd"
+        if self._has_date():
+            return "fld_dat"
+        else:
+            return "fld_aux"
+
+    def get_folds(self):
+        ref = self._reference_column()
+        n = np.max(self.df[ref])
+        folds = []
+        for f in list(self.df[ref]):
+            if f == n:
+                folds += [1]
+            else:
+                folds += [0]
+        return folds
+
+
 # TODO: check minimum number of folds
 class Folds(object):
     def __init__(self, path):
@@ -134,4 +159,5 @@ class Folds(object):
         }
         df = pd.DataFrame(data)
         df["fld_aux"] = AuxiliaryFolding(df).get_folds()
+        df["fld_val"] = ValidationFolding(df).get_folds()
         df.to_csv(self.file_name, index=False)

@@ -9,7 +9,7 @@ ersilia_colors = {
     "pink": "#dca0dc",
     "yellow": "#fad782",
     "blue": "#8cc8fa",
-    "red": "#faa08c"
+    "red": "#faa08c",
 }
 
 
@@ -33,4 +33,3 @@ def set_style(style=None):
 def rgb2hex(r, g, b):
     """RGB to hexadecimal."""
     return "#%02x%02x%02x" % (r, g, b)
-

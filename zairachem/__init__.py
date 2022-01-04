@@ -19,8 +19,10 @@ from .utils.logging import logger
 # Base Zaira class
 import json
 import os
+import numpy as np
+import pandas as pd
 from time import time
-from .vars import BASE_DIR
+from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER
 from .vars import SESSION_FILE
 from .vars import TRAINED_MODEL_SUBFOLDER
 
@@ -70,6 +72,20 @@ class ZairaBase(object):
             return False
         else:
             return True
+
+    def get_train_indices(self, path):
+        fold = np.array(
+            pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))["fld_val"]
+        )
+        idxs = np.array([i for i in range(len(fold))])
+        return idxs[fold == 0]
+
+    def get_validation_indices(self, path):
+        fold = np.array(
+            pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))["fld_val"]
+        )
+        idxs = np.array([i for i in range(len(fold))])
+        return idxs[fold == 1]
 
 
 __all__ = ["__version__"]

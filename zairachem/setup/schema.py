@@ -58,9 +58,8 @@ class InputSchema(ZairaBase):
         if len(cols) > 1:
             can_cols = []
             for c in cols:
-                c = c.lower()
                 # prioritise canonical smiles column
-                if "can" in c:
+                if "can" in c.lower():
                     can_cols += [c]
             if len(can_cols) > 0:
                 cols = can_cols
@@ -107,7 +106,6 @@ class InputSchema(ZairaBase):
         return cols
 
     def _is_date_column(self, col):
-        return False  # TODO: Debug
         if "date" in col.lower():
             return True
         else:
