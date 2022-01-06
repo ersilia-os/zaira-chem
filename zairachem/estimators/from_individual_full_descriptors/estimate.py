@@ -23,7 +23,7 @@ from .. import Y_HAT_FILE
 from . import ESTIMATORS_FAMILY_SUBFOLDER
 
 
-ESTIMATORS = None  # None
+ESTIMATORS = ["rf", "extra_tree"]  # None
 
 
 class BaseEstimatorIndividual(BaseEstimator):
