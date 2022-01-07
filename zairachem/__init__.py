@@ -25,6 +25,7 @@ from time import time
 from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER
 from .vars import SESSION_FILE
 from .vars import TRAINED_MODEL_SUBFOLDER
+from .vars import ENSEMBLE_MODE
 
 
 class ZairaBase(object):
@@ -73,19 +74,46 @@ class ZairaBase(object):
         else:
             return True
 
+    def _dummy_indices(self, path):
+        df = pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))
+        idxs = np.array([i for i in range(df.shape[0])])
+        return idxs
+
     def get_train_indices(self, path):
-        fold = np.array(
-            pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))["fld_val"]
-        )
-        idxs = np.array([i for i in range(len(fold))])
-        return idxs[fold == 0]
+        if ENSEMBLE_MODE == "blending":
+            self.logger.debug("Getting a training set")
+            fold = np.array(
+                pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))[
+                    "fld_val"
+                ]
+            )
+            idxs = np.array([i for i in range(len(fold))])
+            idxs = idxs[fold == 0]
+            return idxs
+        else:
+            self.logger.debug(
+                "Training set is the full dataset. Interpret with caution!"
+            )
+            idxs = self._dummy_indices(path)
+            return idxs
 
     def get_validation_indices(self, path):
-        fold = np.array(
-            pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))["fld_val"]
-        )
-        idxs = np.array([i for i in range(len(fold))])
-        return idxs[fold == 1]
+        if ENSEMBLE_MODE == "blending":
+            self.logger.debug("Getting a validation set")
+            fold = np.array(
+                pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))[
+                    "fld_val"
+                ]
+            )
+            idxs = np.array([i for i in range(len(fold))])
+            idxs = idxs[fold == 1]
+            return idxs
+        else:
+            self.logger.debug(
+                "Validation set is equivalent to the training set. Interpret with caution!"
+            )
+            idxs = self._dummy_indices(path)
+            return idxs
 
 
 __all__ = ["__version__"]

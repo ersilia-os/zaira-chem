@@ -3,6 +3,7 @@ from .commands.describe import describe_cmd
 from .commands.estimate import estimate_cmd
 from .commands.report import report_cmd
 from .commands.pool import pool_cmd
+from .commands.finish import finish_cmd
 from .commands.fit import fit_cmd
 from .commands.predict import predict_cmd
 
@@ -25,6 +26,9 @@ class Command(object):
 
     def report(self):
         report_cmd()
+
+    def finish(self):
+        finish_cmd()
 
     def fit(self):
         fit_cmd()

@@ -21,7 +21,7 @@ REPORT_SUBFOLDER = "report"
 
 TRAINED_MODEL_SUBFOLDER = "trained"
 
-CLF_PERCENTILES = [1, 10, 25]
+CLF_PERCENTILES = [1, 10, 25, 50]
 
 MIN_CLASS = 30
 N_FOLDS = 5
@@ -37,3 +37,7 @@ ERSILIA_HUB_DEFAULT_MODELS = [
     "molbert",
     "mordred",
 ]
+
+ENSEMBLE_MODE = (
+    "bagging"
+)  # bagging, blending, stacking / at the moment stacking is not available

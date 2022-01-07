@@ -117,6 +117,15 @@ class SingleFile(InputSchema):
                 identifiers += [None]
         return identifiers
 
+    def _sanitize_identifiers(self):
+        # TODO more sophisticated sanitization of identifiers
+        if self.df[self.df[self.identifier_column].isnull()].shape[0] > 0:
+            return self._make_identifiers()
+        identifiers = list(self.df[self.identifier_column])
+        if len(identifiers) > len(set(identifiers)):
+            return self._make_identifiers()
+        return identifiers
+
     def _impute_qualifiers(self):
         qualifiers = []
         for qual in list(self.df[self.qualifier_column]):
@@ -139,7 +148,7 @@ class SingleFile(InputSchema):
         if self.identifier_column is None:
             identifiers = self._make_identifiers()
         else:
-            identifiers = list(self.df[self.identifier_column])
+            identifiers = self._sanitize_identifiers()
         df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
 
         df[SMILES_COLUMN] = self.df[self.smiles_column]

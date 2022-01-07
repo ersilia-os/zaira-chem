@@ -86,6 +86,10 @@ class InputSchema(ZairaBase):
         cols = []
         for col in self.columns:
             if self._is_values_column(col):
+                if col.lower() == "id":
+                    continue
+                if col == "Unnamed: 0":
+                    continue
                 cols += [col]
             else:
                 continue
@@ -129,6 +133,10 @@ class InputSchema(ZairaBase):
 
     def _is_identifier_column(self, col):
         if "identifier" in col.lower():
+            return True
+        elif "id" == col.lower():
+            return True
+        elif col == "Unnamed: 0":
             return True
         else:
             values = list(self.df_[self.df_[col].notnull()][col])
@@ -175,6 +183,7 @@ class InputSchema(ZairaBase):
             identifier_column = None
         else:
             identifier_column = identifier_column[0]
+            self.add_explored_column(identifier_column)
         data = {"smiles_column": smiles_column, "identifier_column": identifier_column}
         qualifier_column = self.find_qualifier_column()
         if len(qualifier_column) == 0:
@@ -182,11 +191,14 @@ class InputSchema(ZairaBase):
         else:
             qualifier_column = qualifier_column[0]
         values_column = self.find_values_column()
-        assert len(values_column) > 0, "No values column found!"
-        assert len(values_column) == 1, "More than one values column found! {0}".format(
-            values_column
-        )
-        values_column = values_column[0]
+        self.logger.debug("Values column {0}".format(values_column))
+        if not values_column:
+            values_column = None
+        else:
+            assert (
+                len(values_column) == 1
+            ), "More than one values column found! {0}".format(values_column)
+            values_column = values_column[0]
         group_column = self.find_group_column()
         if len(group_column) == 0:
             group_column = None

@@ -8,7 +8,7 @@ from ..estimators.base import BaseOutcomeAssembler
 from ..estimators import RESULTS_MAPPED_FILENAME, RESULTS_UNMAPPED_FILENAME
 from ..vars import DATA_SUBFOLDER, POOL_SUBFOLDER
 
-from .blender import Fitter, Predictor
+from .bagger import Fitter, Predictor
 
 
 class PoolAssembler(BaseOutcomeAssembler):

@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import json
-from ..vars import DATA_SUBFOLDER, DATA_FILENAME
+from ..vars import DATA_FILENAME
 from . import FOLDS_FILENAME, COMPOUNDS_FILENAME, TASKS_FILENAME, SCHEMA_MERGE_FILENAME
 from . import COMPOUND_IDENTIFIER_COLUMN, SMILES_COLUMN
 

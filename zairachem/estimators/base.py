@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import json
+import numpy as np
 
 from .. import ZairaBase
 from ..setup import (
@@ -99,5 +100,7 @@ class BaseOutcomeAssembler(ZairaBase):
         R = [[None] * ncol for _ in range(n)]
         for m in mappings.values:
             i, j = m[0], m[1]
-            R[i] = list(df.iloc[j])
+            if np.isnan(j):
+                continue
+            R[i] = list(df.iloc[int(j)])
         return pd.DataFrame(R, columns=list(df.columns))
