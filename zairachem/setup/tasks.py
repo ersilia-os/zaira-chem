@@ -140,6 +140,10 @@ class ClfTasks(object):
         self.direction = params["direction"]
         self.thresholds = params["thresholds"]
         self.path = path
+        print(self.values)
+        print(self.direction)
+        print(self.thresholds)
+        print(self.path)
 
     def _is_high(self):
         if self.direction == "high":
@@ -302,11 +306,13 @@ class SingleTasks(ZairaBase):
             reg_tasks = RegTasks(df, params, path=self.trained_path)
             reg = reg_tasks.as_dict()
             for k, v in reg.items():
+                self.logger.debug("Setting {0}".format(k))
                 df[k] = v
             clf_tasks = ClfTasks(df, params, path=self.trained_path)
             clf = clf_tasks.as_dict()
             clf_tasks.save(self.trained_path)
             for k, v in clf.items():
+                self.logger.debug("Setting {0}".format(k))
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
         auxiliary = AuxiliaryBinaryTask(df)

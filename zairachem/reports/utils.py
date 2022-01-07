@@ -1,4 +1,15 @@
+import matplotlib
 import seaborn as sns
+
+sns.set_style("ticks")
+
+matplotlib.rc("font", family="sans-serif")
+matplotlib.rc("font", serif="Arial")
+matplotlib.rc("text", usetex="false")
+matplotlib.rcParams.update({"font.size": 16})
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
+
 
 ersilia_colors = {
     "dark": "#50285a",
@@ -11,23 +22,6 @@ ersilia_colors = {
     "blue": "#8cc8fa",
     "red": "#faa08c",
 }
-
-
-def set_style(style=None):
-    """Set basic plotting style and fonts."""
-    if style is None:
-        style = (
-            "ticks",
-            {
-                "font.family": "sans-serif",
-                "font.serif": ["Arial"],
-                "font.size": 16,
-                "axes.grid": True,
-            },
-        )
-    else:
-        style = style
-    sns.set_style(*style)
 
 
 def rgb2hex(r, g, b):

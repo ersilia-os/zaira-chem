@@ -8,6 +8,7 @@ from ...descriptors.describe import Describer
 from ...estimators.pipe import EstimatorPipeline
 from ...pool.pool import Pooler
 from ...reports.report import Reporter
+from ...finish.finisher import Finisher
 
 
 def fit_cmd():
@@ -43,4 +44,6 @@ def fit_cmd():
         p.run()
         r = Reporter(path=output_dir)
         r.run()
+        f = Finisher(path=output_dir)
+        f.run()
         echo("Done", fg="green")

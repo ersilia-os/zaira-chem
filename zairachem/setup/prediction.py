@@ -35,7 +35,8 @@ class PredictSetup(object):
             self.output_dir = os.path.abspath(self.input_file.split(".")[0])
         else:
             self.output_dir = os.path.abspath(output_dir)
-        assert not os.path.exists(self.output_dir), "Output dir exists!"
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
         assert model_dir is not None, "Model directory not specified"
         self.model_dir = os.path.abspath(model_dir)
         self.time_budget = time_budget  # TODO
