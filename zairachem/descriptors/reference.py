@@ -4,7 +4,6 @@ import h5py
 import numpy as np
 
 from .baseline import Embedder
-from . import DescriptorBase
 from ..utils.matrices import Hdf5
 from .. import ZairaBase
 
@@ -45,4 +44,4 @@ class ReferenceDescriptors(ZairaBase):
     def run(self):
         output_h5 = self.output_h5_filename()
         ref = Embedder()
-        X = ref.calculate(self.smiles_list, output_h5)
+        ref.calculate(self.smiles_list, output_h5)

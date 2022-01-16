@@ -12,8 +12,8 @@ N_NEIGHBORS = 5
 
 
 class FaissSimilarity(object):
-    def __init__(self):
-        self.n_neighbors = N_NEIGHBORS
+    def __init__(self, n_neighbors=N_NEIGHBORS):
+        self.n_neighbors = n_neighbors
         self.index = None
 
     def fit(self, file_name):
@@ -33,7 +33,7 @@ class FaissSimilarity(object):
     def kneighbors(self, file_name):
         hdf5 = Hdf5(file_name)
         V = hdf5.values()
-        m_norm = np.linalg.norm(V, axis=1)
+        m_norm = LA.norm(V, axis=1)
         D, I = self.index.search(V / m_norm[:, None], self.n_neighbors)
         return D, I
 

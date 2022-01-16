@@ -74,6 +74,60 @@ class RocCurvePlot(BasePlot):
             self.is_available = False
 
 
+class IndividualEstimatorsAurocPlot(BasePlot):
+    def __init__(self, ax, path):
+        BasePlot.__init__(self, ax=ax, path=path)
+        if self.has_clf_data():
+            self.name = "roc-individual"
+            ax = self.ax
+            self.fetcher = ResultsFetcher(path=path)
+            tasks = self.fetcher.get_clf_tasks()
+            task = tasks[0]
+            bt = self.fetcher.get_actives_inactives()
+            df_ys = self.fetcher._read_individual_estimator_results(task)
+            aucs = []
+            labels = []
+            for yp in list(df_ys.columns):
+                fpr, tpr, _ = roc_curve(bt, list(df_ys[yp]))
+                aucs += [auc(fpr, tpr)]
+                labels += [yp]
+            x = [i for i in range(len(labels))]
+            y = aucs
+            ax.scatter(x, y)
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=90)
+            ax.set_ylabel("AUROC")
+            self.is_available = True
+        else:
+            self.is_available = False
+
+
+class InidvidualEstimatorsR2Plot(BasePlot):
+    def __init__(self, ax, path):
+        BasePlot.__init__(self, ax=ax, path=path)
+        if self.has_reg_data():
+            self.name = "r2-individual"
+            ax = self.ax
+            self.fetcher = ResultsFetcher(path=path)
+            tasks = self.fetcher.get_reg_tasks()
+            task = tasks[0]
+            yt = ResultsFetcher(path=path).get_transformed()
+            df_ys = self.fetcher._read_individual_estimator_results(task)
+            scores = []
+            labels = []
+            for yp in list(df_ys.columns):
+                scores += [r2_score(yt, list(df_ys[yp]))]
+                labels += [yp]
+            x = [i for i in range(len(labels))]
+            y = scores
+            ax.scatter(x, y)
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=90)
+            ax.set_ylabel("R2")
+            self.is_available = True
+        else:
+            self.is_available = False
+
 class ProjectionPlot(BasePlot):
     def __init__(self, ax, path):
         BasePlot.__init__(self, ax=ax, path=path)
