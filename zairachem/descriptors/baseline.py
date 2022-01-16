@@ -2,6 +2,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors as rd
 from ersilia import ErsiliaModel
+from tqdm import tqdm
 
 RADIUS = 3
 NBITS = 2048
@@ -31,7 +32,7 @@ class Fingerprinter(object):
 
     def calculate(self, smiles_list):
         X = np.zeros((len(smiles_list), NBITS), np.uint8)
-        for i, smi in enumerate(smiles_list):
+        for i, smi in tqdm(enumerate(smiles_list)):
             mol = Chem.MolFromSmiles(smi)
             if mol is None:
                 continue

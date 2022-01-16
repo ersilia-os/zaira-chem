@@ -27,6 +27,7 @@ from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
+from ..augmentation.augment import Augmenter
 
 
 class TrainSetup(object):
@@ -99,6 +100,9 @@ class TrainSetup(object):
     def _merge(self):
         DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
+    def _augment(self):
+        Augmenter(self.output_dir).run()
+
     def _clean(self):
         SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
 
@@ -116,5 +120,6 @@ class TrainSetup(object):
         self._folds()
         self._tasks()
         self._merge()
+        self._augment()
         self._clean()
         self.update_elapsed_time()

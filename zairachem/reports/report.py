@@ -8,6 +8,8 @@ from .plots import (
     RegressionPlotTransf,
     HistogramPlotTransf,
     Transformation,
+    IndividualEstimatorsAurocPlot,
+    InidvidualEstimatorsR2Plot,
 )
 
 from .. import ZairaBase
@@ -49,6 +51,12 @@ class Reporter(ZairaBase):
     def _transformation_plot(self):
         Transformation(ax=None, path=self.path).save()
 
+    def _individual_estimators_auroc_plot(self):
+        IndividualEstimatorsAurocPlot(ax=None, path=self.path).save()
+
+    def _individual_estimators_r2_plot(self):
+        InidvidualEstimatorsR2Plot(ax=None, path=self.path).save()
+
     def run(self):
         self._actives_inactives_plot()
         self._confusion_matrix_plot()
@@ -59,3 +67,5 @@ class Reporter(ZairaBase):
         self._regression_plot_raw()
         self._histogram_plot_raw()
         self._transformation_plot()
+        self._individual_estimators_auroc_plot()
+        self._individual_estimators_r2_plot()

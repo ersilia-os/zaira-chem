@@ -1,14 +1,24 @@
 import os
+from re import I
 import numpy as np
 import pandas as pd
 import joblib
+import importlib
 
 from .. import ZairaBase
 from ..estimators.base import BaseOutcomeAssembler
 from ..estimators import RESULTS_MAPPED_FILENAME, RESULTS_UNMAPPED_FILENAME
-from ..vars import DATA_SUBFOLDER, POOL_SUBFOLDER
+from ..vars import DATA_SUBFOLDER, POOL_SUBFOLDER, ENSEMBLE_MODE
 
-from .bagger import Fitter, Predictor
+if ENSEMBLE_MODE == "bagging":
+    pooler = importlib.import_module("zairachem.pool.bagger")
+elif ENSEMBLE_MODE == "blending":
+    pooler = importlib.import_module("zairachem.pool.blender")
+else:
+    pooler = None
+
+Fitter = pooler.Fitter
+Predictor = pooler.Predictor
 
 
 class PoolAssembler(BaseOutcomeAssembler):

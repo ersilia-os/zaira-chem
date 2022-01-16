@@ -6,6 +6,7 @@ sns.set_style("ticks")
 matplotlib.rc("font", family="sans-serif")
 matplotlib.rc("font", serif="Arial")
 matplotlib.rc("text", usetex="false")
+matplotlib.rcParams["figure.autolayout"] = True
 matplotlib.rcParams.update({"font.size": 16})
 matplotlib.rcParams["pdf.fonttype"] = 42
 matplotlib.rcParams["ps.fonttype"] = 42
