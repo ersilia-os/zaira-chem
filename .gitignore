@@ -5,8 +5,13 @@ naturals
 AfricanNaturalProducts*
 output
 output_pred
+
+# Debugging scripts
 development.py
 development.ipynb
+
+# VSCode
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

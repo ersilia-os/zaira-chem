@@ -115,6 +115,7 @@ class Assembler(BaseOutcomeAssembler):
 class Estimator(ZairaBase):
     def __init__(self, path=None):
         ZairaBase.__init__(self)
+        self.logger.debug(path)
         if path is None:
             self.path = self.get_output_dir()
         else:
