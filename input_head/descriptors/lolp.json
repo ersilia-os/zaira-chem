@@ -1,0 +1,10 @@
+{
+    "keys": 192,
+    "inputs": 192,
+    "features": 3,
+    "values": [
+        192,
+        3
+    ],
+    "is_sparse": null
+}

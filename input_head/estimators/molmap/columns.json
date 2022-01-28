@@ -1,0 +1,13 @@
+{
+    "reg": [
+        "reg_qnt"
+    ],
+    "clf": [
+        "clf_p25"
+    ],
+    "all": [
+        "smiles",
+        "reg_qnt",
+        "clf_p25"
+    ]
+}
