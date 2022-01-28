@@ -1,7 +1,6 @@
 loguru
 click
 joblib
-rdkit-pypi
 pandas
 sklearn
 flaml
@@ -11,3 +10,4 @@ faiss-cpu
 umap-learn
 lolP
 seaborn
+networkx

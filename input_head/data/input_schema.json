@@ -1,0 +1,9 @@
+{
+    "input_file": "/home/mduranfrigola/github/ersilia-os/zaira-chem/input_head.csv",
+    "identifier_column": null,
+    "smiles_column": "smiles",
+    "qualifier_column": null,
+    "values_column": "activity",
+    "date_column": null,
+    "group_column": null
+}
