@@ -4,9 +4,15 @@ ZairaChem is the first library of Ersilia's family of tools devoted to providing
 
 ## Installation
 
-Simply run
+From the terminal, run the installation script:
 ```
 bash install_linux.sh
+```
+
+By default, a Conda enviroment names `zairachem` will be created. Activate it:
+
+```
+conda activate zairachem
 ```
 
 ## Usage
@@ -20,5 +26,11 @@ zairachem --help
 ### Fit
 
 ```bash
-zairachem fit -i input.csv
+zairachem fit -i input.csv -o model_folder
+```
+
+### Predict
+
+```bash
+zairachem predict -i input.csv -m model_folder -o output_folder
 ```
