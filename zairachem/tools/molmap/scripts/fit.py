@@ -21,6 +21,7 @@ mp1 = MolMap(ftype="descriptor", metric="cosine").load(
     filename=os.path.join(root, "../data/descriptor.mp")
 )
 
+# TODO: I just copied this from their tutorial. I would like to add more fingerprints as well as remove the fmap_type="scatter" option.
 bitsinfo = feature.fingerprint.Extraction().bitsinfo
 flist = bitsinfo[bitsinfo.Subtypes.isin(["PubChemFP"])].IDs.tolist()
 mp2 = MolMap(ftype="fingerprint", fmap_type="scatter", flist=flist).load(
