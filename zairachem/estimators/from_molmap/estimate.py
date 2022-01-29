@@ -53,7 +53,7 @@ class Fitter(BaseEstimator):
         df_Y = self._get_Y()
         df = pd.concat([df_X, df_Y], axis=1)
         labels = list(df_Y.columns)
-        self.logger.debug("Staring KerasTuner estimation")
+        self.logger.debug("Staring BIDD MolMap estimation")
         estimator = MolMapEstimator(save_path=self.trained_path)
         self.logger.debug("Fitting")
         estimator.fit(data=df.iloc[train_idxs, :], labels=labels)

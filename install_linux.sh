@@ -43,19 +43,21 @@ python3 -m pip install git+https://github.com/ersilia-os/isaura.git
 # install zairachem
 python -m pip install -e .
 
-# # create extra conda envirnoments
+# create extra conda envirnoments
 
-# # install molmap
+# install molmap
 MOLMAP_ENVIRONMENT='molmap'
 conda create -n $MOLMAP_ENVIRONMENT python=3.6 -y
 source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $MOLMAP_ENVIRONMENT
 cd zairachem/tools/molmap/bidd-molmap/
+conda install -c tmap tmap
+conda install -c conda-forge rdkit=2020.03
 python -m pip install -r requirements.txt
+python -m pip install h5py==2.10.0
 cd $WORKDIR
 
-# # install mollib
-# cd zairachem/tools/mollib/virtual_libraries/
-# bash install_linux.sh
-# cd $WORKDIR
-
+# install mollib
+cd zairachem/tools/mollib/virtual_libraries/
+bash install_linux.sh
+cd $WORKDIR

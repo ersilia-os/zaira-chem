@@ -10,7 +10,7 @@ matrix operation
 """
 
 import numpy as np
-from lapjv import lapjv
+#from lapjv import lapjv
 from scipy.signal import convolve2d
 from scipy.spatial.distance import cdist
 
@@ -47,14 +47,14 @@ class Scatter2Grid:
         grid_map = grid[:N]
         cost_matrix = cdist(grid_map, embedding_2d, "sqeuclidean").astype(np.float)
         cost_matrix = cost_matrix * (100000 / cost_matrix.max())
-        row_asses, col_asses, _ = lapjv(cost_matrix)
+        #row_asses, col_asses, _ = lapjv(cost_matrix)
+        row_asses = None
+        col_asses = None
 
         self.row_asses = row_asses
         self.col_asses = col_asses
         self.fmap_shape = grid_size
         self.indices = col_asses
-        
-        
         
         self.channel_col = channel_col
         self.split_channels = split_channels
