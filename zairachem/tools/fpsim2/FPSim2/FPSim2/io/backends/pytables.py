@@ -18,6 +18,7 @@ BATCH_WRITE_SIZE = 32000
 def create_schema(fp_length: int) -> Any:
     class Particle(tb.IsDescription):
         pass
+
     columns = {}
     pos = 1
     columns["fp_id"] = tb.Int64Col(pos=pos)
@@ -178,7 +179,9 @@ def sort_db_file(filename: str) -> None:
 
 
 class PyTablesStorageBackend(BaseStorageBackend):
-    def __init__(self, fp_filename: str, in_memory_fps: bool = True, fps_sort: bool = False) -> None:
+    def __init__(
+        self, fp_filename: str, in_memory_fps: bool = True, fps_sort: bool = False
+    ) -> None:
         super(PyTablesStorageBackend, self).__init__(fp_filename)
         self.name = "pytables"
         self.fp_type, self.fp_params, self.rdkit_ver = self.read_parameters()
@@ -257,7 +260,9 @@ class PyTablesStorageBackend(BaseStorageBackend):
                 ]
                 fps_table.remove_row(to_delete[0])
 
-    def append_fps(self, mols_source: Union[str, IterableType], mol_id_prop: str = "mol_id") -> None:
+    def append_fps(
+        self, mols_source: Union[str, IterableType], mol_id_prop: str = "mol_id"
+    ) -> None:
         """Appends FPs to the file.
 
         Parameters

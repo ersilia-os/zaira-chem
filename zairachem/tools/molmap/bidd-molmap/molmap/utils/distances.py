@@ -2,7 +2,6 @@ import numpy as np
 import numba
 
 
-
 ################### numeric data #########################
 @numba.njit(fastmath=True)
 def euclidean(x, y):
@@ -15,6 +14,7 @@ def euclidean(x, y):
         result += (x[i] - y[i]) ** 2
     return np.sqrt(result)
 
+
 @numba.njit(fastmath=True)
 def sqeuclidean(x, y):
     """Standard euclidean distance. l2 distance
@@ -25,7 +25,6 @@ def sqeuclidean(x, y):
     for i in range(x.shape[0]):
         result += (x[i] - y[i]) ** 2
     return result
-
 
 
 @numba.njit()
@@ -52,7 +51,6 @@ def canberra(x, y):
     return result
 
 
-
 @numba.njit()
 def chebyshev(x, y):
     """Chebyshev or l-infinity distance.
@@ -64,7 +62,6 @@ def chebyshev(x, y):
         result = max(result, np.abs(x[i] - y[i]))
 
     return result
-
 
 
 ############### binary data ################
@@ -82,7 +79,8 @@ def jaccard(x, y):
         return 0.0
     else:
         return float(num_non_zero - num_equal) / num_non_zero
-    
+
+
 @numba.njit()
 def rogers_tanimoto(x, y):
     num_not_equal = 0.0
@@ -92,7 +90,6 @@ def rogers_tanimoto(x, y):
         num_not_equal += x_true != y_true
 
     return (2.0 * num_not_equal) / (x.shape[0] + num_not_equal)
-
 
 
 @numba.njit()
@@ -137,7 +134,8 @@ def kulsinski(x, y):
         return float(num_not_equal - num_true_true + x.shape[0]) / (
             num_not_equal + x.shape[0]
         )
-    
+
+
 @numba.njit()
 def sokal_sneath(x, y):
     num_true_true = 0.0
@@ -153,9 +151,7 @@ def sokal_sneath(x, y):
     else:
         return num_not_equal / (0.5 * num_true_true + num_not_equal)
 
-    
 
-    
 ################### both #############
 @numba.njit()
 def bray_curtis(x, y):
@@ -207,8 +203,8 @@ def correlation(x, y):
     for i in range(x.shape[0]):
         shifted_x = x[i] - mu_x
         shifted_y = y[i] - mu_y
-        norm_x += shifted_x ** 2
-        norm_y += shifted_y ** 2
+        norm_x += shifted_x**2
+        norm_y += shifted_y**2
         dot_product += shifted_x * shifted_y
 
     if norm_x == 0.0 and norm_y == 0.0:
@@ -217,31 +213,31 @@ def correlation(x, y):
         return 1.0
     else:
         return 1.0 - (dot_product / np.sqrt(norm_x * norm_y))
-    
-    
-    
-descriptors_dist = [(euclidean,'euclidean'),
-                    (sqeuclidean,'sqeuclidean'),
-                    (manhattan,'manhattan'),
-                    (canberra,'canberra'),
-                    (chebyshev,'chebyshev'),
-                    (cosine,'cosine'),
-                    (correlation,'correlation'),
-                    (bray_curtis,'braycurtis')]
 
 
+descriptors_dist = [
+    (euclidean, "euclidean"),
+    (sqeuclidean, "sqeuclidean"),
+    (manhattan, "manhattan"),
+    (canberra, "canberra"),
+    (chebyshev, "chebyshev"),
+    (cosine, "cosine"),
+    (correlation, "correlation"),
+    (bray_curtis, "braycurtis"),
+]
 
-fingerprint_dist = [(jaccard, 'jaccard'),
-                    (rogers_tanimoto, 'rogers_tanimoto'),
-                    (hamming,'hamming'),
-                    (dice, 'dice'),
-                    (kulsinski, 'kulsinski'),
-                    (sokal_sneath,'sokal_sneath'),
-                    (cosine,'cosine'),
-                    (correlation,'correlation'),
-                    (bray_curtis,'braycurtis')]
 
-
+fingerprint_dist = [
+    (jaccard, "jaccard"),
+    (rogers_tanimoto, "rogers_tanimoto"),
+    (hamming, "hamming"),
+    (dice, "dice"),
+    (kulsinski, "kulsinski"),
+    (sokal_sneath, "sokal_sneath"),
+    (cosine, "cosine"),
+    (correlation, "correlation"),
+    (bray_curtis, "braycurtis"),
+]
 
 
 def GenNamedDist(descriptors_dist, fingerprint_dist):
@@ -256,23 +252,20 @@ def GenNamedDist(descriptors_dist, fingerprint_dist):
 named_distances = GenNamedDist(descriptors_dist, fingerprint_dist)
 
 
+if __name__ == "__main__":
 
-
-if __name__ == '__main__':
-    
     import pandas as pd
-    
-    x = np.random.random_sample(size=(100,2))
+
+    x = np.random.random_sample(size=(100, 2))
     x1 = x.round()
-    
+
     res = {}
-    for f,k in descriptors_dist:
-        ks = 'descriptors-' + k
-        res.update({ks:f(x[:,0], x[:,1])})
-        
-    for f,k in fingerprint_dist:
-        ks = 'fingerprint-' + k
-        res.update({ks :f(x1[:,0], x1[:,1])})   
-        
-    
+    for f, k in descriptors_dist:
+        ks = "descriptors-" + k
+        res.update({ks: f(x[:, 0], x[:, 1])})
+
+    for f, k in fingerprint_dist:
+        ks = "fingerprint-" + k
+        res.update({ks: f(x1[:, 0], x1[:, 1])})
+
     print(pd.Series(res))

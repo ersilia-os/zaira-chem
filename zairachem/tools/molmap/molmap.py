@@ -50,13 +50,15 @@ class MolMapModel(object):
         script_path = os.path.join(root, "scripts", "predict.py")
         cmd = "python {0} {1} {2}".format(script_path, data_file, self.save_path)
         SimpleConda().run_commandlines(MOLMAP_CONDA_ENVIRONMENT, cmd)
-        reg_pred = np.load(open(os.path.join(self.tmp_folder, "reg_preds.npy"), "rb"))
-        clf_pred = np.load(open(os.path.join(self.tmp_folder, "clf_preds.npy"), "rb"))
-        data = pd.DataFrame(
-            {
-                SMILES_COLUMN: data[SMILES_COLUMN],
-                columns["reg"][0]: list(reg_pred),
-                columns["clf"][0]: list(clf_pred),
-            }
-        )
+        data = pd.DataFrame({SMILES_COLUMN: data[SMILES_COLUMN]})
+        if len(columns["reg"]) > 0:
+            reg_pred = np.load(
+                open(os.path.join(self.tmp_folder, "reg_preds.npy"), "rb")
+            )
+            data[columns["reg"][0]] = list(reg_pred)
+        if len(columns["clf"]) > 0:
+            clf_pred = np.load(
+                open(os.path.join(self.tmp_folder, "clf_preds.npy"), "rb")
+            )
+            data[columns["clf"][0]] = list(clf_pred)
         return data

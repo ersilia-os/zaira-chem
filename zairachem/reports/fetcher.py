@@ -59,17 +59,29 @@ class ResultsFetcher(ZairaBase):
 
     def get_tasks(self):
         df = self._read_data()
-        tasks = [c for c in list(df.columns) if ("clf_" in c or "reg_" in c) and "_skip" not in c and "_aux" not in c]
+        tasks = [
+            c
+            for c in list(df.columns)
+            if ("clf_" in c or "reg_" in c) and "_skip" not in c and "_aux" not in c
+        ]
         return tasks
 
     def get_reg_tasks(self):
         df = self._read_data()
-        tasks = [c for c in list(df.columns) if "reg_" in c and "_skip" not in c and "_aux" not in c]
+        tasks = [
+            c
+            for c in list(df.columns)
+            if "reg_" in c and "_skip" not in c and "_aux" not in c
+        ]
         return tasks
 
     def get_clf_tasks(self):
         df = self._read_data()
-        tasks = [c for c in list(df.columns) if "clf_" in c and "_skip" not in c and "_aux" not in c]
+        tasks = [
+            c
+            for c in list(df.columns)
+            if "clf_" in c and "_skip" not in c and "_aux" not in c
+        ]
         return tasks
 
     def get_actives_inactives(self):

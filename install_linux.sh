@@ -51,8 +51,8 @@ conda create -n $MOLMAP_ENVIRONMENT python=3.6 -y
 source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $MOLMAP_ENVIRONMENT
 cd zairachem/tools/molmap/bidd-molmap/
-conda install -c tmap tmap
-conda install -c conda-forge rdkit=2020.03
+conda install -c tmap tmap -y
+conda install -c conda-forge rdkit=2020.03 -y
 python -m pip install -r requirements.txt
 python -m pip install h5py==2.10.0
 cd $WORKDIR

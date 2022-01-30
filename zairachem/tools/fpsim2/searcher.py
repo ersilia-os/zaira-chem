@@ -8,13 +8,12 @@ root = os.path.dirname(os.path.abspath(__file__))
 
 
 class SimilaritySearcher(object):
-
     def __init__(self, fp_filename=None, n_workers=4):
         if fp_filename is None:
             self.fp_filename = self.reference_file()
         else:
             self.fp_filename = fp_filename
-        self.db_smiles_filename = self.fp_filename[:-3]+".csv"
+        self.db_smiles_filename = self.fp_filename[:-3] + ".csv"
         if os.path.exists(self.fp_filename):
             self.engine = FPSim2Engine(self.fp_filename)
             self.db_smiles = self.read_db_smiles()
@@ -43,8 +42,10 @@ class SimilaritySearcher(object):
     def fit(self, smiles_list):
         self.write_db_smiles(smiles_list)
         smiles_list = [[smi, i] for i, smi in enumerate(smiles_list)]
-        create_db_file(smiles_list, self.fp_filename, 'Morgan', {'radius': 2, 'nBits': 2048})
-        
+        create_db_file(
+            smiles_list, self.fp_filename, "Morgan", {"radius": 2, "nBits": 2048}
+        )
+
     def search(self, smiles, cutoff=0.7):
         results = self.engine.similarity(smiles, cutoff, n_workers=self.n_workers)
         results = [(r[0], self.db_smiles[r[0]], r[1]) for r in results]
@@ -52,7 +53,6 @@ class SimilaritySearcher(object):
 
 
 class RandomSearcher(object):
-
     def __init__(self, db_smiles_filename=None):
         if db_smiles_filename is None:
             self.db_smiles_filename = self.reference_smiles_file()
@@ -70,6 +70,6 @@ class RandomSearcher(object):
             for r in reader:
                 smiles_list += [r[0]]
         return smiles_list
-        
+
     def search(self, n):
         return set(random.sample(self.db_smiles, n))

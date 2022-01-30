@@ -32,7 +32,7 @@ class KFoldConfidenceSplit:
         self.shuffle = shuffle
         self.random_state = random_state
         self.pp_train_graph_cal_split = pp_train_graph_cal_split
-        if abs(np.array(self.pp_train_graph_cal_split).sum() - 1.0) > 10 ** -6:
+        if abs(np.array(self.pp_train_graph_cal_split).sum() - 1.0) > 10**-6:
             raise ValueError("split of training data must sum to 1")
 
     def split(

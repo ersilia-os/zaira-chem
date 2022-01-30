@@ -25,7 +25,7 @@ class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
     The purpose of this class is to postpone importing pybind11
     until it is actually installed, so that the ``get_include()``
-    method can be invoked. """
+    method can be invoked."""
 
     def __str__(self):
         import pybind11
@@ -36,7 +36,9 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         "FPSim2.FPSim2lib",
-        sources=sorted(["FPSim2/src/sim.cpp", "FPSim2/src/utils.cpp", "FPSim2/src/wraps.cpp"]),
+        sources=sorted(
+            ["FPSim2/src/sim.cpp", "FPSim2/src/utils.cpp", "FPSim2/src/wraps.cpp"]
+        ),
         include_dirs=[
             "FPSim2/src/include",
             # Path to pybind11 headers
@@ -88,7 +90,7 @@ class BuildExt(build_ext):
 
     c_opts = {"msvc": ["/EHsc", "/arch:AVX"], "unix": ["-O3"]}
     machine = platform.machine().lower()
-    if os.getenv("FPSIM2_MARCH_NATIVE") == '1':
+    if os.getenv("FPSIM2_MARCH_NATIVE") == "1":
         c_opts["unix"] += ["-march=native"]
     else:
         if machine.startswith("x86"):

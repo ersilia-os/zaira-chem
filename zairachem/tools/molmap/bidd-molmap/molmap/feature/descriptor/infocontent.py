@@ -20,14 +20,14 @@ def GetInfoContent(mol):
     """
     #################################################################
     The calculation of InformationContent descriptors (ALL).
-    
+
     Usage:
-        
+
         result=GetInfoContent(mol)
-        
+
         Input: mol is a molecule object
-        
-        Output: result is a dict form 
+
+        Output: result is a dict form
     #################################################################
     """
     r = _calc(mol)

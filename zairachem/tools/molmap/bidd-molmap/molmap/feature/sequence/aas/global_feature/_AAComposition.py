@@ -50,170 +50,200 @@ import re
 import pandas as pd
 
 
-
-AALetter=["A","R","N","D","C","E","Q","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
+AALetter = [
+    "A",
+    "R",
+    "N",
+    "D",
+    "C",
+    "E",
+    "Q",
+    "G",
+    "H",
+    "I",
+    "L",
+    "K",
+    "M",
+    "F",
+    "P",
+    "S",
+    "T",
+    "W",
+    "Y",
+    "V",
+]
 #############################################################################################
 def CalculateAAComposition(ProteinSequence):
 
-	"""
-	########################################################################
-	Calculate the composition of Amino acids 
-	
-	for a given protein sequence.
-	
-	Usage:
-	
-	result=CalculateAAComposition(protein)
-	
-	Input: protein is a pure protein sequence.
-	
-	Output: result is a dict form containing the composition of 
-	
-	20 amino acids.
-	########################################################################
-	"""
-	LengthSequence=len(ProteinSequence)
-	Result={}
-	for i in AALetter:
-		Result[i]=round(float(ProteinSequence.count(i))/LengthSequence*100,3)
-	return Result
+    """
+    ########################################################################
+    Calculate the composition of Amino acids
+
+    for a given protein sequence.
+
+    Usage:
+
+    result=CalculateAAComposition(protein)
+
+    Input: protein is a pure protein sequence.
+
+    Output: result is a dict form containing the composition of
+
+    20 amino acids.
+    ########################################################################
+    """
+    LengthSequence = len(ProteinSequence)
+    Result = {}
+    for i in AALetter:
+        Result[i] = round(float(ProteinSequence.count(i)) / LengthSequence * 100, 3)
+    return Result
+
 
 #############################################################################################
 def CalculateDipeptideComposition(ProteinSequence):
-	"""
-	########################################################################
-	Calculate the composition of dipeptidefor a given protein sequence.
-	
-	Usage: 
-	
-	result=CalculateDipeptideComposition(protein)
-	
-	Input: protein is a pure protein sequence.
-	
-	Output: result is a dict form containing the composition of 
-	
-	400 dipeptides.
-	########################################################################
-	"""
+    """
+    ########################################################################
+    Calculate the composition of dipeptidefor a given protein sequence.
 
-	LengthSequence=len(ProteinSequence)
-	Result={}
-	for i in AALetter:
-		for j in AALetter:
-			Dipeptide=i+j
-			Result[Dipeptide]=round(float(ProteinSequence.count(Dipeptide))/(LengthSequence-1)*100,2)
-	return Result
+    Usage:
 
+    result=CalculateDipeptideComposition(protein)
+
+    Input: protein is a pure protein sequence.
+
+    Output: result is a dict form containing the composition of
+
+    400 dipeptides.
+    ########################################################################
+    """
+
+    LengthSequence = len(ProteinSequence)
+    Result = {}
+    for i in AALetter:
+        for j in AALetter:
+            Dipeptide = i + j
+            Result[Dipeptide] = round(
+                float(ProteinSequence.count(Dipeptide)) / (LengthSequence - 1) * 100, 2
+            )
+    return Result
 
 
 #############################################################################################
 
+
 def Getkmers():
-	"""
-	########################################################################
-	Get the amino acid list of 3-mers. 
-	
-	Usage: 
-	
-	result=Getkmers()
-	
-	Output: result is a list form containing 8000 tri-peptides.
-	
-	########################################################################
-	"""
-	kmers=list()
-	for i in AALetter:
-		for j in AALetter:
-			for k in AALetter:
-				kmers.append(i+j+k)
-	return kmers
+    """
+    ########################################################################
+    Get the amino acid list of 3-mers.
+
+    Usage:
+
+    result=Getkmers()
+
+    Output: result is a list form containing 8000 tri-peptides.
+
+    ########################################################################
+    """
+    kmers = list()
+    for i in AALetter:
+        for j in AALetter:
+            for k in AALetter:
+                kmers.append(i + j + k)
+    return kmers
+
 
 #############################################################################################
 def GetSpectrumDict(proteinsequence):
-	"""
-	########################################################################
-	Calcualte the spectrum descriptors of 3-mers for a given protein.
-	
-	Usage: 
-	
-	result=GetSpectrumDict(protein)
-	
-	Input: protein is a pure protein sequence.
-	
-	Output: result is a dict form containing the composition values of 8000
-	
-	3-mers.
-	########################################################################
-	"""
-	result={}
-	kmers=Getkmers()
-	for i in kmers:
-		result[i]=len(re.findall(i,proteinsequence))
-	return result
+    """
+    ########################################################################
+    Calcualte the spectrum descriptors of 3-mers for a given protein.
 
+    Usage:
+
+    result=GetSpectrumDict(protein)
+
+    Input: protein is a pure protein sequence.
+
+    Output: result is a dict form containing the composition values of 8000
+
+    3-mers.
+    ########################################################################
+    """
+    result = {}
+    kmers = Getkmers()
+    for i in kmers:
+        result[i] = len(re.findall(i, proteinsequence))
+    return result
 
 
 #############################################################################################
 def _replace(x):
-	#x = 'ACA'
-	x = list(x)
-	x[1] = '*'
-	x = ''.join(x)
-	return x
+    # x = 'ACA'
+    x = list(x)
+    x[1] = "*"
+    x = "".join(x)
+    return x
+
 
 def Calculate2AACon3AA(proteinsequence):
-	"""
-	########################################################################
-	Calcualte the composition descriptors of 3-mers for a given protein, note that the middle aa in the 3-mer is ignored
-	
-	Usage: 
-	
-	result=Calculate2AACon3AA(protein)
-	
-	Input: protein is a pure protein sequence.
-	
-	Output: result is a dict form containing the composition values of 400 3-mers (ignore middle).
-	########################################################################
-	"""
-	res = GetSpectrumDict(proteinsequence)
-	s1 = pd.Series(res)
-	s1.index = s1.index.map(_replace)
-	res = (s1.reset_index().groupby('index')[0].sum()/len(proteinsequence)*100).round(3).to_dict()
-	return res
+    """
+    ########################################################################
+    Calcualte the composition descriptors of 3-mers for a given protein, note that the middle aa in the 3-mer is ignored
+
+    Usage:
+
+    result=Calculate2AACon3AA(protein)
+
+    Input: protein is a pure protein sequence.
+
+    Output: result is a dict form containing the composition values of 400 3-mers (ignore middle).
+    ########################################################################
+    """
+    res = GetSpectrumDict(proteinsequence)
+    s1 = pd.Series(res)
+    s1.index = s1.index.map(_replace)
+    res = (
+        (s1.reset_index().groupby("index")[0].sum() / len(proteinsequence) * 100)
+        .round(3)
+        .to_dict()
+    )
+    return res
 
 
 #############################################################################################
 def CalculateAADipeptideComposition(ProteinSequence):
 
-	"""
-	########################################################################
-	Calculate the composition of AADs, dipeptide and 3-mers for a 
-	
-	given protein sequence.
-	
-	Usage:
-	
-	result=CalculateAADipeptideComposition(protein)
-	
-	Input: protein is a pure protein sequence.
-	
-	Output: result is a dict form containing all composition values of 
-	
-	AADs, dipeptide and 3-mers (8420).
-	########################################################################
-	"""
+    """
+    ########################################################################
+    Calculate the composition of AADs, dipeptide and 3-mers for a
 
-	result={}
-	result.update(CalculateAAComposition(ProteinSequence))
-	result.update(CalculateDipeptideComposition(ProteinSequence))
-	result.update(GetSpectrumDict(ProteinSequence))
+    given protein sequence.
 
-	return result
+    Usage:
+
+    result=CalculateAADipeptideComposition(protein)
+
+    Input: protein is a pure protein sequence.
+
+    Output: result is a dict form containing all composition values of
+
+    AADs, dipeptide and 3-mers (8420).
+    ########################################################################
+    """
+
+    result = {}
+    result.update(CalculateAAComposition(ProteinSequence))
+    result.update(CalculateDipeptideComposition(ProteinSequence))
+    result.update(GetSpectrumDict(ProteinSequence))
+
+    return result
+
+
 #############################################################################################
-if __name__=="__main__":
+if __name__ == "__main__":
 
-	protein="ADGCGVGEGTGQGPMCNCMCMKWVYADEDAADLESDSFADEDASLESDSFPWSNQRVFCSFADEDAS"
-	AAC=CalculateAAComposition(protein)
-	DAAC=CalculateDipeptideComposition(protein)
-	spectrum=GetSpectrumDict(protein)
-	TAAC=Calculate2AACon3AA(protein)
+    protein = "ADGCGVGEGTGQGPMCNCMCMKWVYADEDAADLESDSFADEDASLESDSFPWSNQRVFCSFADEDAS"
+    AAC = CalculateAAComposition(protein)
+    DAAC = CalculateDipeptideComposition(protein)
+    spectrum = GetSpectrumDict(protein)
+    TAAC = Calculate2AACon3AA(protein)

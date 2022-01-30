@@ -128,6 +128,7 @@ class InidvidualEstimatorsR2Plot(BasePlot):
         else:
             self.is_available = False
 
+
 class ProjectionPlot(BasePlot):
     def __init__(self, ax, path):
         BasePlot.__init__(self, ax=ax, path=path)

@@ -5,7 +5,7 @@ orignal paper: Capecchi, Alice, Daniel Probst, and Jean-Louis Reymond. "One mole
 A small bug is fixed: https://github.com/reymond-group/map4/issues/6
 """
 
-_type = 'topological-based'
+_type = "topological-based"
 
 
 import itertools
@@ -23,8 +23,14 @@ def to_smiles(mol):
 
 
 class MAP4Calculator:
-
-    def __init__(self, dimensions=2048, radius=2, is_counted=False, is_folded=False, fold_dimensions = 2048):
+    def __init__(
+        self,
+        dimensions=2048,
+        radius=2,
+        is_counted=False,
+        is_folded=False,
+        fold_dimensions=2048,
+    ):
         """
         MAP4 calculator class
         """
@@ -33,7 +39,7 @@ class MAP4Calculator:
         self.is_counted = is_counted
         self.is_folded = is_folded
         self.fold_dimensions = fold_dimensions
-        
+
         if self.is_folded:
             self.encoder = MHFPEncoder(dimensions)
         else:
@@ -46,14 +52,14 @@ class MAP4Calculator:
         Returns:
             tmap VectorUint -- minhashed fingerprint
         """
-        
+
         atom_env_pairs = self._calculate(mol)
         if self.is_folded:
             return self._fold(atom_env_pairs)
         return self.encoder.from_string_array(atom_env_pairs)
 
     def calculate_many(self, mols):
-        """ Calculates the atom pair minhashed fingerprint
+        """Calculates the atom pair minhashed fingerprint
         Arguments:
             mols -- list of mols
         Returns:
@@ -89,9 +95,11 @@ class MAP4Calculator:
 
         submol = Chem.PathToSubmol(mol, env, atomMap=atom_map)
         if idx in atom_map:
-            smiles = Chem.MolToSmiles(submol, rootedAtAtom=atom_map[idx], canonical=True, isomericSmiles=False)
+            smiles = Chem.MolToSmiles(
+                submol, rootedAtAtom=atom_map[idx], canonical=True, isomericSmiles=False
+            )
             return smiles
-        return ''
+        return ""
 
     def _all_pairs(self, mol, atoms_env):
         atom_pairs = []
@@ -107,27 +115,32 @@ class MAP4Calculator:
 
                 ordered = sorted([env_a, env_b])
 
-                shingle = '{}|{}|{}'.format(ordered[0], dist, ordered[1])
+                shingle = "{}|{}|{}".format(ordered[0], dist, ordered[1])
 
                 if self.is_counted:
                     shingle_dict[shingle] += 1
-                    shingle += '|' + str(shingle_dict[shingle])
+                    shingle += "|" + str(shingle_dict[shingle])
 
-                atom_pairs.append(shingle.encode('utf-8'))
+                atom_pairs.append(shingle.encode("utf-8"))
         return list(set(atom_pairs))
 
-    
 
-def GetMAP4(mol, nBits=2048, radius = 2, fold_dimensions = None): 
-    
+def GetMAP4(mol, nBits=2048, radius=2, fold_dimensions=None):
+
     """
     MAP4: radius=2
     """
     if fold_dimensions == None:
         fold_dimensions = nBits
 
-    calc = MAP4Calculator(dimensions=nBits, radius=radius, is_counted=False, is_folded=True, fold_dimensions = fold_dimensions)
-    
+    calc = MAP4Calculator(
+        dimensions=nBits,
+        radius=radius,
+        is_counted=False,
+        is_folded=True,
+        fold_dimensions=fold_dimensions,
+    )
+
     arr = calc.calculate(mol)
-    
+
     return arr.astype(bool)
