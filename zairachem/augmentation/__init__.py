@@ -13,7 +13,7 @@ class MoleculeSampler(ZairaBase):
 
     def sample_from_locally_available_molecules(self):
         pass
-    
+
     def sample_with_generative_model(self):
         pass
 
@@ -43,7 +43,6 @@ class TabularDataset(ZairaBase):
 
 
 class SemiSupervised(ZairaBase):
-
     def __init__(self, path):
         ZairaBase.__init__(self)
         if path is None:

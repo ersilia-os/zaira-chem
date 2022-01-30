@@ -1,7 +1,13 @@
 import shutil
 import os
 
-from . import ASSAYS_FILENAME, COMPOUNDS_FILENAME, FOLDS_FILENAME, TASKS_FILENAME, VALUES_FILENAME
+from . import (
+    ASSAYS_FILENAME,
+    COMPOUNDS_FILENAME,
+    FOLDS_FILENAME,
+    TASKS_FILENAME,
+    VALUES_FILENAME,
+)
 
 
 class SetupCleaner(object):
@@ -9,7 +15,13 @@ class SetupCleaner(object):
         self.path = path
 
     def _individual_files(self):
-        for f in [ASSAYS_FILENAME, COMPOUNDS_FILENAME, FOLDS_FILENAME, TASKS_FILENAME, VALUES_FILENAME]:
+        for f in [
+            ASSAYS_FILENAME,
+            COMPOUNDS_FILENAME,
+            FOLDS_FILENAME,
+            TASKS_FILENAME,
+            VALUES_FILENAME,
+        ]:
             path = os.path.join(self.path, f)
             if os.path.exists(path):
                 os.remove(path)

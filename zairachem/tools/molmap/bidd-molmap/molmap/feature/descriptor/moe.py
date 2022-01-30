@@ -31,14 +31,14 @@ def GetMOE(mol):
     """
     #################################################################
     The calculation of MOE-type descriptors (ALL).
-    
+
     Usage:
-        
+
         result=GetMOE(mol)
-        
+
         Input: mol is a molecule object
-        
-        Output: result is a dict form 
+
+        Output: result is a dict form
     #################################################################
     """
     r = _calc(mol)
@@ -48,13 +48,10 @@ def GetMOE(mol):
 
 #########################################################################
 
-if __name__=="__main__":
-    
-    
-    smi5=['COCCCC','CCC(C)CC','CC(C)CCC','CC(C)C(C)C','CCOCCN','c1ccccc1N']
-    smis = ['CCCC','CCCCC','CCCCCC','CC(N)C(=O)O','CC(N)C(=O)[O-].[Na+]']
+if __name__ == "__main__":
+
+    smi5 = ["COCCCC", "CCC(C)CC", "CC(C)CCC", "CC(C)C(C)C", "CCOCCN", "c1ccccc1N"]
+    smis = ["CCCC", "CCCCC", "CCCCCC", "CC(N)C(=O)O", "CC(N)C(=O)[O-].[Na+]"]
     for index, smi in enumerate(smis):
         m = Chem.MolFromSmiles(smi)
         GetMOE(m)
-        
-

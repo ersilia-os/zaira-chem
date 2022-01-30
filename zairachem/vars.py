@@ -39,5 +39,5 @@ ERSILIA_HUB_DEFAULT_MODELS = [
 ]
 
 ENSEMBLE_MODE = (
-    "blending"
-)  # bagging, blending, stacking / at the moment stacking is not available
+    "blending"  # bagging, blending, stacking / at the moment stacking is not available
+)

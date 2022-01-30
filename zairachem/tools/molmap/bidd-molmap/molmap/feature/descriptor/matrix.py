@@ -12,14 +12,17 @@ Created on Sun Aug 25 20:29:36 2019
 from mordred import Calculator, descriptors
 import numpy as np
 
-_calc = Calculator([descriptors.AdjacencyMatrix,
-                     descriptors.BaryszMatrix,
-                     descriptors.DetourMatrix,
-                     descriptors.DistanceMatrix])
+_calc = Calculator(
+    [
+        descriptors.AdjacencyMatrix,
+        descriptors.BaryszMatrix,
+        descriptors.DetourMatrix,
+        descriptors.DistanceMatrix,
+    ]
+)
 
 
 _MatrixNames = [str(i) for i in _calc.descriptors]
-
 
 
 def GetMatrix(mol):

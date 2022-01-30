@@ -69,4 +69,4 @@ class BaseEngine(ABC):
     def similarity(
         self, query_string: str, threshold: float, n_workers=1
     ) -> np.ndarray:
-        """Tanimoto similarity search """
+        """Tanimoto similarity search"""

@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 
 
 class BaseStorageBackend(ABC):
-
     def __init__(self, fp_filename):
         self.fp_filename = fp_filename
 

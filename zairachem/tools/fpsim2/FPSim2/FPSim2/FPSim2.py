@@ -13,7 +13,11 @@ import numpy as np
 
 
 def on_disk_search(
-    search_func: str, query: np.array, storage: Any, args, chunk: Tuple[int, int],
+    search_func: str,
+    query: np.array,
+    storage: Any,
+    args,
+    chunk: Tuple[int, int],
 ) -> np.ndarray:
     fps = storage.get_fps_chunk(chunk)
     num_fields = len(fps[0])
@@ -556,7 +560,13 @@ class FPSim2Engine(BaseEngine):
                     data.append(r["coeff"])
         else:
             with cf.ThreadPoolExecutor(max_workers=n_workers) as executor:
-                future_to_idx = {executor.submit(run, idx,): idx for idx in idxs}
+                future_to_idx = {
+                    executor.submit(
+                        run,
+                        idx,
+                    ): idx
+                    for idx in idxs
+                }
                 for future in tqdm(cf.as_completed(future_to_idx), total=idxs.shape[0]):
                     idx = future_to_idx[future]
                     np_res = future.result()

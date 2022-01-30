@@ -80,17 +80,17 @@ FP_FUNC_DEFAULTS = {
 }
 
 
-def rdmol_to_efp(
-    rdmol: Chem.Mol, fp_func: str, fp_params: Dict[str, Any]
-) -> List[int]:
+def rdmol_to_efp(rdmol: Chem.Mol, fp_func: str, fp_params: Dict[str, Any]) -> List[int]:
     fp = FP_FUNCS[fp_func](rdmol, **fp_params)
     return BitStrToIntList(fp.ToBitString())
+
 
 def build_fp(rdmol, fp_type, fp_params, mol_id):
     efp = rdmol_to_efp(rdmol, fp_type, fp_params)
     popcnt = PyPopcount(np.array(efp, dtype=np.uint64))
     fp = (mol_id, *efp, popcnt)
     return fp
+
 
 def load_molecule(mol_string: str) -> Chem.Mol:
     """Reads SMILES, molblock or InChI and returns a RDKit mol.
@@ -280,8 +280,9 @@ def sdf_mol_supplier(
     tuple
         int id and rdkit mol.
     """
-    if filename.endswith('.gz'):
+    if filename.endswith(".gz"):
         import gzip
+
         gzf = gzip.open(filename)
         suppl = Chem.ForwardSDMolSupplier(gzf)
     else:
@@ -305,7 +306,9 @@ def sdf_mol_supplier(
             continue
 
 
-def get_mol_supplier(io_source: Any) -> Union[Callable[..., IterableType[Tuple[int, Chem.Mol]]], None]:
+def get_mol_supplier(
+    io_source: Any,
+) -> Union[Callable[..., IterableType[Tuple[int, Chem.Mol]]], None]:
     """Returns a mol supplier depending on the object type and file extension.
 
     Parameters
@@ -324,7 +327,7 @@ def get_mol_supplier(io_source: Any) -> Union[Callable[..., IterableType[Tuple[i
     supplier = None
     if isinstance(io_source, str):
         split_source = io_source.split(".")
-        if split_source[-1] == 'gz':
+        if split_source[-1] == "gz":
             input_type = split_source[-2]
         else:
             input_type = split_source[-1]

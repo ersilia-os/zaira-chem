@@ -35,11 +35,13 @@ X1 = mp1.batch_transform(smiles_list)
 X2 = mp2.batch_transform(smiles_list)
 
 # Load regression
-reg = load_model(os.path.join(model_path, "reg"))
-reg_preds = reg.predict((X1, X2))[:, 0]
-np.save(os.path.join(path, "reg_preds.npy"), reg_preds)
+if os.path.exists(os.path.join(model_path, "reg")):
+    reg = load_model(os.path.join(model_path, "reg"))
+    reg_preds = reg.predict((X1, X2))[:, 0]
+    np.save(os.path.join(path, "reg_preds.npy"), reg_preds)
 
 # Load classification
-clf = load_model(os.path.join(model_path, "clf"))
-clf_preds = clf.predict_proba((X1, X2))[:, 1]
-np.save(os.path.join(path, "clf_preds.npy"), clf_preds)
+if os.path.exists(os.path.join(model_path, "clf")):
+    clf = load_model(os.path.join(model_path, "clf"))
+    clf_preds = clf.predict_proba((X1, X2))[:, 1]
+    np.save(os.path.join(path, "clf_preds.npy"), clf_preds)

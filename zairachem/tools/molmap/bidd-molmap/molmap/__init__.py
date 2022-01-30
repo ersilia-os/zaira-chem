@@ -13,7 +13,6 @@ from .seq import GlobAASeqMolMap
 from .pdb import PDB2Fmap, PDB2Img
 
 
-
 from joblib import load as loadmap
 
-__version__ = '1.3.0'
+__version__ = "1.3.0"

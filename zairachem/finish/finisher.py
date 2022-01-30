@@ -10,7 +10,6 @@ from . import OUTPUT_FILENAME
 
 
 class Cleaner(ZairaBase):
-
     def __init__(self, path):
         ZairaBase.__init__(self)
         if path is None:
@@ -26,7 +25,7 @@ class Cleaner(ZairaBase):
             else:
                 if d.endswith(".h5"):
                     os.remove(os.path.join(path, d))
-    
+
     def _clean_descriptors(self):
         self._clean_descriptors_by_subfolder(self.path, DESCRIPTORS_SUBFOLDER)
 

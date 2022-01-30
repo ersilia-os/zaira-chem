@@ -16,18 +16,22 @@ file_path = os.path.dirname(__file__)
 class load_all:
     @property
     def data(self):
-        return pd.read_csv(os.path.join(file_path, 'result_data', 'all_data.csv'))
+        return pd.read_csv(os.path.join(file_path, "result_data", "all_data.csv"))
+
     @property
     def meta(self):
-        return pd.read_csv(os.path.join(file_path, 'result_data', 'all_meta.csv'))
-
+        return pd.read_csv(os.path.join(file_path, "result_data", "all_meta.csv"))
 
 
 class load_index:
     @property
     def data(self):
-        return pd.read_csv(os.path.join(file_path, 'result_data', '01_aaindex.csv'), index_col = 0)
+        return pd.read_csv(
+            os.path.join(file_path, "result_data", "01_aaindex.csv"), index_col=0
+        )
+
     @property
     def meta(self):
-        return pd.read_pickle(os.path.join(file_path, 'result_data', '01_aaindex_meta.pkl'))
-
+        return pd.read_pickle(
+            os.path.join(file_path, "result_data", "01_aaindex_meta.pkl")
+        )

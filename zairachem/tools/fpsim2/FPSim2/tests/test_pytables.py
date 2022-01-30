@@ -17,6 +17,7 @@ with tb.open_file(os.path.join(TESTS_DIR, "data/test.h5"), mode="r") as fp_file:
     fps = fps.reshape(int(fps.size / num_fields), num_fields)
     popcnt_bins = fp_file.root.config[3]
 
+
 @pytest.mark.incremental
 class TestPytablesBackend:
     def test_create_db_file_smi(self):
@@ -79,6 +80,7 @@ def test_create_db_file_list():
     assert fp_params["radius"] == FP_PARAMS["radius"]
     assert fp_params["nBits"] == FP_PARAMS["nBits"]
     assert fpe.fps.shape[0] == 3
+
 
 def test_calc_popcnt_bins():
     in_file = os.path.join(TESTS_DIR, "data/test.h5")

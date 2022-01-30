@@ -21,4 +21,3 @@ def GetEstate(mol):
     r = _calc(mol)
     r = r.fill_missing(0)
     return r.asdict()
-
