@@ -48,7 +48,7 @@ class MultilabelPredictor(ZairaBase):
         **kwargs,
     ):
         ZairaBase.__init__(self)
-        
+
         if len(labels) < 2:
             consider_labels_correlation = False
         else:
@@ -200,7 +200,7 @@ class MultilabelPredictor(ZairaBase):
                     base_old_dir = bod
                 else:
                     continue
-        new_path = old_path.replace(base_old_dir, model_dir+"/")
+        new_path = old_path.replace(base_old_dir, model_dir + "/")
         return new_path
 
     def get_predictor(self, label):
