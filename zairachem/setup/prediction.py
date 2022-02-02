@@ -23,7 +23,6 @@ from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
-from ..vars import TRAINED_MODEL_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerPredictPipeline
 
@@ -67,9 +66,6 @@ class PredictSetup(object):
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
         self._make_subfolder(REPORT_SUBFOLDER)
-        os.symlink(
-            self.model_dir, os.path.join(self.output_dir, TRAINED_MODEL_SUBFOLDER)
-        )
         shutil.copyfile(
             os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE),
             os.path.join(self.output_dir, DATA_SUBFOLDER, PARAMETERS_FILE),

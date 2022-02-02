@@ -4,8 +4,11 @@ from autogluon.core.utils.loaders import load_pkl
 from autogluon.core.utils.savers import save_pkl
 import os.path
 
+from ... import ZairaBase
+from ...vars import ESTIMATORS_SUBFOLDER, POOL_SUBFOLDER
 
-class MultilabelPredictor:
+
+class MultilabelPredictor(ZairaBase):
     """Tabular Predictor for predicting multiple columns in table.
     Creates multiple TabularPredictor objects which you can also use individually.
     You can access the TabularPredictor for a particular label via: `multilabel_predictor.get_predictor(label_i)`
@@ -44,6 +47,8 @@ class MultilabelPredictor:
         consider_labels_correlation=True,
         **kwargs,
     ):
+        ZairaBase.__init__(self)
+        
         if len(labels) < 2:
             consider_labels_correlation = False
         else:
@@ -107,7 +112,6 @@ class MultilabelPredictor:
             train_data = train_data_og.drop(labels_to_drop, axis=1)
             if tuning_data is not None:
                 tuning_data = tuning_data_og.drop(labels_to_drop, axis=1)
-            print(f"Fitting TabularPredictor for label: {label} ...")
             predictor.fit(train_data=train_data, tuning_data=tuning_data, **kwargs)
             self.predictors[label] = predictor.path
             if save_metrics:
@@ -176,9 +180,33 @@ class MultilabelPredictor:
             path = path + os.path.sep
         return load_pkl.load(path=path + cls.multi_predictor_file)
 
+    def redirect_predictor(self, old_path):
+        base_path = "Predictor_".join(old_path.split("Predictor_")[:-1])
+        predictor_with_label_subfolder = old_path.replace(base_path, "")
+        model_dir = self.get_trained_dir()
+        base_old_dirs = []
+        for sf in [POOL_SUBFOLDER, ESTIMATORS_SUBFOLDER]:
+            if sf in base_path:
+                strip = sf.join(base_path.split(sf)[:-1])
+                base_old_dirs += [strip]
+        base_old_dir = None
+        l = 0
+        for bod in base_old_dirs:
+            l = len(bod)
+            if base_old_dir is None:
+                base_old_dir = bod
+            else:
+                if l > len(base_old_dir):
+                    base_old_dir = bod
+                else:
+                    continue
+        new_path = old_path.replace(base_old_dir, model_dir+"/")
+        return new_path
+
     def get_predictor(self, label):
         """Returns TabularPredictor which is used to predict this label."""
         predictor = self.predictors[label]
+        predictor = self.redirect_predictor(predictor)
         if isinstance(predictor, str):
             return TabularPredictor.load(path=predictor)
         return predictor

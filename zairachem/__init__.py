@@ -24,7 +24,6 @@ import pandas as pd
 from time import time
 from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER
 from .vars import SESSION_FILE
-from .vars import TRAINED_MODEL_SUBFOLDER
 from .vars import ENSEMBLE_MODE
 
 
@@ -58,8 +57,9 @@ class ZairaBase(object):
             json.dump(session, f, indent=4)
 
     def get_trained_dir(self):
-        output_dir = self.get_output_dir()
-        return os.path.join(output_dir, TRAINED_MODEL_SUBFOLDER)
+        with open(os.path.join(BASE_DIR, SESSION_FILE), "r") as f:
+            session = json.load(f)
+        return session["model_dir"]
 
     def is_predict(self):
         trained_dir = self.get_trained_dir()

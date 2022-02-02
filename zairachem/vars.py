@@ -19,8 +19,6 @@ RESULTS_FILENAME = "results_unmapped.csv"
 LITE_SUBFOLDER = "lite"
 REPORT_SUBFOLDER = "report"
 
-TRAINED_MODEL_SUBFOLDER = "trained"
-
 CLF_PERCENTILES = [1, 10, 25, 50]
 
 MIN_CLASS = 30
