@@ -72,8 +72,8 @@ class Embedder(ZairaBase):
         trained_path = self.get_trained_dir()
         path = self.get_output_dir()
         if not self.is_predict():
-            imp.fit(X)
-            X = imp.transform(X)
+            imp.fit(X, smiles_list)
+            X = imp.transform(X, smiles_list)
             imp.save(
                 os.path.join(
                     path, DESCRIPTORS_SUBFOLDER, "{0}.joblib".format(imp._prefix)
@@ -87,7 +87,7 @@ class Embedder(ZairaBase):
                     "{0}.joblib".format(imp._prefix),
                 )
             )
-            X = imp.tranform(X)
+            X = imp.transform(X, smiles_list)
         if output_h5 is None:
             return X
         else:

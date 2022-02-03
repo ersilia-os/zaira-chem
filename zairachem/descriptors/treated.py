@@ -225,6 +225,7 @@ class TreatedDescriptors(DescriptorBase):
         ]
         self._name = TREATED_FILE_NAME
         self._is_predict = self.is_predict()
+        print("IS PREDICT", self._is_predict)
 
     def done_eos_iter(self):
         with open(

@@ -47,6 +47,7 @@ class PredictSetup(object):
             "model_dir": self.model_dir,
             "time_stamp": int(time()),
             "elapsed_time": 0,
+            "mode": "predict",
         }
         with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
             json.dump(data, f, indent=4)
