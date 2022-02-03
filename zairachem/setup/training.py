@@ -66,6 +66,7 @@ class TrainSetup(object):
             "model_dir": self.output_dir,
             "time_stamp": int(time()),
             "elapsed_time": 0,
+            "mode": "fit",
         }
         with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
             json.dump(data, f, indent=4)

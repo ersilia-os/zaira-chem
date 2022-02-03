@@ -62,8 +62,9 @@ class ZairaBase(object):
         return session["model_dir"]
 
     def is_predict(self):
-        trained_dir = self.get_trained_dir()
-        if os.path.exists(trained_dir):
+        with open(os.path.join(BASE_DIR, SESSION_FILE), "r") as f:
+            session = json.load(f)
+        if session["mode"] == "predict":
             return True
         else:
             return False
