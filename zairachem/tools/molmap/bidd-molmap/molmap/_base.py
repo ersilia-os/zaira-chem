@@ -46,12 +46,7 @@ class Base:
 
 
 class BaseMap(Base):
-    def __init__(
-        self,
-        dfx,
-        metric="correlation",
-        info_distance=None,
-    ):
+    def __init__(self, dfx, metric="correlation", info_distance=None):
 
         """
         paramters
@@ -360,12 +355,7 @@ class BaseMap(Base):
 
         return self
 
-    def _transform(
-        self,
-        arr_1d,
-        scale=True,
-        scale_method="minmax",
-    ):
+    def _transform(self, arr_1d, scale=True, scale_method="minmax"):
 
         """
         parameters

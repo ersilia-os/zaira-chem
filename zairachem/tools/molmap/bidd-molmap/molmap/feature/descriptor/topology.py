@@ -31,7 +31,7 @@ def _graphdist_(Distance):
     for i in unique:
         k1 = Distance == i
         temp = k1.sum()
-        res += temp**2
+        res += temp ** 2
     return np.log10(res)
 
 

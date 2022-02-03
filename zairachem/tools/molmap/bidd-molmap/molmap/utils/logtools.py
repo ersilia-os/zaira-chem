@@ -24,12 +24,7 @@ formatter = ColoredFormatter(
         "ERROR": "red",
         "CRITICAL": "red,bg_white",
     },
-    secondary_log_colors={
-        "message": {
-            "ERROR": "red",
-            "CRITICAL": "red,bg_white",
-        },
-    },
+    secondary_log_colors={"message": {"ERROR": "red", "CRITICAL": "red,bg_white"}},
     style="%",
 )
 

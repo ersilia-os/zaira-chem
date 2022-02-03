@@ -59,9 +59,7 @@ if __name__ == "__main__":
         for i, df in tqdm(enumerate(iterator), ascii=True):
             end = start + len(df)
             npy = batch_cal(df.smiles.tolist(), bitsize=bitsize, n_jobs=n_jobs)
-            f[
-                start:end,
-            ] = npy
+            f[start:end,] = npy
             f.flush()
 
             print(start, end)

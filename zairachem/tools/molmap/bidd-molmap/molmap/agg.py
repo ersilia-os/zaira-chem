@@ -48,12 +48,7 @@ class Base:
 
 
 class AggMolMap(Base):
-    def __init__(
-        self,
-        dfx,
-        metric="correlation",
-        info_distance=None,
-    ):
+    def __init__(self, dfx, metric="correlation", info_distance=None):
 
         """
         paramters
@@ -358,12 +353,7 @@ class AggMolMap(Base):
 
         return self
 
-    def transform(
-        self,
-        arr_1d,
-        scale=True,
-        scale_method="minmax",
-    ):
+    def transform(self, arr_1d, scale=True, scale_method="minmax"):
 
         """
         parameters

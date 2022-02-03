@@ -1,7 +1,5 @@
 import os
 import pandas as pd
-import h5py
-import numpy as np
 
 from .baseline import Embedder
 from ..utils.matrices import Hdf5

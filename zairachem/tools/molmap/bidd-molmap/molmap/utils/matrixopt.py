@@ -88,18 +88,14 @@ class Scatter2Grid:
                 idx = idict["idx"]
 
                 arr = np.zeros(self.fmap_shape)
-                arr_1d = arr.reshape(
-                    M * N,
-                )
+                arr_1d = arr.reshape(M * N)
                 arr_1d[indices] = vector_1d[idx]
                 arr = arr_1d.reshape(M, N)
                 arr_res.append(arr)
             arr_res = np.stack(arr_res, axis=-1)
         else:
             arr_res = np.zeros(self.fmap_shape)
-            arr_1d = arr_res.reshape(
-                M * N,
-            )
+            arr_1d = arr_res.reshape(M * N)
             arr_1d[self.indices] = vector_1d
             arr_res = arr_1d.reshape(M, N, 1)
         return arr_res
@@ -164,9 +160,7 @@ class Scatter2Array:
 
         M, N = self.fmap_shape
         arr = np.zeros(self.fmap_shape)
-        arr_1d = arr.reshape(
-            M * N,
-        )
+        arr_1d = arr.reshape(M * N)
 
         if self.split_channels:
             df = self.df
@@ -214,7 +208,7 @@ def fspecial_gauss(size=31, sigma=2):
     size should be odd value
     """
     x, y = np.mgrid[-size // 2 + 1 : size // 2 + 1, -size // 2 + 1 : size // 2 + 1]
-    g = np.exp(-((x**2 + y**2) / (2.0 * sigma**2)))
+    g = np.exp(-((x ** 2 + y ** 2) / (2.0 * sigma ** 2)))
     return g / g.sum()
 
 

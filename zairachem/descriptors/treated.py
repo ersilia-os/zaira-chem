@@ -1,14 +1,19 @@
 import os
 import numpy as np
 import joblib
+import shutil
 import json
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import VarianceThreshold
+import tempfile
+import h5py
 
 from . import DescriptorBase
 from .raw import DESCRIPTORS_SUBFOLDER, RawLoader
 from ..utils.matrices import Hdf5
 from .. import ZairaBase
+from ..tools.fpsim2.searcher import SimilaritySearcher
+
 
 TREATED_FILE_NAME = "treated.h5"
 MAX_NA = 0.2
@@ -67,6 +72,83 @@ class Scaler(object):
         return X
 
     def save(self, file_name):
+        joblib.dump(self, file_name)
+
+    def load(self, file_name):
+        return joblib.load(file_name)
+
+
+class FullLineSimilarityImputer(object):
+    def __init__(self):
+        self._name = "full_line_imputer"
+        self._prefix = "fp2sim"
+        self._n_hits = 3
+        self._sim_cutoff = 0.5
+
+    def _set_filenames(self, basedir):
+        self.basedir = basedir
+        self.fp_filename = os.path.join(basedir, "{0}.h5".format(self._prefix))
+        self.smiles_filename = os.path.join(basedir, "{0}.csv".format(self._prefix))
+        self.x_notnan_filename = os.path.join(
+            basedir, "{0}_X_notnan.h5".format(self._prefix)
+        )
+
+    def _get_filenames(self):
+        return (
+            self.basedir,
+            self.fp_filename,
+            self.smiles_filename,
+            self.x_notnan_filename,
+        )
+
+    def fit(self, X, smiles_list):
+        idxs = []
+        for i in range(X.shape[0]):
+            if np.all(np.isnan(X[i, :])):
+                continue
+            else:
+                idxs += [i]
+        X_ = X[idxs]
+        smiles_list_ = [smiles_list[i] for i in idxs]
+        tmp_dir = tempfile.mkdtemp(prefix="ersilia-")
+        self._set_filenames(tmp_dir)
+        similarity_searcher = SimilaritySearcher(fp_filename=self.fp_filename)
+        similarity_searcher.fit(smiles_list_)
+        with h5py.File(self.x_notnan_filename, "w") as f:
+            f.create_dataset("Values", data=X_)
+
+    def transform(self, X, smiles_list):
+        with h5py.File(self.x_notnan_filename, "r") as f:
+            R = f["Values"][:]
+        idxs = []
+        for i in range(X.shape[0]):
+            if np.all(np.isnan(X[i, :])):
+                idxs += [i]
+            else:
+                continue
+        similarity_searcher = SimilaritySearcher(fp_filename=self.fp_filename)
+        for idx in idxs:
+            smi = smiles_list[idx]
+            hits = similarity_searcher.search(smi, cutoff=self._sim_cutoff)
+            hits = np.array([x[0] for x in hits][: self._n_hits])
+            print(hits)
+            if len(hits) == 0:
+                hits = np.random.choice(
+                    [i for i in range(R.shape[0])],
+                    min(R.shape[0], self._n_hits),
+                    replace=False,
+                )
+            r = np.mean(R[hits, :], axis=0)
+            X[idx, :] = r
+        return X
+
+    def save(self, file_name):
+        _, fp_filename, smiles_filename, x_notnan_filename = self._get_filenames()
+        basedir = os.path.dirname(file_name)
+        self._set_filenames(basedir)
+        shutil.move(fp_filename, self.fp_filename)
+        shutil.move(smiles_filename, self.smiles_filename)
+        shutil.move(x_notnan_filename, self.x_notnan_filename)
         joblib.dump(self, file_name)
 
     def load(self, file_name):

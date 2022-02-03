@@ -238,8 +238,7 @@ class FPSim2CudaEngine(BaseEngine):
 
         # create results numpy array
         results = np.empty(
-            len(ids),
-            dtype=np.dtype([("idx", "u4"), ("mol_id", "u4"), ("coeff", "f4")]),
+            len(ids), dtype=np.dtype([("idx", "u4"), ("mol_id", "u4"), ("coeff", "f4")])
         )
         results["idx"] = np.zeros(ids.shape[0])  # need to get rid of this
         results["mol_id"] = ids
