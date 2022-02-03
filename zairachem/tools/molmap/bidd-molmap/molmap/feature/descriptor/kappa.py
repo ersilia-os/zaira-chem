@@ -37,7 +37,7 @@ def CalculateKappaAlapha1(mol):
     alpha = Chem.GraphDescriptors.HallKierAlpha(mol)
     denom = P1 + alpha
     if denom:
-        kappa = (A + alpha) * (A + alpha - 1) ** 2 / denom**2
+        kappa = (A + alpha) * (A + alpha - 1) ** 2 / denom ** 2
     else:
         kappa = 0.0
     return round(kappa, 3)
@@ -66,7 +66,7 @@ def CalculateKappaAlapha2(mol):
     alpha = Chem.GraphDescriptors.HallKierAlpha(mol)
     denom = P2 + alpha
     if denom:
-        kappa = (A + alpha - 1) * (A + alpha - 2) ** 2 / denom**2
+        kappa = (A + alpha - 1) * (A + alpha - 2) ** 2 / denom ** 2
     else:
         kappa = 0.0
     return round(kappa, 3)
@@ -96,9 +96,9 @@ def CalculateKappaAlapha3(mol):
     denom = P3 + alpha
     if denom:
         if A % 2 == 1:
-            kappa = (A + alpha - 1) * (A + alpha - 3) ** 2 / denom**2
+            kappa = (A + alpha - 1) * (A + alpha - 3) ** 2 / denom ** 2
         else:
-            kappa = (A + alpha - 3) * (A + alpha - 2) ** 2 / denom**2
+            kappa = (A + alpha - 3) * (A + alpha - 2) ** 2 / denom ** 2
     else:
         kappa = 0.0
     return round(kappa, 3)

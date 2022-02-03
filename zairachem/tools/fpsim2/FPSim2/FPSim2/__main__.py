@@ -160,13 +160,17 @@ class FPType:
         self.fp_type = fp_type  # The FPSim2 name
         self.fps_typename = fps_typename  # The chemfp name
         self.args = args  # list of fields which must be in the type string, in order
-        self.optional_args = optional_args  # list of fields which are in the type string if not their default value
+        self.optional_args = (
+            optional_args
+        )  # list of fields which are in the type string if not their default value
         if (
             aliases is None
         ):  # mapping from FPSim2 arg to chemfp arg (chemfp always 'fpSize')
             aliases = {}
         self.aliases = aliases
-        self.not_supported = not_supported  # Params which either aren't supported by this driver or by chemfp
+        self.not_supported = (
+            not_supported
+        )  # Params which either aren't supported by this driver or by chemfp
 
     def encode(self, fp_params: Dict[str, Any]) -> str:
         """Convert a dictionary of fingerprint parameters into the chemfp fingerprint type string"""
@@ -201,10 +205,7 @@ _fptype_formatters = (
         "RDKit",
         "RDKit-Fingerprint/2",
         "minPath maxPath fpSize nBitsPerHash useHs".split(),
-        (
-            ("branchedPaths", True),
-            ("useBondOrder", True),
-        ),
+        (("branchedPaths", True), ("useBondOrder", True)),
         not_supported="fromAtoms minSize tgtDensity atomInvariants atomBits bitInfo".split(),
     ),
     # RDKit-Morgan/1 radius=2 fpSize=2048 useFeatures=0 useChirality=0 useBondTypes=1
@@ -233,21 +234,12 @@ _fptype_formatters = (
         "AtomPair",
         "RDKit-AtomPair/2",
         "fpSize minLength maxLength".split(),
-        (
-            ("nBitsPerEntry", 4),
-            ("includeChirality", False),
-            ("use2D", True),
-        ),
+        (("nBitsPerEntry", 4), ("includeChirality", False), ("use2D", True)),
         aliases={"fpSize": "nBits"},
         not_supported="fromAtoms ignoreAtoms atomInvariants confId".split(),
     ),
     # RDKit-MACCS166/2
-    FPType(
-        "MACCSKeys",
-        "RDKit-MACCS166/2",
-        (),
-        (),
-    ),
+    FPType("MACCSKeys", "RDKit-MACCS166/2", (), ()),
     # RDKit-Avalon/1 fpSize=512 isQuery=0 bitFlags=15761407
     FPType(
         "Avalon",
@@ -291,8 +283,7 @@ subparsers = parser.add_subparsers()
 #####  Create
 
 p = create_parser = subparsers.add_parser(
-    "create",
-    help="create an FPSim2 data set from a structure file",
+    "create", help="create an FPSim2 data set from a structure file"
 )
 
 g = p.add_mutually_exclusive_group()
@@ -550,8 +541,7 @@ p.set_defaults(command=create_command, subparser=p)
 #####  Import
 
 p = import_parser = subparsers.add_parser(
-    "import",
-    help="import RDKit fingerprints in FPS format",
+    "import", help="import RDKit fingerprints in FPS format"
 )
 
 p.add_argument("--input", "-i", metavar="FILENAME", help="input fingerprints")
@@ -898,8 +888,7 @@ p.set_defaults(command=import_command, subparser=p)
 #####  Export
 
 p = export_parser = subparsers.add_parser(
-    "export",
-    help="export the fingerprints to FPS format",
+    "export", help="export the fingerprints to FPS format"
 )
 
 p.add_argument("--output", "-o", metavar="FILENAME", help="where to write the FPS data")
@@ -1054,10 +1043,7 @@ def add_structure_file_arguments(p: argparse.ArgumentParser):
 
 #####  Tanimoto and Tverksy search
 
-p = search_parser = subparsers.add_parser(
-    "search",
-    help="Tanimoto or Tversky search",
-)
+p = search_parser = subparsers.add_parser("search", help="Tanimoto or Tversky search")
 
 add_query_arguments(p)
 
@@ -1118,12 +1104,9 @@ def get_reader(parser: argparse.ArgumentParser, args: argparse.Namespace) -> Non
                 return iter_with_prop_name(suppl, args.mol_id_tag)
 
         if queries.endswith(".smi"):
-            delimiter = {
-                None: " ",  # default
-                "tab": "\t",
-                "space": " ",
-                "comma": ",",
-            }[args.delimiter]
+            delimiter = {None: " ", "tab": "\t", "space": " ", "comma": ","}[  # default
+                args.delimiter
+            ]
             suppl = Chem.SmilesMolSupplier(
                 queries, delimiter=delimiter, titleLine=not args.has_header
             )
@@ -1343,8 +1326,7 @@ p.set_defaults(command=search_command, subparser=p)
 #####  substructure screening
 
 p = substructure_parser = subparsers.add_parser(
-    "substructure",
-    help="substructure screen",
+    "substructure", help="substructure screen"
 )
 
 add_query_arguments(p)
@@ -1526,10 +1508,7 @@ def distmat_command(parser: argparse.ArgumentParser, args: argparse.Namespace) -
 
     # Load the data set into memory and record the time.
     start_load_time = time.time()
-    engine = FPSim2.FPSim2Engine(
-        fp_filename=args.targets,
-        in_memory_fps=True,
-    )
+    engine = FPSim2.FPSim2Engine(fp_filename=args.targets, in_memory_fps=True)
     load_time = time.time() - start_load_time
 
     # Prepare the output

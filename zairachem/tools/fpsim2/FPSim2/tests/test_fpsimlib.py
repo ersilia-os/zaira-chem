@@ -1,13 +1,6 @@
 import numpy as np
-from FPSim2.FPSim2lib.utils import (
-    PyPopcount,
-    SortResults,
-)
-from FPSim2.FPSim2lib import (
-    TanimotoSearch,
-    TverskySearch,
-    SubstructureScreenout,
-)
+from FPSim2.FPSim2lib.utils import PyPopcount, SortResults
+from FPSim2.FPSim2lib import TanimotoSearch, TverskySearch, SubstructureScreenout
 from FPSim2 import FPSim2Engine
 import os
 

@@ -244,12 +244,7 @@ class MolMap(Base):
         self.isfit = True
         self.fmap_shape = self._S.fmap_shape
 
-    def transform(
-        self,
-        smiles,
-        scale=True,
-        scale_method="minmax",
-    ):
+    def transform(self, smiles, scale=True, scale_method="minmax"):
 
         """
         parameters
@@ -332,9 +327,7 @@ class MolMap(Base):
         res = []
         for i in tqdm(range(N), ascii=True):
             x = orignal_X[i].sum(axis=-1)
-            vector_1d_ordered = x.reshape(
-                -1,
-            )
+            vector_1d_ordered = x.reshape(-1)
             vector_1d_ordered = vector_1d_ordered[:M]
             vector_1d = vector_1d_ordered[idx]
             fmap = target_mp._S.transform(vector_1d)

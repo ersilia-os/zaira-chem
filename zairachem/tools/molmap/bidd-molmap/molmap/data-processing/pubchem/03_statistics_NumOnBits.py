@@ -15,9 +15,7 @@ f = np.memmap(file, dtype=np.bool, shape=(total_sample, bitsize))
 
 
 def _sum(memmap, x):
-    return memmap[
-        x,
-    ].sum()
+    return memmap[x,].sum()
 
 
 P = Parallel(n_jobs=16)  #

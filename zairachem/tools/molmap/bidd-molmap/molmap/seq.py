@@ -132,12 +132,7 @@ class GlobAASeqMolMap(BaseMap):
 
         return self
 
-    def transform(
-        self,
-        seq,
-        scale=True,
-        scale_method="minmax",
-    ):
+    def transform(self, seq, scale=True, scale_method="minmax"):
 
         """
         parameters
@@ -255,9 +250,7 @@ class LocalAASeqMolMap:
         assert self.isfit, "please fit first"
         assert index_key in self.index1, "index1 key only: %s" % self.index1
         data = self.aaindex.data.T[[index_key]]
-        dist = pairwise_distances(data).reshape(
-            -1,
-        )
+        dist = pairwise_distances(data).reshape(-1)
         ts = pd.Series(dist, index=self.aa_list_pair)
         ts = ts / ts.max()
         d = self.df2m.index.map(ts).values.reshape(self.N, self.N)

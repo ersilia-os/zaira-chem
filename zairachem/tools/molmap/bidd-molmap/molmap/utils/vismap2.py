@@ -151,9 +151,7 @@ def plot_grid(mp, htmlpath="./", htmlname=None, enabled_data_labels=False):
 
     m, n = mp.fmap_shape
     colormaps = mp.colormaps
-    position = np.zeros(mp.fmap_shape, dtype="O").reshape(
-        m * n,
-    )
+    position = np.zeros(mp.fmap_shape, dtype="O").reshape(m * n)
     position[mp._S.col_asses] = mp.flist
     position = position.reshape(m, n)
 

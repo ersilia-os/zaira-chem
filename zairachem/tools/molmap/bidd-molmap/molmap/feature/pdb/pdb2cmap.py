@@ -238,10 +238,7 @@ def reindex_chain_from_rnum1(valid_amino_acids, inpdb, maxresnum=512):
 
 
 def get_dist_maps(
-    file_pdb,
-    flag_gaps=False,
-    flag_any2any=False,
-    valid_amino_acids=valid_amino_acids,
+    file_pdb, flag_gaps=False, flag_any2any=False, valid_amino_acids=valid_amino_acids
 ):
     f = open(file_pdb, mode="r")
     lines = f.read()

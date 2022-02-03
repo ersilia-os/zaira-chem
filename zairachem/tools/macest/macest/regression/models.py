@@ -235,7 +235,7 @@ class ModelWithPredictionInterval:
                 "Need to remove pre-cached training neighbour data from training"
             )
 
-        error_weighted_poly = self._alpha * error_weighted_dist**self._beta
+        error_weighted_poly = self._alpha * error_weighted_dist ** self._beta
         return error_weighted_poly
 
     def std_on_y_star(self, x_star: np.ndarray) -> np.ndarray:
@@ -326,7 +326,7 @@ class ModelWithPredictionInterval:
         return np.diff(intervals)
 
     def sample_prediction(
-        self, x_star: np.ndarray, nsamples: int = 10**3
+        self, x_star: np.ndarray, nsamples: int = 10 ** 3
     ) -> np.ndarray:
         """
         Draw samples from any predicted distribution to get a distribution of predictions.

@@ -1,11 +1,6 @@
 from typing import Any, Iterable as IterableType, Dict, List, Tuple, Union
 from .base import BaseStorageBackend
-from ..chem import (
-    build_fp,
-    get_mol_supplier,
-    get_fp_length,
-    FP_FUNC_DEFAULTS,
-)
+from ..chem import build_fp, get_mol_supplier, get_fp_length, FP_FUNC_DEFAULTS
 import tables as tb
 import numpy as np
 import rdkit

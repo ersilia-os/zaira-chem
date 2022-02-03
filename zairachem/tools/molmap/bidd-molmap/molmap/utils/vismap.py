@@ -154,9 +154,7 @@ def plot_grid(molmap, htmlpath="./", htmlname=None):
 
     m, n = molmap.fmap_shape
     colormaps = molmap.extract.colormaps
-    position = np.zeros(molmap.fmap_shape, dtype="O").reshape(
-        m * n,
-    )
+    position = np.zeros(molmap.fmap_shape, dtype="O").reshape(m * n)
     position[molmap._S.col_asses] = molmap.flist
     position = position.reshape(m, n)
 

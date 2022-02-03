@@ -58,15 +58,14 @@ def plot_pred_with_conf(
 
     :return: None
     """
-    pred_dist = conf_model.sample_prediction(x_star, nsamples=10**4)
+    pred_dist = conf_model.sample_prediction(x_star, nsamples=10 ** 4)
 
     point_pred = np.mean(pred_dist)
     plt.figure(figsize=(12, 6))
     sns.histplot(pred_dist.T, stat="probability", label="p(y|x)")
-    (
-        lower,
-        upper,
-    ) = conf_model.predict_interval(x_star, conf_level=np.array(confidence_level)).T
+    (lower, upper) = conf_model.predict_interval(
+        x_star, conf_level=np.array(confidence_level)
+    ).T
 
     plt.axvline(lower, linestyle="--", color="b")
     plt.axvline(

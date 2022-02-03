@@ -816,9 +816,5 @@ if __name__ == "__main__":
     # lamda should be smaller that length of the seq
 
     # PAAC=GetPseudoAAC(protein,lamda=5,AAP=[_Hydrophobicity,_hydrophilicity])
-    PAAC = GetPseudoAAC(
-        protein,
-        lamda=30,
-        weight=0.05,
-    )  # type-1
+    PAAC = GetPseudoAAC(protein, lamda=30, weight=0.05)  # type-1
     APAAC = GetAPseudoAAC(protein, lamda=30, weight=0.5)  # type-2

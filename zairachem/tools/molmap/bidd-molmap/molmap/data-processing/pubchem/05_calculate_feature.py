@@ -24,9 +24,7 @@ def calculate(npy_file_name, batch_cal_fuc, M, N, chunksize, n_jobs, dtype):
         for i, df in tqdm(enumerate(iterator), ascii=True):
             end = start + len(df)
             npy = batch_cal_fuc(df.smiles.tolist(), n_jobs=n_jobs)
-            f[
-                start:end,
-            ] = npy
+            f[start:end,] = npy
             f.flush()
             print(start, end)
             start = end

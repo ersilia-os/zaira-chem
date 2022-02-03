@@ -203,8 +203,8 @@ def correlation(x, y):
     for i in range(x.shape[0]):
         shifted_x = x[i] - mu_x
         shifted_y = y[i] - mu_y
-        norm_x += shifted_x**2
-        norm_y += shifted_y**2
+        norm_x += shifted_x ** 2
+        norm_y += shifted_y ** 2
         dot_product += shifted_x * shifted_y
 
     if norm_x == 0.0 and norm_y == 0.0:

@@ -327,9 +327,7 @@ _Mutability = {
 def standard_scale(aap):
     scaler = StandardScaler()
     s = pd.Series(aap)
-    res = scaler.fit_transform(s.values.reshape(-1, 1)).reshape(
-        -1,
-    )
+    res = scaler.fit_transform(s.values.reshape(-1, 1)).reshape(-1)
     return pd.Series(res, index=s.index).to_dict()
 
 
