@@ -6,8 +6,6 @@ from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER, REPORT_SUBFOLDER
 
 from .. import ZairaBase
 
-from .utils import ersilia_colors
-
 
 INDIVIDUAL_FIGSIZE = (5, 5)
 
