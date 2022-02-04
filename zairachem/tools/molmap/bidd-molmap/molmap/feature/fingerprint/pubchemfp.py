@@ -764,7 +764,7 @@ PubchemKeys = None
 
 
 def InitKeys(keyList, keyDict):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     generates SMARTS patterns for the keys, run once
     """
     assert len(keyList) == len(keyDict.keys()), "length mismatch"
@@ -779,7 +779,7 @@ def InitKeys(keyList, keyDict):
 
 
 def calcPubChemFingerPart1(mol, **kwargs):
-    """Calculate PubChem Fingerprints （1-115; 263-881)
+    """  Calculate PubChem Fingerprints （1-115; 263-881)
     **Arguments**
      - mol: the molecule to be fingerprinted
      - any extra keyword arguments are ignored
@@ -811,7 +811,7 @@ def calcPubChemFingerPart1(mol, **kwargs):
 
 
 def func_1(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     Calculate PubChem Fingerprints （116-263)
     """
     ringSize = []
@@ -907,7 +907,7 @@ def func_1(mol, bits):
 
 
 def func_2(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     saturated or aromatic carbon-only ring
     """
     AllRingsBond = mol.GetRingInfo().BondRings()
@@ -1027,7 +1027,7 @@ def func_2(mol, bits):
 
 
 def func_3(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     saturated or aromatic nitrogen-containing
     """
     AllRingsBond = mol.GetRingInfo().BondRings()
@@ -1147,7 +1147,7 @@ def func_3(mol, bits):
 
 
 def func_4(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     saturated or aromatic heteroatom-containing
     """
     AllRingsBond = mol.GetRingInfo().BondRings()
@@ -1270,7 +1270,7 @@ def func_4(mol, bits):
 
 
 def func_5(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     unsaturated non-aromatic carbon-only
     """
     ringSize = []
@@ -1386,7 +1386,7 @@ def func_5(mol, bits):
 
 
 def func_6(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     unsaturated non-aromatic nitrogen-containing
     """
     ringSize = []
@@ -1502,7 +1502,7 @@ def func_6(mol, bits):
 
 
 def func_7(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     unsaturated non-aromatic heteroatom-containing
     """
     ringSize = []
@@ -1621,7 +1621,7 @@ def func_7(mol, bits):
 
 
 def func_8(mol, bits):
-    """*Internal Use Only*
+    """ *Internal Use Only*
     aromatic rings or hetero-aromatic rings
     """
     AllRingsBond = mol.GetRingInfo().BondRings()
@@ -1682,7 +1682,7 @@ def func_8(mol, bits):
 
 
 def calcPubChemFingerPart2(mol):  # 116-263
-    """*Internal Use Only*
+    """ *Internal Use Only*
     Calculate PubChem Fingerprints （116-263)
     """
     bits = [0] * 148

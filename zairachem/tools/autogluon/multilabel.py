@@ -59,9 +59,7 @@ class MultilabelPredictor(object):
         self.path = setup_outputdir(path, warn_if_exist=False)
         self.labels = labels
         self.consider_labels_correlation = consider_labels_correlation
-        self.predictors = (
-            {}
-        )
+        self.predictors = {}
         if eval_metrics is None:
             self.eval_metrics = {}
         else:

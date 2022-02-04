@@ -17,18 +17,18 @@ from rdkit import Chem
 def CalculateKappaAlapha1(mol):
     """
     #################################################################
-    Calculation of molecular shape index for one bonded fragment
-
+    Calculation of molecular shape index for one bonded fragment 
+    
     with Alapha
-
+    
     ---->kappam1
-
+    
     Usage:
-
+        
         result=CalculateKappaAlapha1(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -46,18 +46,18 @@ def CalculateKappaAlapha1(mol):
 def CalculateKappaAlapha2(mol):
     """
     #################################################################
-    Calculation of molecular shape index for two bonded fragment
-
+    Calculation of molecular shape index for two bonded fragment 
+    
     with Alapha
-
+    
     ---->kappam2
-
+    
     Usage:
-
+        
         result=CalculateKappaAlapha2(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -75,18 +75,18 @@ def CalculateKappaAlapha2(mol):
 def CalculateKappaAlapha3(mol):
     """
     #################################################################
-    Calculation of molecular shape index for three bonded fragment
-
+    Calculation of molecular shape index for three bonded fragment 
+    
     with Alapha
-
+    
     ---->kappam3
-
+    
     Usage:
-
+        
         result=CalculateKappaAlapha3(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -108,15 +108,15 @@ def CalculateFlexibility(mol):
     """
     #################################################################
     Calculation of Kier molecular flexibility index
-
+    
     ---->phi
-
+    
     Usage:
-
+        
         result=CalculateFlexibility(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -150,13 +150,13 @@ def GetKappa(mol):
     """
     #################################################################
     Calculation of all kappa values.
-
+    
     Usage:
-
+        
         result=GetKappa(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a dcit form containing 6 kappa values.
     #################################################################
     """

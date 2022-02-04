@@ -28,7 +28,7 @@ def RunCmd(cmd):
         status: int, 0 for success
         stdout: str
         stderr: str
-
+        
     """
     print_info("run command : %s" % cmd)
 
@@ -72,7 +72,7 @@ def RunCmd(cmd):
 def ImapUnorder(processor, iterator, max_workers=10, fail_in_file="./filed.lst"):
     """
     processor: fuction
-    iterator: list or iterator,each element should be a tuple or dict, so that data can be used as ordered
+    iterator: list or iterator,each element should be a tuple or dict, so that data can be used as ordered 
     """
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
 

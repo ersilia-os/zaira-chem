@@ -7,23 +7,15 @@ sys.path.append(os.path.join(root, "../bidd-molmap/"))
 import pandas as pd
 import numpy as np
 
-from molmap import MolMap
-from molmap import feature
 from molmap.model import load_model
+from utils import descriptors_molmap, fingerprints_molmap
 
 file_name = sys.argv[1]
 model_path = sys.argv[2]
 path = os.path.dirname(file_name)
 
-mp1 = MolMap(ftype="descriptor", metric="cosine").load(
-    filename=os.path.join(root, "../data/descriptor.mp")
-)
-
-bitsinfo = feature.fingerprint.Extraction().bitsinfo
-flist = bitsinfo[bitsinfo.Subtypes.isin(["PubChemFP"])].IDs.tolist()
-mp2 = MolMap(ftype="fingerprint", fmap_type="scatter", flist=flist).load(
-    filename=os.path.join(root, "../data/fingerprint.mp")
-)
+mp1 = descriptors_molmap()
+mp2 = fingerprints_molmap()
 
 SMILES_COLUMN = "smiles"
 

@@ -371,7 +371,7 @@ def get_pdb_xyzb_ca(df_aa):
 def get_pdb_xyzb_cb(df_aa):
     """
     https://en.wikipedia.org/wiki/Protein_contact_map:
-
+    
     df_aa is the dataframe that is groupbyed from `residue_name` and  `residue_number`
     """
     # df_aa = df[(df['residue_name'] == 'PRO') & (df['residue_number'] ==2)]
@@ -535,7 +535,7 @@ class PDB2Fmap:
         aap_df example:
         ==============
         >>> from molmap.feature.sequence.aas.local_feature.aai import load_index
-        >>> aap_df = load_index.data.T
+        >>> aap_df = load_index.data.T        
         """
 
         df_custom = pd.DataFrame(index=self.df_embd.index)

@@ -4,18 +4,18 @@ import collections
 import seaborn as sns
 import numpy as np
 from sklearn.preprocessing import QuantileTransformer
+
 sns.set_style("ticks")
 
-mpl.rcParams['font.family'] = "sans-serif"
-mpl.rcParams['font.sans-serif'] = "Arial"
-mpl.rcParams.update({'font.size': 10})
-#mpl.rcParams['pdf.fonttype'] = 42
-#mpl.rcParams['ps.fonttype'] = 42
+mpl.rcParams["font.family"] = "sans-serif"
+mpl.rcParams["font.sans-serif"] = "Arial"
+mpl.rcParams.update({"font.size": 10})
+# mpl.rcParams['pdf.fonttype'] = 42
+# mpl.rcParams['ps.fonttype'] = 42
 mpl.rcParams.update({"axes.grid": True})
 
 
 class Colors(object):
-
     def __init__(self, cmap_name="Spectral", empty="lightgray"):
         self.cmap_name = cmap_name
         self.empty = empty
@@ -24,20 +24,20 @@ class Colors(object):
         self.set_bokeh()
 
     def set_bokeh(self):
-        self.red = '#EC1557'
-        self.orange = '#F05223'
-        self.yellow = '#F6A91B'
-        self.lightgreen = '#A5CD39'
-        self.green = '#20B254'
-        self.lightblue = '#00AAAE'
-        self.blue = '#4998D3'
-        self.purple = '#892889'
+        self.red = "#EC1557"
+        self.orange = "#F05223"
+        self.yellow = "#F6A91B"
+        self.lightgreen = "#A5CD39"
+        self.green = "#20B254"
+        self.lightblue = "#00AAAE"
+        self.blue = "#4998D3"
+        self.purple = "#892889"
 
     def ideas(self):
         ideas = {
             "diverging": ["Spectral", "coolwarm"],
             "uniform": ["viridis", "plasma"],
-            "sequential": ["YlGnBu"]
+            "sequential": ["YlGnBu"],
         }
         return ideas
 
@@ -62,7 +62,7 @@ class Colors(object):
         return [cat2col[c] for c in categories]
 
     def from_values(self, values, method="uniform"):
-        values = np.array(values).reshape(-1,1)
+        values = np.array(values).reshape(-1, 1)
         if self.transformer is None:
             self.transformer = QuantileTransformer(output_distribution=method)
             self.transformer.fit(values)

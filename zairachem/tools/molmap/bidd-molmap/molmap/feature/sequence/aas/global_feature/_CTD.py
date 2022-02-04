@@ -112,20 +112,20 @@ _AATPropertyName = (
 
 def StringtoNum(ProteinSequence, AAProperty):
     """
-    ###############################################################################################
-    Tranform the protein sequence into the string form such as 32123223132121123.
-
-    Usage:
-
-    result=StringtoNum(protein,AAProperty)
-
-    Input: protein is a pure protein sequence.
-
-    AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
-
-    Output: result is a string such as 123321222132111123222
-    ###############################################################################################
-    """
+	###############################################################################################
+	Tranform the protein sequence into the string form such as 32123223132121123.
+	
+	Usage:
+	
+	result=StringtoNum(protein,AAProperty)
+	
+	Input: protein is a pure protein sequence.
+	
+	AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
+	
+	Output: result is a string such as 123321222132111123222
+	###############################################################################################
+	"""
 
     hardProteinSequence = copy.deepcopy(ProteinSequence)
     for k, m in AAProperty.items():
@@ -138,22 +138,22 @@ def StringtoNum(ProteinSequence, AAProperty):
 
 def CalculateComposition(ProteinSequence, AAProperty, AAPName):
     """
-    ###############################################################################################
-    A method used for computing composition descriptors.
-
-    Usage:
-
-    result=CalculateComposition(protein,AAProperty,AAPName)
-
-    Input: protein is a pure protein sequence.
-
-    AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
-
-    AAPName is a string used for indicating a AAP name.
-
-    Output: result is a dict form containing composition descriptors based on the given property.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for computing composition descriptors.
+	
+	Usage:
+	
+	result=CalculateComposition(protein,AAProperty,AAPName)
+	
+	Input: protein is a pure protein sequence.
+	
+	AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
+	
+	AAPName is a string used for indicating a AAP name.
+	
+	Output: result is a dict form containing composition descriptors based on the given property.
+	###############################################################################################
+	"""
     TProteinSequence = StringtoNum(ProteinSequence, AAProperty)
     Result = {}
     Num = len(TProteinSequence)
@@ -165,22 +165,22 @@ def CalculateComposition(ProteinSequence, AAProperty, AAPName):
 
 def CalculateTransition(ProteinSequence, AAProperty, AAPName):
     """
-    ###############################################################################################
-    A method used for computing transition descriptors
-
-    Usage:
-
-    result=CalculateTransition(protein,AAProperty,AAPName)
-
-    Input:protein is a pure protein sequence.
-
-    AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
-
-    AAPName is a string used for indicating a AAP name.
-
-    Output:result is a dict form containing transition descriptors based on the given property.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for computing transition descriptors
+	
+	Usage:
+	
+	result=CalculateTransition(protein,AAProperty,AAPName)
+	
+	Input:protein is a pure protein sequence.
+	
+	AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
+	
+	AAPName is a string used for indicating a AAP name.
+	
+	Output:result is a dict form containing transition descriptors based on the given property.
+	###############################################################################################
+	"""
 
     TProteinSequence = StringtoNum(ProteinSequence, AAProperty)
     Result = {}
@@ -201,22 +201,22 @@ def CalculateTransition(ProteinSequence, AAProperty, AAPName):
 def CalculateDistribution(ProteinSequence, AAProperty, AAPName):
 
     """
-    ###############################################################################################
-    A method used for computing distribution descriptors.
-
-    Usage:
-
-    result=CalculateDistribution(protein,AAProperty,AAPName)
-
-    Input:protein is a pure protein sequence.
-
-    AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
-
-    AAPName is a string used for indicating a AAP name.
-
-    Output:result is a dict form containing Distribution descriptors based on the given property.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for computing distribution descriptors.
+	
+	Usage:
+	
+	result=CalculateDistribution(protein,AAProperty,AAPName)
+	
+	Input:protein is a pure protein sequence.
+	
+	AAProperty is a dict form containing classifciation of amino acids such as _Polarizability.
+	
+	AAPName is a string used for indicating a AAP name.
+	
+	Output:result is a dict form containing Distribution descriptors based on the given property.
+	###############################################################################################
+	"""
     TProteinSequence = StringtoNum(ProteinSequence, AAProperty)
     Result = {}
     Num = len(TProteinSequence)
@@ -258,20 +258,20 @@ def CalculateDistribution(ProteinSequence, AAProperty, AAPName):
 def CalculateCompositionHydrophobicity(ProteinSequence):
 
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on Hydrophobicity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionHydrophobicity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on Hydrophobicity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on Hydrophobicity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionHydrophobicity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on Hydrophobicity.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(ProteinSequence, _Hydrophobicity, "_Hydrophobicity")
     return result
@@ -279,40 +279,40 @@ def CalculateCompositionHydrophobicity(ProteinSequence):
 
 def CalculateCompositionNormalizedVDWV(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on NormalizedVDWV of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionNormalizedVDWV(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on NormalizedVDWV.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on NormalizedVDWV of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionNormalizedVDWV(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on NormalizedVDWV.
+	###############################################################################################
+	"""
     result = CalculateComposition(ProteinSequence, _NormalizedVDWV, "_NormalizedVDWV")
     return result
 
 
 def CalculateCompositionPolarity(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on Polarity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionPolarity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on Polarity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on Polarity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionPolarity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on Polarity.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(ProteinSequence, _Polarity, "_Polarity")
     return result
@@ -320,20 +320,20 @@ def CalculateCompositionPolarity(ProteinSequence):
 
 def CalculateCompositionCharge(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on Charge of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionCharge(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on Charge.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on Charge of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionCharge(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on Charge.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(ProteinSequence, _Charge, "_Charge")
     return result
@@ -341,20 +341,20 @@ def CalculateCompositionCharge(ProteinSequence):
 
 def CalculateCompositionSecondaryStr(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on SecondaryStr of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionSecondaryStr(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on SecondaryStr.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on SecondaryStr of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionSecondaryStr(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on SecondaryStr.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(ProteinSequence, _SecondaryStr, "_SecondaryStr")
     return result
@@ -362,20 +362,20 @@ def CalculateCompositionSecondaryStr(ProteinSequence):
 
 def CalculateCompositionSolventAccessibility(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on SolventAccessibility
-
-    of  AADs.
-
-    Usage:
-
-    result=CalculateCompositionSolventAccessibility(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on SolventAccessibility.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on SolventAccessibility
+	
+	of  AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionSolventAccessibility(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on SolventAccessibility.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(
         ProteinSequence, _SolventAccessibility, "_SolventAccessibility"
@@ -385,20 +385,20 @@ def CalculateCompositionSolventAccessibility(ProteinSequence):
 
 def CalculateCompositionPolarizability(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating composition descriptors based on Polarizability of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateCompositionPolarizability(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Composition descriptors based on Polarizability.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating composition descriptors based on Polarizability of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateCompositionPolarizability(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Composition descriptors based on Polarizability.
+	###############################################################################################
+	"""
 
     result = CalculateComposition(ProteinSequence, _Polarizability, "_Polarizability")
     return result
@@ -410,20 +410,20 @@ def CalculateCompositionPolarizability(ProteinSequence):
 ##################################################################################################
 def CalculateTransitionHydrophobicity(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on Hydrophobicity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionHydrophobicity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on Hydrophobicity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on Hydrophobicity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionHydrophobicity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on Hydrophobicity.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _Hydrophobicity, "_Hydrophobicity")
     return result
@@ -431,20 +431,20 @@ def CalculateTransitionHydrophobicity(ProteinSequence):
 
 def CalculateTransitionNormalizedVDWV(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on NormalizedVDWV of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionNormalizedVDWV(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on NormalizedVDWV.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on NormalizedVDWV of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionNormalizedVDWV(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on NormalizedVDWV.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _NormalizedVDWV, "_NormalizedVDWV")
     return result
@@ -452,20 +452,20 @@ def CalculateTransitionNormalizedVDWV(ProteinSequence):
 
 def CalculateTransitionPolarity(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on Polarity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionPolarity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on Polarity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on Polarity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionPolarity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on Polarity.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _Polarity, "_Polarity")
     return result
@@ -473,20 +473,20 @@ def CalculateTransitionPolarity(ProteinSequence):
 
 def CalculateTransitionCharge(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on Charge of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionCharge(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on Charge.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on Charge of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionCharge(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on Charge.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _Charge, "_Charge")
     return result
@@ -494,20 +494,20 @@ def CalculateTransitionCharge(ProteinSequence):
 
 def CalculateTransitionSecondaryStr(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on SecondaryStr of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionSecondaryStr(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on SecondaryStr.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on SecondaryStr of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionSecondaryStr(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on SecondaryStr.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _SecondaryStr, "_SecondaryStr")
     return result
@@ -515,20 +515,20 @@ def CalculateTransitionSecondaryStr(ProteinSequence):
 
 def CalculateTransitionSolventAccessibility(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on SolventAccessibility
-
-    of  AADs.
-
-    Usage:
-
-    result=CalculateTransitionSolventAccessibility(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on SolventAccessibility.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on SolventAccessibility
+	
+	of  AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionSolventAccessibility(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on SolventAccessibility.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(
         ProteinSequence, _SolventAccessibility, "_SolventAccessibility"
@@ -538,20 +538,20 @@ def CalculateTransitionSolventAccessibility(ProteinSequence):
 
 def CalculateTransitionPolarizability(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Transition descriptors based on Polarizability of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateTransitionPolarizability(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Transition descriptors based on Polarizability.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Transition descriptors based on Polarizability of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateTransitionPolarizability(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Transition descriptors based on Polarizability.
+	###############################################################################################
+	"""
 
     result = CalculateTransition(ProteinSequence, _Polarizability, "_Polarizability")
     return result
@@ -561,20 +561,20 @@ def CalculateTransitionPolarizability(ProteinSequence):
 ##################################################################################################
 def CalculateDistributionHydrophobicity(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on Hydrophobicity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionHydrophobicity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on Hydrophobicity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on Hydrophobicity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionHydrophobicity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on Hydrophobicity.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _Hydrophobicity, "_Hydrophobicity")
     return result
@@ -582,20 +582,20 @@ def CalculateDistributionHydrophobicity(ProteinSequence):
 
 def CalculateDistributionNormalizedVDWV(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on NormalizedVDWV of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionNormalizedVDWV(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on NormalizedVDWV.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on NormalizedVDWV of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionNormalizedVDWV(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on NormalizedVDWV.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _NormalizedVDWV, "_NormalizedVDWV")
     return result
@@ -603,20 +603,20 @@ def CalculateDistributionNormalizedVDWV(ProteinSequence):
 
 def CalculateDistributionPolarity(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on Polarity of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionPolarity(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on Polarity.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on Polarity of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionPolarity(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on Polarity.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _Polarity, "_Polarity")
     return result
@@ -624,20 +624,20 @@ def CalculateDistributionPolarity(ProteinSequence):
 
 def CalculateDistributionCharge(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on Charge of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionCharge(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on Charge.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on Charge of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionCharge(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on Charge.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _Charge, "_Charge")
     return result
@@ -645,20 +645,20 @@ def CalculateDistributionCharge(ProteinSequence):
 
 def CalculateDistributionSecondaryStr(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on SecondaryStr of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionSecondaryStr(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on SecondaryStr.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on SecondaryStr of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionSecondaryStr(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on SecondaryStr.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _SecondaryStr, "_SecondaryStr")
     return result
@@ -667,20 +667,20 @@ def CalculateDistributionSecondaryStr(ProteinSequence):
 def CalculateDistributionSolventAccessibility(ProteinSequence):
 
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on SolventAccessibility
-
-    of  AADs.
-
-    Usage:
-
-    result=CalculateDistributionSolventAccessibility(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on SolventAccessibility.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on SolventAccessibility
+	
+	of  AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionSolventAccessibility(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on SolventAccessibility.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(
         ProteinSequence, _SolventAccessibility, "_SolventAccessibility"
@@ -690,20 +690,20 @@ def CalculateDistributionSolventAccessibility(ProteinSequence):
 
 def CalculateDistributionPolarizability(ProteinSequence):
     """
-    ###############################################################################################
-    A method used for calculating Distribution descriptors based on Polarizability of
-
-    AADs.
-
-    Usage:
-
-    result=CalculateDistributionPolarizability(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing Distribution descriptors based on Polarizability.
-    ###############################################################################################
-    """
+	###############################################################################################
+	A method used for calculating Distribution descriptors based on Polarizability of 
+	
+	AADs.
+	
+	Usage: 
+	
+	result=CalculateDistributionPolarizability(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing Distribution descriptors based on Polarizability.
+	###############################################################################################
+	"""
 
     result = CalculateDistribution(ProteinSequence, _Polarizability, "_Polarizability")
     return result
@@ -714,18 +714,18 @@ def CalculateDistributionPolarizability(ProteinSequence):
 
 def CalculateC(ProteinSequence):
     """
-    ###############################################################################################
-    Calculate all composition descriptors based seven different properties of AADs.
-
-    Usage:
-
-    result=CalculateC(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing all composition descriptors.
-    ###############################################################################################
-    """
+	###############################################################################################
+	Calculate all composition descriptors based seven different properties of AADs.
+	
+	Usage:
+	
+	result=CalculateC(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing all composition descriptors.
+	###############################################################################################
+	"""
     result = {}
     result.update(CalculateCompositionPolarizability(ProteinSequence))
     result.update(CalculateCompositionSolventAccessibility(ProteinSequence))
@@ -739,18 +739,18 @@ def CalculateC(ProteinSequence):
 
 def CalculateT(ProteinSequence):
     """
-    ###############################################################################################
-    Calculate all transition descriptors based seven different properties of AADs.
-
-    Usage:
-
-    result=CalculateT(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing all transition descriptors.
-    ###############################################################################################
-    """
+	###############################################################################################
+	Calculate all transition descriptors based seven different properties of AADs.
+	
+	Usage:
+	
+	result=CalculateT(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing all transition descriptors.
+	###############################################################################################
+	"""
     result = {}
     result.update(CalculateTransitionPolarizability(ProteinSequence))
     result.update(CalculateTransitionSolventAccessibility(ProteinSequence))
@@ -764,18 +764,18 @@ def CalculateT(ProteinSequence):
 
 def CalculateD(ProteinSequence):
     """
-    ###############################################################################################
-    Calculate all distribution descriptors based seven different properties of AADs.
-
-    Usage:
-
-    result=CalculateD(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing all distribution descriptors.
-    ###############################################################################################
-    """
+	###############################################################################################
+	Calculate all distribution descriptors based seven different properties of AADs.
+	
+	Usage:
+	
+	result=CalculateD(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing all distribution descriptors.
+	###############################################################################################
+	"""
     result = {}
     result.update(CalculateDistributionPolarizability(ProteinSequence))
     result.update(CalculateDistributionSolventAccessibility(ProteinSequence))
@@ -789,18 +789,18 @@ def CalculateD(ProteinSequence):
 
 def CalculateCTD(ProteinSequence):
     """
-    ###############################################################################################
-    Calculate all CTD descriptors based seven different properties of AADs.
-
-    Usage:
-
-    result=CalculateCTD(protein)
-
-    Input:protein is a pure protein sequence.
-
-    Output:result is a dict form containing all CTD descriptors.
-    ###############################################################################################
-    """
+	###############################################################################################
+	Calculate all CTD descriptors based seven different properties of AADs.
+	
+	Usage:
+	
+	result=CalculateCTD(protein)
+	
+	Input:protein is a pure protein sequence.
+	
+	Output:result is a dict form containing all CTD descriptors.
+	###############################################################################################
+	"""
     result = {}
     result.update(CalculateCompositionPolarizability(ProteinSequence))
     result.update(CalculateCompositionSolventAccessibility(ProteinSequence))

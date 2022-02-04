@@ -47,7 +47,7 @@ def pairwise_distance(npydata, n_cpus=8, method="correlation"):
     """
     parameters
     ---------------
-    method: {'euclidean', 'manhattan', 'canberra', 'chebyshev',
+    method: {'euclidean', 'manhattan', 'canberra', 'chebyshev', 
              'cosine', 'braycurtis', 'correlation',
              'jaccard', 'rogerstanimoto', 'hamming', 'dice', 'kulsinski', 'sokal_sneath'}
     npydata: np.array or np.memmap, Note that the default we will calcuate the vector's distances instead of sample's distances, if you wish to calculate distances between samples, you can pass data.T instead of data
@@ -58,7 +58,7 @@ def pairwise_distance(npydata, n_cpus=8, method="correlation"):
     >>> data = np.random.random_sample(size=(10000,10)
     >>> dist_matrix = pairwise_distance(data)
     >>> dist_matrix.shape
-    >>> (10,10)
+    >>> (10,10)  
     """
     global data, func
 

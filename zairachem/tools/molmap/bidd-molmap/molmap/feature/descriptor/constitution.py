@@ -150,13 +150,13 @@ def GetConstitution(mol):
     """
     #################################################################
     Get the dictionary of constitutional descriptors for given moelcule mol
-
+    
     Usage:
-
+        
         result=GetConstitutional(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a dict form containing all constitutional values.
     #################################################################
     """

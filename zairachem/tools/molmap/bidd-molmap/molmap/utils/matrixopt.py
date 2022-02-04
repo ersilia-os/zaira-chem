@@ -10,8 +10,6 @@ matrix operation
 """
 
 import numpy as np
-
-# from lapjv import lapjv
 from scipy.signal import convolve2d
 from scipy.spatial.distance import cdist
 
@@ -23,60 +21,9 @@ class Scatter2Grid:
         self.indices = None
         self.indices_list = None
 
-    def fit(self, df, split_channels=True, channel_col="Channels", channel_order=[]):
-        """
-        parameters
-        ------------------
-        df: dataframe with x, y columns
-        split_channels: bool, if True, will apply split by group
-        channel_col: column in df.columns, split to groups by this col
-
-        """
-        df["idx"] = range(len(df))
-
-        embedding_2d = df[["x", "y"]].values
-        N = len(df)
-
-        size1 = int(np.ceil(np.sqrt(N)))
-        size2 = int(np.ceil(N / size1))
-        grid_size = (size1, size2)
-
-        grid = np.dstack(
-            np.meshgrid(np.linspace(0, 1, size2), np.linspace(0, 1, size1))
-        ).reshape(-1, 2)
-        grid_map = grid[:N]
-        cost_matrix = cdist(grid_map, embedding_2d, "sqeuclidean").astype(np.float)
-        cost_matrix = cost_matrix * (100000 / cost_matrix.max())
-        # row_asses, col_asses, _ = lapjv(cost_matrix)
-        row_asses = None
-        col_asses = None
-
-        self.row_asses = row_asses
-        self.col_asses = col_asses
-        self.fmap_shape = grid_size
-        self.indices = col_asses
-
-        self.channel_col = channel_col
-        self.split_channels = split_channels
-        df["indices"] = self.indices
-        self.df = df
-
-        if self.split_channels:
-
-            def _apply_split(x):
-                return x[["idx", "indices"]].to_dict("list")
-
-            sidx = df.groupby(channel_col).apply(_apply_split)
-            if len(channel_order) != 0:
-                sidx = sidx.loc[channel_order]
-
-            channels = sidx.index.tolist()
-            indices_list = sidx.tolist()
-            self.channels = channels
-            self.indices_list = indices_list
-
     def transform(self, vector_1d):
-        """vector_1d: extracted features"""
+        """vector_1d: extracted features
+        """
         ### linear assignment map ###
         M, N = self.fmap_shape
 
@@ -116,7 +63,7 @@ class Scatter2Array:
 
     def _transform(self, dfnew):
         """dfnew: dataframe with x, y columns
-        in case we need to split channels
+           in case we need to split channels
         """
         x = dfnew.x.values
         y = dfnew.y.values
@@ -205,7 +152,7 @@ def smartpadding(array, target_size, mode="constant", constant_values=0):
 def fspecial_gauss(size=31, sigma=2):
 
     """Function to mimic the 'fspecial' gaussian MATLAB function
-    size should be odd value
+      size should be odd value
     """
     x, y = np.mgrid[-size // 2 + 1 : size // 2 + 1, -size // 2 + 1 : size // 2 + 1]
     g = np.exp(-((x ** 2 + y ** 2) / (2.0 * sigma ** 2)))

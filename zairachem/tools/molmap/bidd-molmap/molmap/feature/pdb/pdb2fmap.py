@@ -357,7 +357,7 @@ def get_pdb_xyzb_ca(df_aa):
 def get_pdb_xyzb_cb(df_aa):
     """
     https://en.wikipedia.org/wiki/Protein_contact_map:
-
+    
     df_aa is the dataframe that is groupbyed from `residue_name` and  `residue_number`
     """
     # df_aa = df[(df['residue_name'] == 'PRO') & (df['residue_number'] ==2)]
@@ -520,7 +520,7 @@ class PDB2Fmap:
 
         """
         aap_df: dataframe of animo acid propetries, each column is one type of property, total 20 rows for all 20 types of animo acids
-
+        
         """
 
         df_custom = pd.DataFrame(index=self.df_embd.index)

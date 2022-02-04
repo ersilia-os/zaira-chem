@@ -133,13 +133,13 @@ from collections import OrderedDict
 def GetPath(mol):
     """
     Calculation of all path values.
-
+    
     Usage:
-
+        
         result=GetPath(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a dcit form containing 6 kappa values.
 
     """

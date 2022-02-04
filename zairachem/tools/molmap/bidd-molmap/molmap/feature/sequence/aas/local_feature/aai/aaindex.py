@@ -100,7 +100,7 @@ class Aaindex:
     def search(self, keyword, dbkey="aaindex", max_hits=0):
 
         """
-        keyword: 'charge', 'alpha-helix' or 'hydrophobicity', ...
+        keyword: 'charge', 'alpha-helix' or 'hydrophobicity', ... 
         dbkey: {'aaindex', 'aaindex1','aaindex2', 'aaindex3'}
         """
         loc = "locale=en"
