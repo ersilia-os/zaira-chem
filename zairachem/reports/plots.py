@@ -2,13 +2,12 @@ import numpy as np
 
 from sklearn import metrics
 from sklearn.metrics import auc, roc_curve, r2_score, mean_absolute_error
-from scipy.stats import gaussian_kde
 
 
 import matplotlib as plt
 from . import BasePlot
 from .fetcher import ResultsFetcher
-from .utils import ersilia_colors
+from .utils import Colors
 
 
 class ActivesInactivesPlot(BasePlot):
@@ -25,7 +24,7 @@ class ActivesInactivesPlot(BasePlot):
             ax.bar(
                 x=["Actives", "Inactives"],
                 height=[actives, inactives],
-                color=[ersilia_colors["pink"], ersilia_colors["blue"]],
+                color=[Colors().red, Colors().blue],
             )
             ax.set_ylabel("Number of compounds")
         else:
@@ -47,8 +46,8 @@ class ConfusionPlot(BasePlot):
                 metrics.confusion_matrix(bt, bp), display_labels=class_names
             )
             disp.plot(ax=ax, cmap=plt.cm.Greens, colorbar=False)
-            for labels in disp.text_.ravel():
-                labels.set_fontsize(22)
+            #for labels in disp.text_.ravel():
+                #labels.set_fontsize(22)
             ax.grid(False)
             ax.set_title("Confusion matrix")
         else:
@@ -65,7 +64,7 @@ class RocCurvePlot(BasePlot):
             bt = ResultsFetcher(path=path).get_actives_inactives()
             yp = ResultsFetcher(path=path).get_pred_proba_clf()
             fpr, tpr, _ = roc_curve(bt, yp)
-            ax.plot(fpr, tpr, color=ersilia_colors["mint"])
+            ax.plot(fpr, tpr, color=Colors().purple)
             ax.set_title("ROC AUC {0}".format(round(auc(fpr, tpr), 3)))
             ax.set_title("AUROC = {0}".format(round(auc(fpr, tpr), 2)))
             ax.set_xlabel("1-Specificity (FPR)")
@@ -93,7 +92,7 @@ class IndividualEstimatorsAurocPlot(BasePlot):
                 labels += [yp]
             x = [i for i in range(len(labels))]
             y = aucs
-            ax.scatter(x, y)
+            ax.scatter(x, y, colors=Colors().red)
             ax.set_xticks(x)
             ax.set_xticklabels(labels, rotation=90)
             ax.set_ylabel("AUROC")
@@ -120,7 +119,7 @@ class InidvidualEstimatorsR2Plot(BasePlot):
                 labels += [yp]
             x = [i for i in range(len(labels))]
             y = scores
-            ax.scatter(x, y)
+            ax.scatter(x, y, color=Colors().red)
             ax.set_xticks(x)
             ax.set_xticklabels(labels, rotation=90)
             ax.set_ylabel("R2")
@@ -149,14 +148,14 @@ class ProjectionPlot(BasePlot):
         ax.scatter(
             [umap0[i] for i in bp_i],
             [umap1[i] for i in bp_i],
-            color=ersilia_colors["blue"],
+            color=Colors().blue,
             alpha=0.7,
             s=15,
         )
         ax.scatter(
             [umap0[i] for i in bp_a],
             [umap1[i] for i in bp_a],
-            color=ersilia_colors["pink"],
+            color=Colors().red,
             alpha=0.7,
             s=15,
         )
@@ -172,7 +171,7 @@ class RegressionPlotTransf(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_transformed()
             yp = ResultsFetcher(path=path).get_pred_reg_trans()
-            ax.scatter(yt, yp, c=ersilia_colors["dark"], s=15, alpha=0.7)
+            ax.scatter(yt, yp, c=Colors().purple, s=15, alpha=0.7)
             ax.set_xlabel("Observed Activity (Transformed)")
             ax.set_ylabel("Predicted Activity (Transformed)")
             ax.set_title(
@@ -192,7 +191,7 @@ class HistogramPlotTransf(BasePlot):
             self.name = "histogram-trans"
             ax = self.ax
             yp = ResultsFetcher(path=path).get_pred_reg_trans()
-            ax.hist(yp, color=ersilia_colors["mint"])
+            ax.hist(yp, color=Colors().green)
             ax.set_xlabel("Predicted Activity")
             ax.set_ylabel("Frequency")
             ax.set_title("Predicted activity distribution")
@@ -209,7 +208,7 @@ class RegressionPlotRaw(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_raw()
             yp = ResultsFetcher(path=path).get_pred_reg_raw()
-            ax.scatter(yt, yp, c=ersilia_colors["dark"], s=15, alpha=0.7)
+            ax.scatter(yt, yp, c=Colors().green, s=15, alpha=0.7)
             ax.set_xlabel("Observed Activity (Transformed)")
             ax.set_ylabel("Predicted Activity (Transformed)")
             ax.set_title(
@@ -229,7 +228,7 @@ class HistogramPlotRaw(BasePlot):
             self.name = "histogram-raw"
             ax = self.ax
             yp = ResultsFetcher(path=path).get_pred_reg_raw()
-            ax.hist(yp, color=ersilia_colors["mint"])
+            ax.hist(yp, color=Colors().green)
             ax.set_xlabel("Predicted Activity")
             ax.set_ylabel("Frequency")
             ax.set_title("Predicted activity distribution")
@@ -246,7 +245,7 @@ class Transformation(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_raw()
             ytrans = ResultsFetcher(path=path).get_transformed()
-            ax.scatter(yt, ytrans, c=ersilia_colors["dark"], s=15, alpha=0.7)
+            ax.scatter(yt, ytrans, c=Colors().green, s=15, alpha=0.7)
             ax.set_xlabel("Observed Activity (Raw)")
             ax.set_ylabel("Observed Activity (Transformed)")
         else:

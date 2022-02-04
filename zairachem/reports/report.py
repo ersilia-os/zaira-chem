@@ -13,7 +13,6 @@ from .plots import (
 )
 
 from .. import ZairaBase
-from ..vars import REPORT_SUBFOLDER
 
 
 class Reporter(ZairaBase):
