@@ -8,7 +8,11 @@ from ... import ZairaBase
 from ...vars import ESTIMATORS_SUBFOLDER, POOL_SUBFOLDER
 
 
-class MultilabelPredictor(ZairaBase):
+zb = ZairaBase()
+model_dir = zb.get_trained_dir()
+
+
+class MultilabelPredictor(object):
     """Tabular Predictor for predicting multiple columns in table.
     Creates multiple TabularPredictor objects which you can also use individually.
     You can access the TabularPredictor for a particular label via: `multilabel_predictor.get_predictor(label_i)`
@@ -47,7 +51,6 @@ class MultilabelPredictor(ZairaBase):
         consider_labels_correlation=True,
         **kwargs,
     ):
-        ZairaBase.__init__(self)
 
         if len(labels) < 2:
             consider_labels_correlation = False
@@ -182,7 +185,6 @@ class MultilabelPredictor(ZairaBase):
 
     def redirect_predictor(self, old_path):
         base_path = "Predictor_".join(old_path.split("Predictor_")[:-1])
-        model_dir = self.get_trained_dir()
         base_old_dirs = []
         for sf in [POOL_SUBFOLDER, ESTIMATORS_SUBFOLDER]:
             if sf in base_path:
