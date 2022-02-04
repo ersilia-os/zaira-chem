@@ -58,7 +58,7 @@ class MultilabelPredictor(ZairaBase):
         self.consider_labels_correlation = consider_labels_correlation
         self.predictors = (
             {}
-        )  # key = label, value = TabularPredictor or str path to the TabularPredictor for this label
+        )
         if eval_metrics is None:
             self.eval_metrics = {}
         else:
@@ -182,7 +182,6 @@ class MultilabelPredictor(ZairaBase):
 
     def redirect_predictor(self, old_path):
         base_path = "Predictor_".join(old_path.split("Predictor_")[:-1])
-        predictor_with_label_subfolder = old_path.replace(base_path, "")
         model_dir = self.get_trained_dir()
         base_old_dirs = []
         for sf in [POOL_SUBFOLDER, ESTIMATORS_SUBFOLDER]:
@@ -206,8 +205,8 @@ class MultilabelPredictor(ZairaBase):
     def get_predictor(self, label):
         """Returns TabularPredictor which is used to predict this label."""
         predictor = self.predictors[label]
-        predictor = self.redirect_predictor(predictor)
         if isinstance(predictor, str):
+            predictor = self.redirect_predictor(predictor)
             return TabularPredictor.load(path=predictor)
         return predictor
 
