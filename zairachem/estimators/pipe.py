@@ -38,8 +38,8 @@ class EstimatorPipeline(ZairaBase):
         SimpleEvaluator(path=self.path).run()
 
     def run(self, time_budget_sec=None):
-        # self._individual_estimator_pipeline(time_budget_sec)
-        # self._manifolds_pipeline(time_budget_sec)
-        # self._reference_pipeline(time_budget_sec)
+        self._individual_estimator_pipeline(time_budget_sec)
+        self._manifolds_pipeline(time_budget_sec)
+        self._reference_pipeline(time_budget_sec)
         self._molmap_pipeline(time_budget_sec)
         self._simple_evaluation()
