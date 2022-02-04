@@ -33,10 +33,10 @@ def GetPharmacoPFPs(
 ):
     """
     Note: maxPointCont with 3 is slowly
-
-    bins = [(i,i+1) for i in range(20)],
+    
+    bins = [(i,i+1) for i in range(20)], 
     maxPonitCount=2 for large-scale computation
-
+    
     """
     MysigFactory = SigFactory(
         featFactory,

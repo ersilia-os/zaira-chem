@@ -13,7 +13,7 @@ def plot_scatter(molmap, htmlpath="./", htmlname=None, radius=3):
     """
     molmap: the object of molmap
     htmlpath: the figure path, not include the prefix of 'html'
-    htmlname: the name
+    htmlname: the name 
     radius: int, defaut:3, the radius of scatter dot
     """
 

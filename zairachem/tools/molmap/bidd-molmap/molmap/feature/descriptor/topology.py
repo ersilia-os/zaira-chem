@@ -109,7 +109,7 @@ def CalculateRadius(mol):
     """
     Calculation of radius based on topology.
     It is :If ri is the largest matrix entry in row i of the distance
-    matrix D,then the radius is defined as the smallest of the ri
+    matrix D,then the radius is defined as the smallest of the ri 
     [Petitjean 1992].
     """
     Distance = Chem.GetDistanceMatrix(mol)
@@ -156,7 +156,7 @@ def CalculateGutmanTopo(mol):
 
 def CalculatePolarityNumber(mol):
     """
-    Calculation of Polarity number.
+    Calculation of Polarity number. 
     It is the number of pairs of vertexes at distance matrix equal to 3
     """
     Distance = Chem.GetDistanceMatrix(mol)
@@ -171,7 +171,7 @@ def CalculatePolarityNumber(mol):
 def _GetPrincipleQuantumNumber(atNum):
     """
     Get the principle quantum number of atom with atomic
-    number equal to atNum
+    number equal to atNum 
     """
     if atNum <= 2:
         return 1
@@ -191,13 +191,13 @@ def _GetPrincipleQuantumNumber(atNum):
 
 def CalculatePoglianiIndex(mol):
     """Calculation of Poglicani index
-
+    
     The Pogliani index (Dz) is the sum over all non-hydrogen atoms
-
+    
     of a modified vertex degree calculated as the ratio
-
+    
     of the number of valence electrons over the principal
-
+    
     quantum number of an atom [L. Pogliani, J.Phys.Chem. 1996, 100, 18065-18077].
     """
     res = MINVALUE
@@ -211,12 +211,12 @@ def CalculatePoglianiIndex(mol):
 
 def CalculateIpc(mol):
     """
-    This returns the information content of the coefficients
-    of the characteristic polynomial of the adjacency matrix
-    of a hydrogen-suppressed graph of a molecule.
-    'avg = 1' returns the information content divided by the total population.
+    This returns the information content of the coefficients 
+    of the characteristic polynomial of the adjacency matrix 
+    of a hydrogen-suppressed graph of a molecule. 
+    'avg = 1' returns the information content divided by the total population. 
     From D. Bonchev & N. Trinajstic, J. Chem. Phys. vol 67, 4517-4533 (1977)
-
+    
     log of log values for index
     """
     temp = GD.Ipc(mol)
@@ -228,26 +228,26 @@ def CalculateIpc(mol):
 
 
 def CalculateBertzCT(mol):
-    """
+    """ 
     #################################################################
     A topological index meant to quantify "complexity" of molecules.
 
     Consists of a sum of two terms, one representing the complexity
-
+    
     of the bonding, the other representing the complexity of the
-
+    
     distribution of heteroatoms.
 
     From S. H. Bertz, J. Am. Chem. Soc., vol 103, 3599-3601 (1981)
-
+    
     ---->BertzCT(log value)
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateBertzCT(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -276,15 +276,15 @@ def CalculateSchiultz(mol):
     """
     #################################################################
     Calculation of Schiultz number
-
+    
     ---->Tsch(log value)
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateSchiultz(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -317,15 +317,15 @@ def CalculateZagreb2(mol):
     """
     #################################################################
     Calculation of Zagreb index with order 2 in a molecule
-
+    
     ---->ZM2
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateZagreb2(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -343,15 +343,15 @@ def CalculateMZagreb1(mol):
     """
     #################################################################
     Calculation of Modified Zagreb index with order 1 in a molecule
-
+    
     ---->MZM1
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateMZagreb1(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -370,15 +370,15 @@ def CalculateMZagreb2(mol):
     """
     #################################################################
     Calculation of Modified Zagreb index with order 2 in a molecule
-
+    
     ---->MZM2
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateMZagreb2(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -399,15 +399,15 @@ def CalculatePlatt(mol):
     """
     #################################################################
     Calculation of Platt number in a molecule
-
+    
     ---->Platt
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculatePlatt(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -425,17 +425,17 @@ def CalculateSimpleTopoIndex(mol):
     """
     #################################################################
     Calculation of the logarithm of the simple topological index by Narumi,
-
+    
     which is defined as the product of the vertex degree.
-
+    
     ---->Sito
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateSimpleTopoIndex(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -455,15 +455,15 @@ def CalculateHarmonicTopoIndex(mol):
     """
     #################################################################
     Calculation of harmonic topological index proposed by Narnumi.
-
+    
     ---->Hato
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateHarmonicTopoIndex(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -486,15 +486,15 @@ def CalculateGeometricTopoIndex(mol):
     """
     #################################################################
     Geometric topological index by Narumi
-
+    
     ---->Geto
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateGeometricTopoIndex(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -513,15 +513,15 @@ def CalculateArithmeticTopoIndex(mol):
     """
     #################################################################
     Arithmetic topological index by Narumi
-
+    
     ---->Arto
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateArithmeticTopoIndex(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a numeric value
     #################################################################
     """
@@ -569,15 +569,15 @@ def GetTopology(mol):
     """
     #################################################################
     Get the dictionary of constitutional descriptors for given
-
+    
     moelcule mol
-
-    Usage:
-
+    
+    Usage: 
+        
         result=CalculateWeiner(mol)
-
+        
         Input: mol is a molecule object
-
+        
         Output: result is a dict form containing all topological indices.
     #################################################################
     """

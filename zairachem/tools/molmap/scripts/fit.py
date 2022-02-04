@@ -7,30 +7,18 @@ sys.path.append(os.path.join(root, "../bidd-molmap/"))
 import pandas as pd
 import numpy as np
 
-import molmap
 from molmap.model import save_model
 from molmap.model import RegressionEstimator, MultiClassEstimator
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
+from utils import descriptors_molmap, fingerprints_molmap
+
 file_name = sys.argv[1]
 model_path = sys.argv[2]
 
-metric = 'cosine'
-method = 'umap'
-n_neighbors = 30
-min_dist = 0.1
-
-mp_name = os.path.join(root, '../data/descriptor.mp')
-mp1 = molmap.MolMap(ftype = 'descriptor', metric = metric, flist = [])
-mp1.fit(method = method, n_neighbors = n_neighbors, min_dist = min_dist)
-
-mp_name = os.path.join(root, '../data/fingerprint.mp')
-bitsinfo = molmap.feature.fingerprint.Extraction().bitsinfo
-flist = bitsinfo[bitsinfo.Subtypes.isin(['MACCSFP', 'PharmacoErGFP','PubChemFP'])].IDs.tolist()
-mp2 = molmap.MolMap(ftype = 'fingerprint', metric = metric, flist = flist)
-mp2.fit(method = method, n_neighbors = n_neighbors, min_dist = min_dist)
-
+mp1 = descriptors_molmap()
+mp2 = fingerprints_molmap()
 
 SMILES_COLUMN = "smiles"
 GPUID = 1

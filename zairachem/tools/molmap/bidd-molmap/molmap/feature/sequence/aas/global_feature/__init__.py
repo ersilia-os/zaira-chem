@@ -114,7 +114,7 @@ colormaps = {
 
 class Extraction:
     def __init__(self, feature_dict={}):
-        """
+        """        
         parameters
         -----------------------
         feature_dict: dict parameters for the corresponding fingerprint type, say: {'PAAC':{'lamda':10}}

@@ -31,14 +31,14 @@ def GetMOE(mol):
     """
     #################################################################
     The calculation of MOE-type descriptors (ALL).
-
+    
     Usage:
-
+        
         result=GetMOE(mol)
-
+        
         Input: mol is a molecule object
-
-        Output: result is a dict form
+        
+        Output: result is a dict form 
     #################################################################
     """
     r = _calc(mol)

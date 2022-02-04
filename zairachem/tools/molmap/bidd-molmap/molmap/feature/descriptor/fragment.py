@@ -18,11 +18,11 @@ def GetFragment(mol):
     """
     #################################################################
     Get the dictionary of Fragments descriptors for given moelcule mol
-
+    
     Usage:
-
+        
         result=GetFragments(mol)
-
+        
         Input: mol is a molecule object.
 
         Output: result is a dict form containing all constitutional values.

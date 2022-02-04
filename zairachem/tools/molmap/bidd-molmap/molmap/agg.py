@@ -56,7 +56,7 @@ class AggMolMap(Base):
         dfx: pandas DataFrame
         metric: {'cosine', 'correlation', 'euclidean', 'jaccard', 'hamming', 'dice'}, default: 'correlation', measurement of feature distance
         info_distance: a vector-form distance vector of the feature points, shape should be: (n*(n-1)/2), where n is the number of the features
-
+        
         """
 
         assert (

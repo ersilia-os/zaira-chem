@@ -272,7 +272,6 @@ class MolMap(Base):
                 df = self.MinMaxScaleClip(
                     df, self.scale_info["min"], self.scale_info["max"]
                 )
-
         df = df[self.flist]
         vector_1d = df.values[0]  # shape = (N, )
         fmap = self._S.transform(vector_1d)

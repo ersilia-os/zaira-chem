@@ -29,11 +29,11 @@ import math
 def _CalculateBondNumber(mol, bondtype="SINGLE"):
 
     """
-    #################################################################
+    ################################################################# 
     **Internal used only*
-
-    Calculation of bond counts in a molecule. it may be
-
+    
+    Calculation of bond counts in a molecule. it may be 
+    
     SINGLE, DOUBLE, TRIPLE and AROMATIC
     #################################################################
     """
@@ -50,15 +50,15 @@ def CalculateUnsaturationIndex(mol):
     """
     #################################################################
     Calculation of unsaturation index.
-
+    
     ---->UI
-
+    
     Usage:
-
+        
         result=CalculateUnsaturationIndex(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -73,20 +73,20 @@ def CalculateUnsaturationIndex(mol):
 def CalculateHydrophilicityFactor(mol):
     """
     #################################################################
-    Calculation of hydrophilicity factor. The hydrophilicity
-
-    index is described in more detail on page 225 of the
-
+    Calculation of hydrophilicity factor. The hydrophilicity 
+    
+    index is described in more detail on page 225 of the 
+    
     Handbook of Molecular Descriptors (Todeschini and Consonni 2000).
-
+    
     ---->Hy
-
+    
     Usage:
-
+        
         result=CalculateHydrophilicityFactor(mol)
-
+        
         Input: mol is a molecule object.
-
+        
         Output: result is a numeric value.
     #################################################################
     """
@@ -121,7 +121,7 @@ def CalculateHydrophilicityFactor(mol):
 
 def FilterItLogS(mol):
     '''
-    Fragement based solubity value: """Filter-it™ LogS descriptor.: based on a simple fragment-based method.
+    Fragement based solubity value: """Filter-it™ LogS descriptor.: based on a simple fragment-based method. 
     http://silicos-it.be.s3-website-eu-west-1.amazonaws.com/software/filter-it/1.0.2/filter-it.html#installation
     '''
     calc = Calculator(descriptors.LogS)
@@ -207,11 +207,11 @@ def GetProperty(mol):
     """
     #################################################################
     Get the dictionary of Properties descriptors for given moelcule mol
-
+    
     Usage:
-
+        
         result=GetProperties(mol)
-
+        
         Input: mol is a molecule object.
 
         Output: result is a dict form containing all constitutional values.

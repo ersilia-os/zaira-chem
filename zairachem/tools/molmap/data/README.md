@@ -1,0 +1,1 @@
+Descriptors downloaded from GitHub repo BIDD-MOLMAP (version July 2021)

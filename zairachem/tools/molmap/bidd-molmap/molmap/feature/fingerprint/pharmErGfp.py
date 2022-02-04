@@ -51,7 +51,7 @@ def GetPharmacoErGFPs(
     """
     https://pubs.acs.org/doi/full/10.1021/ci050457y#
     return maxPath*21 bits
-
+    
     size(v) = (n(n + 1)/2) * (maxDist - minDist + 1)
 
     """

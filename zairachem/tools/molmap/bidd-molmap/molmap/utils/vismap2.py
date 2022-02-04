@@ -13,7 +13,7 @@ def plot_scatter(mp, htmlpath="./", htmlname=None, radius=2, enabled_data_labels
     """
     mp: the object of mp
     htmlpath: the figure path, not include the prefix of 'html'
-    htmlname: the name
+    htmlname: the name 
     radius: int, defaut:3, the radius of scatter dot
     """
 

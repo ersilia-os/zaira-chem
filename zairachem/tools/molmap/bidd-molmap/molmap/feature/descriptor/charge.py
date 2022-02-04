@@ -24,7 +24,7 @@ def _CalculateElementMaxPCharge(mol, AtomicNum=6):
     """
     #################################################################
     **Internal used only**
-
+    
     Most positive charge on atom with atomic number equal to n
     #################################################################
     """
@@ -45,7 +45,7 @@ def _CalculateElementMaxNCharge(mol, AtomicNum=6):
     """
     #################################################################
     **Internal used only**
-
+    
     Most negative charge on atom with atomic number equal to n
     #################################################################
     """
@@ -65,15 +65,15 @@ def CalculateHMaxPCharge(mol):
     """
     #################################################################
     Most positive charge on H atoms
-
+    
     -->QHmax
-
+    
     Usage:
-
+    
         result=CalculateHMaxPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -84,15 +84,15 @@ def CalculateCMaxPCharge(mol):
     """
     #################################################################
     Most positive charge on C atoms
-
+    
     -->QCmax
 
     Usage:
-
+    
         result=CalculateCMaxPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -103,15 +103,15 @@ def CalculateNMaxPCharge(mol):
     """
     #################################################################
     Most positive charge on N atoms
-
+    
     -->QNmax
 
     Usage:
-
+    
         result=CalculateNMaxPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -122,15 +122,15 @@ def CalculateOMaxPCharge(mol):
     """
     #################################################################
     Most positive charge on O atoms
-
+    
     -->QOmax
 
     Usage:
-
+    
         result=CalculateOMaxPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -141,15 +141,15 @@ def CalculateHMaxNCharge(mol):
     """
     #################################################################
     Most negative charge on H atoms
-
+  
     -->QHmin
 
     Usage:
-
+    
         result=CalculateHMaxNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -160,15 +160,15 @@ def CalculateCMaxNCharge(mol):
     """
     #################################################################
     Most negative charge on C atoms
-
+    
     -->QCmin
 
     Usage:
-
+    
         result=CalculateCMaxNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -179,15 +179,15 @@ def CalculateNMaxNCharge(mol):
     """
     #################################################################
     Most negative charge on N atoms
-
+    
     -->QNmin
 
     Usage:
-
+    
         result=CalculateNMaxNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -198,15 +198,15 @@ def CalculateOMaxNCharge(mol):
     """
     #################################################################
     Most negative charge on O atoms
-
+    
     -->QOmin
 
     Usage:
-
+    
         result=CalculateOMaxNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -217,15 +217,15 @@ def CalculateAllMaxPCharge(mol):
     """
     #################################################################
     Most positive charge on ALL atoms
-
+    
     -->Qmax
 
     Usage:
-
+    
         result=CalculateAllMaxPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -244,15 +244,15 @@ def CalculateAllMaxNCharge(mol):
     """
     #################################################################
     Most negative charge on all atoms
-
+    
     -->Qmin
 
     Usage:
-
+    
         result=CalculateAllMaxNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -271,7 +271,7 @@ def _CalculateElementSumSquareCharge(mol, AtomicNum=6):
     """
     #################################################################
     **Internal used only**
-
+    
     Ths sum of square Charges on all atoms with atomicnumber equal to n
     #################################################################
     """
@@ -292,15 +292,15 @@ def CalculateHSumSquareCharge(mol):
     """
     #################################################################
     The sum of square charges on all H atoms
-
+    
     -->QHss
 
     Usage:
-
+    
         result=CalculateHSumSquareCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -311,15 +311,15 @@ def CalculateCSumSquareCharge(mol):
     """
     #################################################################
     The sum of square charges on all C atoms
-
+    
     -->QCss
 
     Usage:
-
+    
         result=CalculateCSumSquareCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -330,15 +330,15 @@ def CalculateNSumSquareCharge(mol):
     """
     #################################################################
     The sum of square charges on all N atoms
-
+    
     -->QNss
 
     Usage:
-
+    
         result=CalculateNSumSquareCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -349,15 +349,15 @@ def CalculateOSumSquareCharge(mol):
     """
     #################################################################
     The sum of square charges on all O atoms
-
+    
     -->QOss
 
     Usage:
-
+    
         result=CalculateOSumSquareCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -368,15 +368,15 @@ def CalculateAllSumSquareCharge(mol):
     """
     #################################################################
     The sum of square charges on all atoms
-
+    
     -->Qass
 
     Usage:
-
+    
         result=CalculateAllSumSquareCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -396,15 +396,15 @@ def CalculateTotalPCharge(mol):
     """
     #################################################################
     The total postive charge
-
+    
     -->Tpc
 
     Usage:
-
+    
         result=CalculateTotalPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -425,15 +425,15 @@ def CalculateMeanPCharge(mol):
     """
     #################################################################
     The average postive charge
-
+    
     -->Mpc
-
+    
     Usage:
-
+    
         result=CalculateMeanPCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -454,15 +454,15 @@ def CalculateTotalNCharge(mol):
     """
     #################################################################
     The total negative charge
-
+    
     -->Tnc
-
+    
     Usage:
-
+    
         result=CalculateTotalNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -483,15 +483,15 @@ def CalculateMeanNCharge(mol):
     """
     #################################################################
     The average negative charge
-
+    
     -->Mnc
-
+    
     Usage:
-
+    
         result=CalculateMeanNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -512,15 +512,15 @@ def CalculateTotalAbsoulteCharge(mol):
     """
     #################################################################
     The total absolute charge
-
+    
     -->Tac
-
+    
     Usage:
-
+    
         result=CalculateTotalAbsoulteCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -541,15 +541,15 @@ def CalculateMeanAbsoulteCharge(mol):
     """
     #################################################################
     The average absolute charge
-
+    
     -->Mac
-
+    
     Usage:
-
+    
         result=CalculateMeanAbsoulteCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -570,17 +570,17 @@ def CalculateRelativePCharge(mol):
     """
     #################################################################
     The partial charge of the most positive atom divided by
-
+    
     the total positive charge.
-
+    
     -->Rpc
-
+    
     Usage:
-
+    
         result=CalculateRelativePCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -605,17 +605,17 @@ def CalculateRelativeNCharge(mol):
     """
     #################################################################
     The partial charge of the most negative atom divided
-
+    
     by the total negative charge.
-
+    
     -->Rnc
-
+    
     Usage:
-
+    
         result=CalculateRelativeNCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -639,15 +639,15 @@ def CalculateLocalDipoleIndex(mol):
     """
     #################################################################
     Calculation of local dipole index (D)
-
+    
     -->LDI
-
+    
     Usage:
-
+    
         result=CalculateLocalDipoleIndex(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -671,15 +671,15 @@ def CalculateSubmolPolarityPara(mol):
     """
     #################################################################
     Calculation of submolecular polarity parameter(SPP)
-
+    
     -->SPP
-
+    
     Usage:
-
+    
         result=CalculateSubmolPolarityPara(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a numeric value.
     #################################################################
     """
@@ -727,13 +727,13 @@ def GetCharge(mol):
     """
     #################################################################
     Get the dictionary of constitutional descriptors for given moelcule mol
-
+    
     Usage:
-
+    
         result=GetCharge(mol)
-
+    
         Input: mol is a molecule object.
-
+    
         Output: result is a dict form containing all charge descriptors.
     #################################################################
     """

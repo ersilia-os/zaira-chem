@@ -46,8 +46,8 @@ class ConfusionPlot(BasePlot):
                 metrics.confusion_matrix(bt, bp), display_labels=class_names
             )
             disp.plot(ax=ax, cmap=plt.cm.Greens, colorbar=False)
-            #for labels in disp.text_.ravel():
-                #labels.set_fontsize(22)
+            # for labels in disp.text_.ravel():
+            # labels.set_fontsize(22)
             ax.grid(False)
             ax.set_title("Confusion matrix")
         else:
