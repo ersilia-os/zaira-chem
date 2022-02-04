@@ -7,8 +7,7 @@ sys.path.append(os.path.join(root, "../bidd-molmap/"))
 import pandas as pd
 import numpy as np
 
-from molmap import MolMap
-from molmap import feature
+import molmap
 from molmap.model import save_model
 from molmap.model import RegressionEstimator, MultiClassEstimator
 from tensorflow.keras.utils import to_categorical
@@ -17,16 +16,21 @@ from sklearn.model_selection import train_test_split
 file_name = sys.argv[1]
 model_path = sys.argv[2]
 
-mp1 = MolMap(ftype="descriptor", metric="cosine").load(
-    filename=os.path.join(root, "../data/descriptor.mp")
-)
+metric = 'cosine'
+method = 'umap'
+n_neighbors = 30
+min_dist = 0.1
 
-# TODO: I just copied this from their tutorial. I would like to add more fingerprints as well as remove the fmap_type="scatter" option.
-bitsinfo = feature.fingerprint.Extraction().bitsinfo
-flist = bitsinfo[bitsinfo.Subtypes.isin(["PubChemFP"])].IDs.tolist()
-mp2 = MolMap(ftype="fingerprint", fmap_type="scatter", flist=flist).load(
-    filename=os.path.join(root, "../data/fingerprint.mp")
-)
+mp_name = os.path.join(root, '../data/descriptor.mp')
+mp1 = molmap.MolMap(ftype = 'descriptor', metric = metric, flist = [])
+mp1.fit(method = method, n_neighbors = n_neighbors, min_dist = min_dist)
+
+mp_name = os.path.join(root, '../data/fingerprint.mp')
+bitsinfo = molmap.feature.fingerprint.Extraction().bitsinfo
+flist = bitsinfo[bitsinfo.Subtypes.isin(['MACCSFP', 'PharmacoErGFP','PubChemFP'])].IDs.tolist()
+mp2 = molmap.MolMap(ftype = 'fingerprint', metric = metric, flist = flist)
+mp2.fit(method = method, n_neighbors = n_neighbors, min_dist = min_dist)
+
 
 SMILES_COLUMN = "smiles"
 GPUID = 1
