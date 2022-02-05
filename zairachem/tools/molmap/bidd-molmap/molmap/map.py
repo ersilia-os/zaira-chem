@@ -287,6 +287,7 @@ class MolMap(Base):
         scale_method: {'minmax', 'standard'}
         n_jobs: number of parallel
         """
+        _ = self.transform("CC")
 
         P = Parallel(n_jobs=n_jobs)
         res = P(
@@ -294,7 +295,6 @@ class MolMap(Base):
             for smiles in tqdm(smiles_list, ascii=True)
         )
         X = np.stack(res)
-
         return X
 
     def rearrangement(self, orignal_X, target_mp):
