@@ -21,5 +21,5 @@ def fingerprints_molmap():
         bitsinfo.Subtypes.isin(["MACCSFP", "PharmacoErGFP", "PubChemFP"])
     ].IDs.tolist()
     return molmap.MolMap(ftype="fingerprint", metric=metric, flist=flist).load(
-        filename="../data/fingerprint.mp"
+        filename=os.path.join(root, "../data/fingerprint.mp")
     )
