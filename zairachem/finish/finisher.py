@@ -20,6 +20,8 @@ class Cleaner(ZairaBase):
     def _clean_descriptors_by_subfolder(self, path, subfolder):
         path = os.path.join(path, subfolder)
         for d in os.listdir(path):
+            if d.startswith("fp2sim"):
+                continue
             if os.path.isdir(os.path.join(path, d)):
                 self._clean_descriptors_by_subfolder(path, d)
             else:
