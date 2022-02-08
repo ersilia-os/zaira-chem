@@ -92,7 +92,7 @@ class IndividualEstimatorsAurocPlot(BasePlot):
                 labels += [yp]
             x = [i for i in range(len(labels))]
             y = aucs
-            ax.scatter(x, y, colors=Colors().red)
+            ax.scatter(x, y, color=Colors().red)
             ax.set_xticks(x)
             ax.set_xticklabels(labels, rotation=90)
             ax.set_ylabel("AUROC")
