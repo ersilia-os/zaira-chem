@@ -5,7 +5,6 @@ from ersilia import ErsiliaModel
 from tqdm import tqdm
 import h5py
 import os
-import shutil
 
 from zairachem.descriptors.treated import FullLineSimilarityImputer
 from zairachem.vars import DESCRIPTORS_SUBFOLDER
@@ -91,12 +90,11 @@ class Embedder(ZairaBase):
         if output_h5 is None:
             return X
         else:
-            bkp_h5 = "{0}.bkp".format(output_h5)
-            shutil.move(output_h5, bkp_h5)
-            with h5py.File(bkp_h5, "r") as f:
+            with h5py.File(output_h5, "r") as f:
                 keys = f["Keys"][:]
                 inputs = f["Inputs"][:]
                 features = f["Features"][:]
+            os.remove(output_h5)
             with h5py.File(output_h5, "w") as f:
                 f.create_dataset("Keys", data=keys)
                 f.create_dataset("Features", data=features)
