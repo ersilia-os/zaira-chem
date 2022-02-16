@@ -9,7 +9,7 @@ from .plots import (
     HistogramPlotTransf,
     Transformation,
     IndividualEstimatorsAurocPlot,
-    InidvidualEstimatorsR2Plot,
+    IndividualEstimatorsR2Plot,
 )
 
 from .. import ZairaBase
