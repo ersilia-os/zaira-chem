@@ -8,8 +8,10 @@ from ... import ZairaBase
 from ...vars import ESTIMATORS_SUBFOLDER, POOL_SUBFOLDER
 
 
-zb = ZairaBase()
-model_dir = zb.get_trained_dir()
+def get_model_dir():
+    zb = ZairaBase()
+    model_dir = zb.get_trained_dir()
+    return model_dir
 
 
 class MultilabelPredictor(object):
@@ -199,7 +201,7 @@ class MultilabelPredictor(object):
                     base_old_dir = bod
                 else:
                     continue
-        new_path = old_path.replace(base_old_dir, model_dir + "/")
+        new_path = old_path.replace(base_old_dir, get_model_dir() + "/")
         return new_path
 
     def get_predictor(self, label):
