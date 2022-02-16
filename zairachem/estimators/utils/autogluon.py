@@ -127,6 +127,7 @@ class AutoGluonUtil(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.logger.debug("AutoGluon util using path {0}".format(self.path))
         path_ = os.path.join(
             self.path, ESTIMATORS_SUBFOLDER, estimators_family_subfolder
         )
