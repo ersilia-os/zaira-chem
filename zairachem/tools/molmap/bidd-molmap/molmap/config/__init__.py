@@ -34,9 +34,11 @@ def load_config(ftype="descriptor", metric="cosine"):
 
     dirf = os.path.dirname(__file__)
     filename = os.path.join(dirf, name)
+    print("Loading config {0}".format(filename))
 
     if os.path.exists(filename):
         df = pd.read_pickle(filename, compression="gzip")
+
     else:
 
         name = "%s_%s.cfg.gzip" % (ftype, metric)
