@@ -54,7 +54,7 @@ class Reporter(ZairaBase):
         IndividualEstimatorsAurocPlot(ax=None, path=self.path).save()
 
     def _individual_estimators_r2_plot(self):
-        InidvidualEstimatorsR2Plot(ax=None, path=self.path).save()
+        IndividualEstimatorsR2Plot(ax=None, path=self.path).save()
 
     def run(self):
         self._actives_inactives_plot()

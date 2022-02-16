@@ -21,7 +21,8 @@ class ActivesInactivesPlot(BasePlot):
             self.name = "actives-inactives"
             ax = self.ax
 
-            y = ResultsFetcher(path=path).get_actives_inactives()
+            rf = ResultsFetcher(path=path)
+            y = rf.get_actives_inactives()
             actives = int(np.sum(y))
             inactives = len(y) - actives
             ax.bar(
@@ -29,8 +30,10 @@ class ActivesInactivesPlot(BasePlot):
                 height=[actives, inactives],
                 color=[named_colors.red, named_colors.blue],
             )
+            direction = rf.get_direction()
+            cut = rf.get_used_cut()
             ax.set_ylabel("Number of compounds")
-            ax.set_xlabel("Direction: {0}, Threshold: {1}".format())
+            ax.set_xlabel("Direction: {0}, Threshold: {1}".format(direction, round(cut, 3)))
             ax.set_title("Ratio actives:inactives")
         else:
             self.is_available = False
@@ -183,7 +186,7 @@ class RegressionPlotTransf(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_transformed()
             yp = ResultsFetcher(path=path).get_pred_reg_trans()
-            ax.scatter(yt, yp, c=named_colors.purple, s=15, alpha=0.7)
+            ax.scatter(yt, yp, color=named_colors.purple, s=15, alpha=0.7)
             ax.set_xlabel("Observed Activity (Transformed)")
             ax.set_ylabel("Predicted Activity (Transformed)")
             ax.set_title(
@@ -220,9 +223,9 @@ class RegressionPlotRaw(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_raw()
             yp = ResultsFetcher(path=path).get_pred_reg_raw()
-            ax.scatter(yt, yp, c=named_colors.green, s=15, alpha=0.7)
-            ax.set_xlabel("Observed Activity (Transformed)")
-            ax.set_ylabel("Predicted Activity (Transformed)")
+            ax.scatter(yt, yp, color=named_colors.green, s=15, alpha=0.7)
+            ax.set_xlabel("Observed Activity")
+            ax.set_ylabel("Predicted Activity")
             ax.set_title(
                 "R2 = {0} | MAE = {1}".format(
                     round(r2_score(yt, yp), 3), round(mean_absolute_error(yt, yp), 3)
@@ -257,8 +260,9 @@ class Transformation(BasePlot):
             ax = self.ax
             yt = ResultsFetcher(path=path).get_raw()
             ytrans = ResultsFetcher(path=path).get_transformed()
-            ax.scatter(yt, ytrans, c=named_colors.green, s=15, alpha=0.7)
+            ax.scatter(yt, ytrans, color=named_colors.green, s=15, alpha=0.7)
             ax.set_xlabel("Observed Activity (Raw)")
             ax.set_ylabel("Observed Activity (Transformed)")
+            ax.set_title("Continuous data transformation")
         else:
             self.is_available = False

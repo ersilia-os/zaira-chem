@@ -40,6 +40,9 @@ ersilia --help
 # install isaura
 python3 -m pip install git+https://github.com/ersilia-os/isaura.git
 
+# install stylia
+python3 -m pip install git+https://github.com/ersilia-os/stylia.git
+
 # install zairachem
 python -m pip install -e .
 
