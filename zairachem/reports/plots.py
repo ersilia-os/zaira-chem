@@ -49,15 +49,18 @@ class ConfusionPlot(BasePlot):
 
             bt = ResultsFetcher(path=path).get_actives_inactives()
             bp = ResultsFetcher(path=path).get_pred_binary_clf()
-            class_names = ["I (0)", "A (1)"]
-            disp = metrics.ConfusionMatrixDisplay(
-                metrics.confusion_matrix(bt, bp), display_labels=class_names
-            )
-            disp.plot(ax=ax, cmap=plt.cm.Greens, colorbar=False)
-            # for labels in disp.text_.ravel():
-            # labels.set_fontsize(22)
-            ax.grid(False)
-            ax.set_title("Confusion matrix")
+            if len(set(bp)) > 1:
+                class_names = ["I (0)", "A (1)"]
+                disp = metrics.ConfusionMatrixDisplay(
+                    metrics.confusion_matrix(bt, bp), display_labels=class_names
+                )
+                disp.plot(ax=ax, cmap=plt.cm.Greens, colorbar=False)
+                # for labels in disp.text_.ravel():
+                # labels.set_fontsize(22)
+                ax.grid(False)
+                ax.set_title("Confusion matrix")
+            else:
+                self.is_available = False
         else:
             self.is_available = False
 
