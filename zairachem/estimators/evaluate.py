@@ -86,9 +86,12 @@ class SimpleEvaluator(ZairaBase):
                 if "reg_" in c or "clf_" in c:
                     if c in avail_columns:
                         if "clf_" in c:
-                            data[c] = {
-                                "roc_auc_score": roc_auc_score(df_true[c], df_pred[c])
-                            }
+                            if len(set(df_true[c])) > 1:
+                                data[c] = {
+                                    "roc_auc_score": roc_auc_score(df_true[c], df_pred[c])
+                                }
+                            else:
+                                data[c] = 0.0
                         else:
                             data[c] = {"r2_score": r2_score(df_true[c], df_pred[c])}
             if valid_idxs is not None:
