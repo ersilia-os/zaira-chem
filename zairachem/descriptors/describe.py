@@ -5,6 +5,8 @@ from .manifolds import Manifolds
 
 from .. import ZairaBase
 
+from ..utils.pipeline import PipelineStep
+
 
 class Describer(ZairaBase):
     def __init__(self, path):
@@ -16,16 +18,28 @@ class Describer(ZairaBase):
         self.logger.debug(self.path)
 
     def _raw_descriptions(self):
-        RawDescriptors().run()
+        step = PipelineStep("raw_descriptions")
+        if not step.is_done():
+            RawDescriptors().run()
+            step.update()
 
     def _treated_descriptions(self):
-        TreatedDescriptors().run()
+        step = PipelineStep("treated_descriptions")
+        if not step.is_done():
+            TreatedDescriptors().run()
+            step.update()
 
     def _reference_descriptors(self):
-        ReferenceDescriptors().run()
+        step = PipelineStep("reference_descriptors")
+        if not step.is_done():
+            ReferenceDescriptors().run()
+            step.update()
 
     def _manifolds(self):
-        Manifolds().run()
+        step = PipelineStep("manifolds")
+        if not step.is_done():
+            Manifolds().run()
+            step.update()
 
     def run(self):
         self.reset_time()
