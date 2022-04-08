@@ -6,6 +6,7 @@ def create_cli():
 
     cmd = Command()
 
+    cmd.session()
     cmd.setup()
     cmd.describe()
     cmd.estimate()

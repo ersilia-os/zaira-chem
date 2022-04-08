@@ -147,21 +147,25 @@ class ResultsFetcher(ZairaBase):
         return umap0, umap1
 
     def get_parameters(self):
-        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
+        with open(
+            os.path.join(self.trained_path, DATA_SUBFOLDER, PARAMETERS_FILE), "r"
+        ) as f:
             return json.load(f)
 
     def get_direction(self):
         return self.get_parameters()["direction"]
 
     def get_used_cuts(self):
-        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, USED_CUTS_FILE), "r") as f:
+        with open(
+            os.path.join(self.trained_path, DATA_SUBFOLDER, USED_CUTS_FILE), "r"
+        ) as f:
             return json.load(f)
 
     def get_used_cut(self):
         used_cuts = self.get_used_cuts()
-        for k,v in used_cuts["ecuts"].items():
+        for k, v in used_cuts["ecuts"].items():
             if "_skip" not in k:
                 return v
-        for k,v in used_cuts["pcuts"].items():
+        for k, v in used_cuts["pcuts"].items():
             if "_skip" not in k:
                 return v

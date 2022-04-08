@@ -1,10 +1,7 @@
 import os
 import shutil
-import json
 
-from time import time
-
-from .. import ZairaBase
+from .. import ZairaBase, open_session
 
 from .files import SingleFileForPrediction, ParametersFile
 from .tasks import SingleTasksForPrediction
@@ -13,9 +10,6 @@ from .merge import DataMergerForPrediction
 from .clean import SetupCleaner
 
 from . import PARAMETERS_FILE
-
-from ..vars import BASE_DIR
-from ..vars import SESSION_FILE
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
@@ -42,15 +36,7 @@ class PredictSetup(object):
         assert os.path.exists(self.model_dir)
 
     def _open_session(self):
-        data = {
-            "output_dir": self.output_dir,
-            "model_dir": self.model_dir,
-            "time_stamp": int(time()),
-            "elapsed_time": 0,
-            "mode": "predict",
-        }
-        with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
-            json.dump(data, f, indent=4)
+        open_session(self.output_dir, self.model_dir, "predict")
 
     def _make_output_dir(self):
         if os.path.exists(self.output_dir):

@@ -27,6 +27,21 @@ from .vars import SESSION_FILE
 from .vars import ENSEMBLE_MODE
 
 
+def open_session(output_dir, model_dir, mode):
+    output_dir = os.path.abspath(output_dir)
+    if model_dir is not None:
+        model_dir = os.path.abspath(model_dir)
+    data = {
+        "output_dir": output_dir,
+        "model_dir": model_dir,
+        "time_stamp": int(time()),
+        "elapsed_time": 0,
+        "mode": mode,
+    }
+    with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
+        json.dump(data, f, indent=4)
+
+
 class ZairaBase(object):
     def __init__(self):
         self.logger = logger

@@ -88,7 +88,9 @@ class SimpleEvaluator(ZairaBase):
                         if "clf_" in c:
                             if len(set(df_true[c])) > 1:
                                 data[c] = {
-                                    "roc_auc_score": roc_auc_score(df_true[c], df_pred[c])
+                                    "roc_auc_score": roc_auc_score(
+                                        df_true[c], df_pred[c]
+                                    )
                                 }
                             else:
                                 data[c] = 0.0

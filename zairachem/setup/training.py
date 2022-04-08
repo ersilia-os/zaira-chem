@@ -2,9 +2,7 @@ import os
 import json
 import shutil
 
-from time import time
-
-from .. import ZairaBase
+from .. import ZairaBase, open_session
 
 from .files import ParametersFile
 from .files import SingleFile
@@ -15,9 +13,6 @@ from .merge import DataMerger
 from .clean import SetupCleaner
 
 from . import PARAMETERS_FILE
-
-from ..vars import BASE_DIR
-from ..vars import SESSION_FILE
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
@@ -61,15 +56,7 @@ class TrainSetup(object):
         os.makedirs(self.output_dir)
 
     def _open_session(self):
-        data = {
-            "output_dir": self.output_dir,
-            "model_dir": self.output_dir,
-            "time_stamp": int(time()),
-            "elapsed_time": 0,
-            "mode": "fit",
-        }
-        with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
-            json.dump(data, f, indent=4)
+        open_session(self.output_dir, self.output_dir, "fit")
 
     def _make_subfolder(self, name):
         os.makedirs(os.path.join(self.output_dir, name))
