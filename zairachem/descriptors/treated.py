@@ -131,7 +131,6 @@ class FullLineSimilarityImputer(object):
             smi = smiles_list[idx]
             hits = similarity_searcher.search(smi, cutoff=self._sim_cutoff)
             hits = np.array([x[0] for x in hits][: self._n_hits])
-            print(hits)
             if len(hits) == 0:
                 hits = np.random.choice(
                     [i for i in range(R.shape[0])],
@@ -152,7 +151,9 @@ class FullLineSimilarityImputer(object):
         joblib.dump(self, file_name)
 
     def load(self, file_name):
-        return joblib.load(file_name)
+        imp = joblib.load(file_name)
+        imp._set_filenames(os.path.dirname(file_name))
+        return imp
 
 
 class Imputer(object):
