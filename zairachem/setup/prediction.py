@@ -20,6 +20,8 @@ from ..vars import REPORT_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerPredictPipeline
 
+from ..utils.pipeline import PipelineStep
+
 
 class PredictSetup(object):
     def __init__(self, input_file, output_dir, model_dir, time_budget):
@@ -59,39 +61,63 @@ class PredictSetup(object):
         )
 
     def _normalize_input(self):
-        params = ParametersFile(
-            full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
-        ).load()
-        f = SingleFileForPrediction(self.input_file, params)
-        f.process()
-        self.has_tasks = f.has_tasks
+        step = PipelineStep("normalize_input")
+        if not step.is_done():
+            params = ParametersFile(
+                full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
+            ).load()
+            f = SingleFileForPrediction(self.input_file, params)
+            f.process()
+            self.has_tasks = f.has_tasks
+            step.update()
 
     def _melloddy_tuner_run(self):
-        MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
-            has_tasks=self.has_tasks
-        )
+        step = PipelineStep("melloddy_tuner")
+        if not step.is_done():
+            MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
+                has_tasks=self.has_tasks
+            )
+            step.update()
 
     def _standardize(self):
-        Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("standardize")
+        if not step.is_done():
+            Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _tasks(self):
-        SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("tasks")
+        if not step.is_done():
+            SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _merge(self):
-        DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
-            self.has_tasks
-        )
+        step = PipelineStep("merge")
+        if not step.is_done():
+            DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
+                self.has_tasks
+            )
+            step.update()
 
     def _clean(self):
-        SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("clean")
+        if not step.is_done():
+            SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
+
+    def _initialize(self):
+        step = PipelineStep("initialize")
+        if not step.is_done():
+            self._make_output_dir()
+            self._open_session()
+            self._make_subfolders()
+            step.update()
 
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
 
     def setup(self):
-        self._make_output_dir()
-        self._open_session()
-        self._make_subfolders()
+        self._initialize()
         self._normalize_input()
         self._melloddy_tuner_run()
         self._standardize()

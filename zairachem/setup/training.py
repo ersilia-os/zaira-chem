@@ -24,6 +24,8 @@ from ..vars import REPORT_SUBFOLDER
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 from ..augmentation.augment import Augmenter
 
+from ..utils.pipeline import PipelineStep
+
 
 class TrainSetup(object):
     def __init__(
@@ -70,38 +72,68 @@ class TrainSetup(object):
         self._make_subfolder(REPORT_SUBFOLDER)
 
     def _normalize_input(self):
-        f = SingleFile(self.input_file, self.params)
-        f.process()
+        step = PipelineStep("normalize_input")
+        if not step.is_done():
+            f = SingleFile(self.input_file, self.params)
+            f.process()
+            step.update()
 
     def _melloddy_tuner_run(self):
-        MelloddyTunerTrainPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("mellody_tuner")
+        if not step.is_done():
+            MelloddyTunerTrainPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _standardize(self):
-        Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("standardize")
+        if not step.is_done():
+            Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _folds(self):
-        Folds(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("folds")
+        if not step.is_done():
+            Folds(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _tasks(self):
-        SingleTasks(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("tasks")
+        if not step.is_done():
+            SingleTasks(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _merge(self):
-        DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("merge")
+        if not step.is_done():
+            DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
 
     def _augment(self):
-        Augmenter(self.output_dir).run()
+        step = PipelineStep("augment")
+        if not step.is_done():
+            Augmenter(self.output_dir).run()
+            step.update()
 
     def _clean(self):
-        SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+        step = PipelineStep("clean")
+        if not step.is_done():
+            SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
+       
+    def _initialize(self):
+        step = PipelineStep("initialize")
+        if not step.is_done():
+            self._make_output_dir()
+            self._open_session()
+            self._make_subfolders()
+            self._save_params()
+            step.update()
 
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
 
     def setup(self):
-        self._make_output_dir()
-        self._open_session()
-        self._make_subfolders()
-        self._save_params()
+        self._initialize()
         self._normalize_input()
         self._melloddy_tuner_run()
         self._standardize()
