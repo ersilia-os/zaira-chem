@@ -7,6 +7,7 @@ from .commands.pool import pool_cmd
 from .commands.finish import finish_cmd
 from .commands.fit import fit_cmd
 from .commands.predict import predict_cmd
+from .commands.example import example_cmd
 
 
 class Command(object):
@@ -39,3 +40,6 @@ class Command(object):
 
     def predict(self):
         predict_cmd()
+
+    def example(self):
+        example_cmd()
