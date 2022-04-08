@@ -20,9 +20,6 @@ def example_cmd():
             data = make_regression(n_samples=n_samples)
         else:
             data = make_classification(n_samples=n_samples, p=proportion)
-        data = {
-            "smiles": data[0],
-            "activity": data[1]
-        }
+        data = {"smiles": data[0], "activity": data[1]}
         data = pd.DataFrame(data)
         data.to_csv(file_name, index=False)
