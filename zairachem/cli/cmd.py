@@ -1,3 +1,4 @@
+from .commands.session import session_cmd
 from .commands.setup import setup_cmd
 from .commands.describe import describe_cmd
 from .commands.estimate import estimate_cmd
@@ -11,6 +12,9 @@ from .commands.predict import predict_cmd
 class Command(object):
     def __init__(self):
         pass
+
+    def session(self):
+        session_cmd()
 
     def setup(self):
         setup_cmd()

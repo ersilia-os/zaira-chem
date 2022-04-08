@@ -36,15 +36,29 @@ class Pca(object):
 
 
 class Umap(object):
-    def __init__(self):
+    def __init__(self, max_components=500):
         self._name = "umap"
+        self._max_components = max_components
+
+    def _get_pca(self, X):
+        pca = PCA(n_components=0.9, whiten=True)
+        pca.fit(X)
+        Xt = pca.transform(X)
+        n_components = int(np.min([Xt.shape[1], self._max_components]))
+        pca = PCA(n_components=n_components, whiten=True)
+        return pca
 
     def fit(self, X, y=None):
+        self.pca = self._get_pca(X)
+        self.pca.fit(X)
+        Xt = self.pca.transform(X)
         self.reducer = UMAP(densmap=False)
-        self.reducer.fit(X)
+        self.reducer.fit(Xt)
 
     def transform(self, X):
-        return self.reducer.transform(X)
+        Xt = self.pca.transform(X)
+        Xt = self.reducer.transform(Xt)
+        return Xt
 
     def save(self, file_name):
         joblib.dump(self, file_name)

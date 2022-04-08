@@ -33,7 +33,9 @@ class ActivesInactivesPlot(BasePlot):
             direction = rf.get_direction()
             cut = rf.get_used_cut()
             ax.set_ylabel("Number of compounds")
-            ax.set_xlabel("Direction: {0}, Threshold: {1}".format(direction, round(cut, 3)))
+            ax.set_xlabel(
+                "Direction: {0}, Threshold: {1}".format(direction, round(cut, 3))
+            )
             ax.set_title("Ratio actives:inactives")
         else:
             self.is_available = False
@@ -76,7 +78,7 @@ class RocCurvePlot(BasePlot):
             yp = ResultsFetcher(path=path).get_pred_proba_clf()
             fpr, tpr, _ = roc_curve(bt, yp)
             ax.plot(fpr, tpr, color=named_colors.purple)
-            ax.plot([0,1], [0,1], color=named_colors.gray)
+            ax.plot([0, 1], [0, 1], color=named_colors.gray)
             ax.set_title("ROC AUC {0}".format(round(auc(fpr, tpr), 3)))
             ax.set_title("AUROC = {0}".format(round(auc(fpr, tpr), 2)))
             ax.set_xlabel("1-Specificity (FPR)")
@@ -156,14 +158,16 @@ class ProjectionPlot(BasePlot):
         umap0, umap1 = ResultsFetcher(path=path).get_projections()
         if self.is_predict():
             umap0_tr, umap1_tr = ResultsFetcher(path=path).get_projections_trained()
-            ax.scatter(umap0_tr, umap1_tr, color=named_colors.gray, s=5, label="Training")
+            ax.scatter(
+                umap0_tr, umap1_tr, color=named_colors.gray, s=5, label="Training"
+            )
         ax.scatter(
             [umap0[i] for i in bp_i],
             [umap1[i] for i in bp_i],
             color=named_colors.blue,
             alpha=0.7,
             s=15,
-            label="Inactives"
+            label="Inactives",
         )
         ax.scatter(
             [umap0[i] for i in bp_a],
@@ -171,7 +175,7 @@ class ProjectionPlot(BasePlot):
             color=named_colors.red,
             alpha=0.7,
             s=15,
-            label="Actives"
+            label="Actives",
         )
         self.is_available = True
         ax.set_title("UMAP 2D Projection")
