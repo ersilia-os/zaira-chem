@@ -30,6 +30,8 @@ from .vars import ENSEMBLE_MODE
 def create_session_symlink(output_dir):
     output_session = os.path.join(os.path.abspath(output_dir), SESSION_FILE)
     system_session = os.path.join(BASE_DIR, SESSION_FILE)
+    if os.path.islink(system_session):
+        os.unlink(system_session)
     os.symlink(output_session, system_session)
 
 
