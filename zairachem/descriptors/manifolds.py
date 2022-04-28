@@ -6,6 +6,10 @@ from sklearn.decomposition import PCA
 from umap import UMAP
 from lol import LOL
 
+import dill
+from dill import extend
+extend(use_dill=False)
+
 from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER
 
 from . import DescriptorBase
