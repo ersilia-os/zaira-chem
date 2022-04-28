@@ -1,4 +1,5 @@
 import click
+import sys
 
 from . import zairachem_cli
 from ..echo import echo

@@ -1,3 +1,5 @@
+import os
+
 from .raw import RawDescriptors
 from .treated import TreatedDescriptors
 from .reference import ReferenceDescriptors
@@ -15,28 +17,30 @@ class Describer(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        assert os.path.exists(self.output_dir)
         self.logger.debug(self.path)
 
     def _raw_descriptions(self):
-        step = PipelineStep("raw_descriptions")
+        step = PipelineStep("raw_descriptions", self.output_dir)
         if not step.is_done():
             RawDescriptors().run()
             step.update()
 
     def _treated_descriptions(self):
-        step = PipelineStep("treated_descriptions")
+        step = PipelineStep("treated_descriptions", self.output_dir)
         if not step.is_done():
             TreatedDescriptors().run()
             step.update()
 
     def _reference_descriptors(self):
-        step = PipelineStep("reference_descriptors")
+        step = PipelineStep("reference_descriptors", self.output_dir)
         if not step.is_done():
             ReferenceDescriptors().run()
             step.update()
 
     def _manifolds(self):
-        step = PipelineStep("manifolds")
+        step = PipelineStep("manifolds", self.output_dir)
         if not step.is_done():
             Manifolds().run()
             step.update()

@@ -1,9 +1,11 @@
 import click
+from zairachem import create_session_symlink
 
 from . import zairachem_cli
 from ..echo import echo
 
-from ... import open_session
+from ...utils.pipeline import SessionFile
+from ... import create_session_symlink
 
 
 def session_cmd():
@@ -18,4 +20,6 @@ def session_cmd():
             model_dir = output_dir
         else:
             mode = "predict"
-        open_session(output_dir, model_dir, mode)
+        sf = SessionFile(output_dir)
+        sf.open_session(mode, output_dir, model_dir)
+        create_session_symlink(output_dir)

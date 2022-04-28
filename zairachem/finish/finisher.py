@@ -1,5 +1,3 @@
-import shutil
-
 import os
 import shutil
 
@@ -16,6 +14,8 @@ class Cleaner(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        assert os.path.exists(self.output_dir)
 
     def _clean_descriptors_by_subfolder(self, path, subfolder):
         path = os.path.join(path, subfolder)

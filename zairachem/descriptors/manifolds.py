@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 from umap import UMAP
 from lol import LOL
 
-import dill
+# Bugfix to deal with large data in UMAP #TODO check
 from dill import extend
 extend(use_dill=False)
 

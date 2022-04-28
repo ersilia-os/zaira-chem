@@ -1,3 +1,5 @@
+import os
+
 from .plots import (
     ActivesInactivesPlot,
     ConfusionPlot,
@@ -22,6 +24,8 @@ class Reporter(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        assert os.path.exists(self.output_dir)
 
     def _actives_inactives_plot(self):
         ActivesInactivesPlot(ax=None, path=self.path).save()

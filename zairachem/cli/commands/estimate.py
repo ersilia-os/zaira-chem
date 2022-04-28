@@ -1,5 +1,7 @@
 import click
 
+from ... import create_session_symlink
+
 from . import zairachem_cli
 from ..echo import echo
 from ...estimators.pipe import EstimatorPipeline
@@ -16,6 +18,7 @@ def estimate_cmd():
         help="Time budget in seconds for each of the two models.",
     )
     def estimate(dir, time_budget):
+        create_session_symlink(dir)
         echo("Estimator".format(dir))
         e = EstimatorPipeline(path=dir)
         e.run(time_budget_sec=time_budget)
