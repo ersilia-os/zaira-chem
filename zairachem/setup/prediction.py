@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from .. import ZairaBase, open_session
+from .. import ZairaBase, create_session_symlink
 
 from .files import SingleFileForPrediction, ParametersFile
 from .tasks import SingleTasksForPrediction
@@ -20,7 +20,7 @@ from ..vars import REPORT_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerPredictPipeline
 
-from ..utils.pipeline import PipelineStep
+from ..utils.pipeline import PipelineStep, SessionFile
 
 
 class PredictSetup(object):
@@ -38,7 +38,9 @@ class PredictSetup(object):
         assert os.path.exists(self.model_dir)
 
     def _open_session(self):
-        open_session(self.output_dir, self.model_dir, "predict")
+        sf = SessionFile(self.output_dir)
+        sf.open_session(mode="predict", output_dir=self.output_dir, model_dir=self.model_dir)
+        create_session_symlink(self.output_dir)
 
     def _make_output_dir(self):
         if os.path.exists(self.output_dir):
@@ -61,7 +63,7 @@ class PredictSetup(object):
         )
 
     def _normalize_input(self):
-        step = PipelineStep("normalize_input")
+        step = PipelineStep("normalize_input", self.output_dir)
         if not step.is_done():
             params = ParametersFile(
                 full_path=os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
@@ -72,7 +74,7 @@ class PredictSetup(object):
             step.update()
 
     def _melloddy_tuner_run(self):
-        step = PipelineStep("melloddy_tuner")
+        step = PipelineStep("melloddy_tuner", self.output_dir)
         if not step.is_done():
             MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
                 has_tasks=self.has_tasks
@@ -80,19 +82,19 @@ class PredictSetup(object):
             step.update()
 
     def _standardize(self):
-        step = PipelineStep("standardize")
+        step = PipelineStep("standardize", self.output_dir)
         if not step.is_done():
             Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _tasks(self):
-        step = PipelineStep("tasks")
+        step = PipelineStep("tasks", self.output_dir)
         if not step.is_done():
             SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _merge(self):
-        step = PipelineStep("merge")
+        step = PipelineStep("merge", self.output_dir)
         if not step.is_done():
             DataMergerForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
                 self.has_tasks
@@ -100,13 +102,13 @@ class PredictSetup(object):
             step.update()
 
     def _clean(self):
-        step = PipelineStep("clean")
+        step = PipelineStep("clean", self.output_dir)
         if not step.is_done():
             SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _initialize(self):
-        step = PipelineStep("initialize")
+        step = PipelineStep("initialize", self.output_dir)
         if not step.is_done():
             self._make_output_dir()
             self._open_session()

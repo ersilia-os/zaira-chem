@@ -64,6 +64,8 @@ class Pooler(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        assert os.path.exists(self.output_dir)
         if not self.is_predict():
             self.logger.debug("Starting pooled fitter")
             self.estimator = Fitter(path=self.path)

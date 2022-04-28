@@ -2,7 +2,7 @@ import os
 import json
 import shutil
 
-from .. import ZairaBase, open_session
+from .. import ZairaBase, create_session_symlink
 
 from .files import ParametersFile
 from .files import SingleFile
@@ -24,7 +24,7 @@ from ..vars import REPORT_SUBFOLDER
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 from ..augmentation.augment import Augmenter
 
-from ..utils.pipeline import PipelineStep
+from ..utils.pipeline import PipelineStep, SessionFile
 
 
 class TrainSetup(object):
@@ -58,7 +58,9 @@ class TrainSetup(object):
         os.makedirs(self.output_dir)
 
     def _open_session(self):
-        open_session(self.output_dir, self.output_dir, "fit")
+        sf = SessionFile(self.output_dir)
+        sf.open_session(mode="fit", output_dir=self.output_dir, model_dir=self.output_dir)
+        create_session_symlink(self.output_dir)
 
     def _make_subfolder(self, name):
         os.makedirs(os.path.join(self.output_dir, name))
@@ -72,56 +74,56 @@ class TrainSetup(object):
         self._make_subfolder(REPORT_SUBFOLDER)
 
     def _normalize_input(self):
-        step = PipelineStep("normalize_input")
+        step = PipelineStep("normalize_input", self.output_dir)
         if not step.is_done():
             f = SingleFile(self.input_file, self.params)
             f.process()
             step.update()
 
     def _melloddy_tuner_run(self):
-        step = PipelineStep("mellody_tuner")
+        step = PipelineStep("mellody_tuner", self.output_dir)
         if not step.is_done():
             MelloddyTunerTrainPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _standardize(self):
-        step = PipelineStep("standardize")
+        step = PipelineStep("standardize", self.output_dir)
         if not step.is_done():
             Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _folds(self):
-        step = PipelineStep("folds")
+        step = PipelineStep("folds", self.output_dir)
         if not step.is_done():
             Folds(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _tasks(self):
-        step = PipelineStep("tasks")
+        step = PipelineStep("tasks", self.output_dir)
         if not step.is_done():
             SingleTasks(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _merge(self):
-        step = PipelineStep("merge")
+        step = PipelineStep("merge", self.output_dir)
         if not step.is_done():
             DataMerger(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
     def _augment(self):
-        step = PipelineStep("augment")
+        step = PipelineStep("augment", self.output_dir)
         if not step.is_done():
             Augmenter(self.output_dir).run()
             step.update()
 
     def _clean(self):
-        step = PipelineStep("clean")
+        step = PipelineStep("clean", self.output_dir)
         if not step.is_done():
             SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
        
     def _initialize(self):
-        step = PipelineStep("initialize")
+        step = PipelineStep("initialize", self.output_dir)
         if not step.is_done():
             self._make_output_dir()
             self._open_session()

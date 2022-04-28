@@ -1,3 +1,5 @@
+import os
+
 from .. import ZairaBase
 from ..utils.pipeline import PipelineStep
 from .from_individual_full_descriptors.pipe import IndividualFullDescriptorPipeline
@@ -14,9 +16,11 @@ class EstimatorPipeline(ZairaBase):
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        assert os.path.exists(self.output_dir)
 
     def _individual_estimator_pipeline(self, time_budget_sec):
-        step = PipelineStep("individual_estimator_pipeline")
+        step = PipelineStep("individual_estimator_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running individual estimator pipeline")
             p = IndividualFullDescriptorPipeline(path=self.path)
@@ -24,7 +28,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _manifolds_pipeline(self, time_budget_sec):
-        step = PipelineStep("manifolds_pipeline")
+        step = PipelineStep("manifolds_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running manifolds estimator pipeline")
             p = ManifoldPipeline(path=self.path)
@@ -32,7 +36,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _reference_pipeline(self, time_budget_sec):
-        step = PipelineStep("reference_pipeline")
+        step = PipelineStep("reference_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Reference embedding pipeline")
             p = ReferenceEmbeddingPipeline(path=self.path)
@@ -40,7 +44,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _molmap_pipeline(self, time_budget_sec):
-        step = PipelineStep("molmap_pipeline")
+        step = PipelineStep("molmap_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Molmap estimator pipeline")
             p = MolMapPipeline(path=self.path)
@@ -48,7 +52,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _simple_evaluation(self):
-        step = PipelineStep("simple_evaluation")
+        step = PipelineStep("simple_evaluation", self.output_dir)
         if not step.is_done():
             SimpleEvaluator(path=self.path).run()
             step.update()

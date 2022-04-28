@@ -27,19 +27,10 @@ from .vars import SESSION_FILE
 from .vars import ENSEMBLE_MODE
 
 
-def open_session(output_dir, model_dir, mode):
-    output_dir = os.path.abspath(output_dir)
-    if model_dir is not None:
-        model_dir = os.path.abspath(model_dir)
-    data = {
-        "output_dir": output_dir,
-        "model_dir": model_dir,
-        "time_stamp": int(time()),
-        "elapsed_time": 0,
-        "mode": mode,
-    }
-    with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
-        json.dump(data, f, indent=4)
+def create_session_symlink(output_dir):
+    output_session = os.path.join(os.path.abspath(output_dir), SESSION_FILE)
+    system_session = os.path.join(BASE_DIR, SESSION_FILE)
+    os.symlink(output_session, system_session)
 
 
 class ZairaBase(object):
@@ -60,7 +51,8 @@ class ZairaBase(object):
         with open(os.path.join(BASE_DIR, SESSION_FILE), "r") as f:
             session = json.load(f)
         session["time_stamp"] = int(time())
-        with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
+        output_dir = session["output_dir"]
+        with open(os.path.join(output_dir, SESSION_FILE), "w") as f:
             json.dump(session, f, indent=4)
 
     def update_elapsed_time(self):
@@ -68,7 +60,8 @@ class ZairaBase(object):
             session = json.load(f)
         delta_time = int(time()) - session["time_stamp"]
         session["elapsed_time"] = session["elapsed_time"] + delta_time
-        with open(os.path.join(BASE_DIR, SESSION_FILE), "w") as f:
+        output_dir = session["output_dir"]
+        with open(os.path.join(output_dir, SESSION_FILE), "w") as f:
             json.dump(session, f, indent=4)
 
     def get_trained_dir(self):
