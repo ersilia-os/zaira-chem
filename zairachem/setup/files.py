@@ -343,8 +343,6 @@ class SingleFileForPrediction(SingleFile):
         return sc
 
     def process(self):
-        print("PARAMETERS")
-        print(self.params)
         path = os.path.join(self.get_output_dir(), DATA_SUBFOLDER)
         df = self.normalize_dataframe()
         dfc = self.dedupe(df, path)
@@ -357,30 +355,3 @@ class SingleFileForPrediction(SingleFile):
         schema = self.input_schema()
         with open(os.path.join(path, INPUT_SCHEMA_FILENAME), "w") as f:
             json.dump(schema, f, indent=4)
-
-
-# TODO: When three files are given, use the following
-
-
-class CompoundsFile(InputSchema):
-    def __init__(self, input_file):
-        InputSchema.__init__(self, input_file)
-
-    def process(self):
-        pass
-
-
-class AssaysFile(InputSchema):
-    def __init__(self):
-        InputSchema.__init__(self)
-
-    def process(self):
-        pass
-
-
-class ValuesFile(InputSchema):
-    def __init__(self):
-        InputSchema.__init__(self)
-
-    def process(self):
-        pass
