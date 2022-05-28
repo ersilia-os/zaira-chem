@@ -30,3 +30,5 @@ AUXILIARY_TASK_COLUMN = "clf_aux"
 
 INCHIKEY_COLUMN = "inchikey"
 STANDARD_SMILES_COLUMN = "standard_smiles"
+
+RAW_INPUT_FILENAME = "raw_input"

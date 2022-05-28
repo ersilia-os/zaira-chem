@@ -3,8 +3,8 @@ import numpy as np
 from sklearn import metrics
 from sklearn.metrics import auc, roc_curve, r2_score, mean_absolute_error
 
-
 import matplotlib as plt
+
 from . import BasePlot
 from .fetcher import ResultsFetcher
 from stylia.colors.colors import NamedColors

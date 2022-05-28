@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import random
 from ..tools.melloddy import MELLODDY_SUBFOLDER
 from . import COMPOUNDS_FILENAME, COMPOUND_IDENTIFIER_COLUMN, FOLDS_FILENAME
 
@@ -44,7 +45,10 @@ class ScaffoldFolding(object):
             folds_dict[cid] = fld
         folds = []
         for cid in list(self.df[COMPOUND_IDENTIFIER_COLUMN]):
-            folds += [folds_dict[cid]]
+            if cid not in folds_dict:
+                folds += [random.choice(list(dfm["fold_id"]))]
+            else:
+                folds += [folds_dict[cid]]
         return folds
 
 
@@ -69,7 +73,10 @@ class LshFolding(object):
             folds_dict[cid] = fld
         folds = []
         for cid in list(self.df[COMPOUND_IDENTIFIER_COLUMN]):
-            folds += [folds_dict[cid]]
+            if cid not in folds_dict:
+                folds += [random.choice(list(dfm["fold_id"]))]
+            else:
+                folds += [folds_dict[cid]]
         return folds
 
 

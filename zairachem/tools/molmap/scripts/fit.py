@@ -13,6 +13,7 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
 from utils import descriptors_molmap, fingerprints_molmap
+# from utils import chunker, Hdf5XWriter, Hdf5XReader
 
 file_name = sys.argv[1]
 model_path = sys.argv[2]
@@ -25,10 +26,7 @@ GPUID = 1
 
 data = pd.read_csv(file_name)
 
-smiles_list = list(data[SMILES_COLUMN])
-
-X1 = mp1.batch_transform(smiles_list)
-X2 = mp2.batch_transform(smiles_list)
+smiles_list = list(data[SMILES_COLUMN])[:100]
 
 reg_columns = [
     c
@@ -43,13 +41,53 @@ clf_columns = [
 
 train_idxs, valid_idxs = train_test_split([i for i in range(len(smiles_list))])
 
+X1 = mp1.batch_transform(smiles_list)
+X2 = mp2.batch_transform(smiles_list)
+
+"""
+smiles_train = [smiles_list[i] for i in train_idxs]
+
+CHUNKSIZE = 100000
+
+X1_train_path = os.path.join(model_path, "X1_train_fit.h5")
+h = Hdf5XWriter(X1_train_path)
+for smiles_chunk in chunker(smiles_train, CHUNKSIZE):
+    X1 = mp1.batch_transform(smiles_chunk)
+    h.append(X1)
+
+X2_train_path = os.path.join(model_path, "X2_train_fit.h5")
+h = Hdf5XWriter(X2_train_path)
+for smiles_chunk in chunker(smiles_train, CHUNKSIZE):
+    X2 = mp2.batch_transform(smiles_chunk)
+    h.append(X2)
+
+smiles_valid = [smiles_list[i] for i in valid_idxs]
+
+X1_valid_path = os.path.join(model_path, "X1_valid_fit.h5")
+h = Hdf5XWriter(X1_valid_path)
+for smiles_chunk in chunker(smiles_valid, CHUNKSIZE):
+    X1 = mp1.batch_transform(smiles_chunk)
+    h.append(X1)
+
+X2_valid_path = os.path.join(model_path, "X2_valid_fit.h5")
+h = Hdf5XWriter(X2_valid_path)
+for smiles_chunk in chunker(smiles_valid, CHUNKSIZE):
+    X2 = mp2.batch_transform(smiles_chunk)
+    h.append(X2)
+"""
+
+X1_outer_shape = X1.shape[1:]
+X2_outer_shape = X2.shape[1:]
+
 if reg_columns:
     reg = data[reg_columns]
     y_reg = np.array(reg)
+    y_reg_train = y_reg[train_idxs]
+    y_reg_valid = y_reg[valid_idxs]
     mdl = RegressionEstimator(
         n_outputs=y_reg.shape[1],
-        fmap_shape1=X1.shape[1:],
-        fmap_shape2=X2.shape[1:],
+        fmap_shape1=X1_outer_shape,
+        fmap_shape2=X2_outer_shape,
         dense_layers=[128, 64],
         batch_size=8,
         y_scale=None,
