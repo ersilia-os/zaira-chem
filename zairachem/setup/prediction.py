@@ -9,7 +9,7 @@ from .standardize import Standardize
 from .merge import DataMergerForPrediction
 from .clean import SetupCleaner
 
-from . import PARAMETERS_FILE
+from . import PARAMETERS_FILE, RAW_INPUT_FILENAME
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
@@ -36,6 +36,10 @@ class PredictSetup(object):
         self.model_dir = os.path.abspath(model_dir)
         self.time_budget = time_budget  # TODO
         assert os.path.exists(self.model_dir)
+
+    def _copy_input_file(self):
+        extension = self.input_file.split(".")[-1]
+        shutil.copy(self.input_file, os.path.join(self.output_dir, RAW_INPUT_FILENAME+"."+extension))
 
     def _open_session(self):
         sf = SessionFile(self.output_dir)
@@ -113,6 +117,7 @@ class PredictSetup(object):
             self._make_output_dir()
             self._open_session()
             self._make_subfolders()
+            self._copy_input_file()
             step.update()
 
     def update_elapsed_time(self):

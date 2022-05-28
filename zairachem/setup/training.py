@@ -11,8 +11,9 @@ from .folding import Folds
 from .tasks import SingleTasks
 from .merge import DataMerger
 from .clean import SetupCleaner
+from .check import SetupChecker
 
-from . import PARAMETERS_FILE
+from . import PARAMETERS_FILE, RAW_INPUT_FILENAME
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
@@ -42,6 +43,10 @@ class TrainSetup(object):
         self.input_file = os.path.abspath(input_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
+        
+    def _copy_input_file(self):
+        extension = self.input_file.split(".")[-1]
+        shutil.copy(self.input_file, os.path.join(self.output_dir, RAW_INPUT_FILENAME+"."+extension))
 
     def _load_params(self, params, passed_params):
         return ParametersFile(full_path=params, passed_params=passed_params).load()
@@ -121,6 +126,12 @@ class TrainSetup(object):
         if not step.is_done():
             SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
+
+    def _check(self):
+        step = PipelineStep("setup_check", self.output_dir)
+        if not step.is_done():
+            SetupChecker(self.output_dir).run()
+            step.update()
        
     def _initialize(self):
         step = PipelineStep("initialize", self.output_dir)
@@ -129,6 +140,7 @@ class TrainSetup(object):
             self._open_session()
             self._make_subfolders()
             self._save_params()
+            self._copy_input_file()
             step.update()
 
     def update_elapsed_time(self):
@@ -144,4 +156,5 @@ class TrainSetup(object):
         self._merge()
         self._augment()
         self._clean()
+        self._check()
         self.update_elapsed_time()

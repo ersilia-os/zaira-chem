@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 import pandas as pd
 import joblib
@@ -7,8 +8,8 @@ from umap import UMAP
 from lol import LOL
 
 # Bugfix to deal with large data in UMAP #TODO check
-from dill import extend
-extend(use_dill=False)
+#from dill import extend
+#extend(use_dill=False)
 
 from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER
 
@@ -40,9 +41,10 @@ class Pca(object):
 
 
 class Umap(object):
-    def __init__(self, max_components=500):
+    def __init__(self, max_components=500, max_samples=1000):
         self._name = "umap"
         self._max_components = max_components
+        self._max_samples = max_samples
 
     def _get_pca(self, X):
         pca = PCA(n_components=0.9, whiten=True)
@@ -53,6 +55,9 @@ class Umap(object):
         return pca
 
     def fit(self, X, y=None):
+        if X.shape[0] > self._max_samples:
+            idxs = np.array(random.sample([i for i in range(X.shape[0])], self._max_samples), dtype=int)
+            X = X[idxs]
         self.pca = self._get_pca(X)
         self.pca.fit(X)
         Xt = self.pca.transform(X)
@@ -60,7 +65,10 @@ class Umap(object):
         self.reducer.fit(Xt)
 
     def transform(self, X):
-        Xt = self.pca.transform(X)
+        try:
+            Xt = self.pca.transform(X)
+        except:
+            Xt = X
         Xt = self.reducer.transform(Xt)
         return Xt
 
