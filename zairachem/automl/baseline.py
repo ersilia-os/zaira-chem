@@ -3,20 +3,8 @@ import collections
 import pandas as pd
 import numpy as np
 
-from ..tools.molmap.molmap import MolMapModel
-
-
-class RandomForestRegressor(object):
-
-    def __init__(self):
-        pass
-
-    def fit(self):
-        pass
-
-    def predict(self):
-        pass
-
+from lazyqsar.regression.morgan import MorganRegressor
+from lazyqsar.binary.morgan import MorganBinaryClassifier
 
 
 class BaselineEstimator(object):
@@ -29,17 +17,17 @@ class BaselineEstimator(object):
         X_columns = [c for c in columns if c not in labels_set]
         X = np.array(data[X_columns], dtype=int)
         
-        self.model = MolMapModel(self.save_path)
+        self.model = BaselineModel(self.save_path)
         self.model.fit(data)
 
     def save(self):
         pass
 
     def load(self):
-        return MolMapEstimatorArtifact(MolMapModel(self.save_path))
+        return BaselineEstimatorArtifact(BaselineModel(self.save_path))
 
 
-class MolMapEstimatorArtifact(object):
+class BaselineEstimatorArtifact(object):
     def __init__(self, model):
         self.model = model
 

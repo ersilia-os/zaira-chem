@@ -1,6 +1,8 @@
 import json
 import os
 
+from timeout_decorator import timeout
+
 from .. import ZairaBase
 from ..utils.matrices import Hdf5
 from ersilia import ErsiliaModel
@@ -9,6 +11,8 @@ from ..setup import PARAMETERS_FILE
 from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
 
 RAW_FILE_NAME = "raw.h5"
+
+TIMEOUT_SEC = 60
 
 
 class RawLoader(ZairaBase):
@@ -42,14 +46,21 @@ class RawDescriptors(ZairaBase):
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, RAW_FILE_NAME)
 
+    @timeout(TIMEOUT_SEC)
+    def _run_eos(self, eos_id):
+        output_h5 = self.output_h5_filename(eos_id)
+        with ErsiliaModel(eos_id) as em:
+            em.api(input=self.input_csv, output=output_h5)
+        Hdf5(output_h5).save_summary_as_csv()
+
     def run(self):
         done_eos = []
         for eos_id in self.eos_ids():
-            output_h5 = self.output_h5_filename(eos_id)
-            with ErsiliaModel(eos_id) as em:
-                em.api(input=self.input_csv, output=output_h5)
-            done_eos += [eos_id]
-            Hdf5(output_h5).save_summary_as_csv()
+            try:
+                self._run_eos(eos_id)
+                done_eos += [eos_id]
+            except:
+                continue
         with open(
             os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w"
         ) as f:
