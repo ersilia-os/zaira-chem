@@ -154,23 +154,31 @@ class Fitter(BaseEstimator):
         # regression
         X_reg = np.array(df_X_reg)
         Y_reg = np.array(df_Y_reg)
-        reg = LinearRegression()
-        reg.fit(X_reg[valid_idxs], Y_reg[valid_idxs])
-        Y_reg_hat = reg.predict(X_reg)
+        if X_reg.shape[1] > 0:
+            reg = LinearRegression()
+            reg.fit(X_reg[valid_idxs], Y_reg[valid_idxs])
+            Y_reg_hat = reg.predict(X_reg)
+        else:
+            reg = None
         # classification
         X_clf = np.array(df_X_clf)
         Y_clf = np.array(df_Y_clf)
-        clf = MultiOutputClassifier(LogisticRegressionCV())
-        clf.fit(X_clf[valid_idxs], Y_clf[valid_idxs])
-        B_clf_hat = clf.predict(X_clf)
-        Y_clf_hat = np.zeros(Y_clf.shape)
-        for j, yh in enumerate(clf.predict_proba(X_clf)):
-            Y_clf_hat[:, j] = yh[:, 1]
+        if X_clf.shape[1] > 0:
+            clf = MultiOutputClassifier(LogisticRegressionCV())
+            clf.fit(X_clf[valid_idxs], Y_clf[valid_idxs])
+            B_clf_hat = clf.predict(X_clf)
+            Y_clf_hat = np.zeros(Y_clf.shape)
+            for j, yh in enumerate(clf.predict_proba(X_clf)):
+                Y_clf_hat[:, j] = yh[:, 1]
+        else:
+            clf = None
         path_ = os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER)
         if not os.path.exists(path_):
             os.makedirs(path_)
-        joblib.dump(reg, os.path.join(path_, "reg.joblib"))
-        joblib.dump(clf, os.path.join(path_, "clf.joblib"))
+        if reg:
+            joblib.dump(reg, os.path.join(path_, "reg.joblib"))
+        if clf:
+            joblib.dump(clf, os.path.join(path_, "clf.joblib"))
         with open(
             os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER, "columns.json"),
             "w",

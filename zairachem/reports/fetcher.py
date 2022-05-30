@@ -156,13 +156,16 @@ class ResultsFetcher(ZairaBase):
         return self.get_parameters()["direction"]
 
     def get_used_cuts(self):
-        with open(
-            os.path.join(self.trained_path, DATA_SUBFOLDER, USED_CUTS_FILE), "r"
-        ) as f:
+        used_cuts_file = os.path.join(self.trained_path, DATA_SUBFOLDER, USED_CUTS_FILE)
+        if not os.path.exists(used_cuts_file):
+            return None
+        with open(used_cuts_file, "r") as f:
             return json.load(f)
 
     def get_used_cut(self):
         used_cuts = self.get_used_cuts()
+        if used_cuts is None:
+            return 1
         for k, v in used_cuts["ecuts"].items():
             if "_skip" not in k:
                 return v

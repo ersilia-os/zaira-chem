@@ -11,3 +11,4 @@ umap-learn
 lolP
 seaborn
 networkx
+timeout_decorator
