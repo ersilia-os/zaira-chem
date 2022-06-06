@@ -98,23 +98,6 @@ class XGetter(ZairaBase):
         return df
 
 
-class Consensus(object):
-    def __init__(self):
-        pass
-
-    def fit(self, X):
-        return np.mean(X, axis=1)
-
-    def predict(self, X):
-        return np.mean(X, axis=1)
-
-
-def _filter_out_manifolds(df):
-    columns = list(df.columns)
-    columns = [c for c in columns if "umap-" not in c and "pca-" not in c]
-    return df[columns]
-
-
 class Fitter(BaseEstimator):
     def __init__(self, path):
         BaseEstimator.__init__(self, path=path)
@@ -163,31 +146,30 @@ class Fitter(BaseEstimator):
             time_budget_sec = time_budget_sec
         valid_idxs = self.get_validation_indices(path=self.path)
         df_X = self._get_X()
-        df_X = _filter_out_manifolds(df_X)
         df_X_reg = self._get_X_reg(df_X)
         df_X_clf = self._get_X_clf(df_X)
         df_Y = self._get_Y()
-        df_Y = _filter_out_manifolds(df_Y)
         df_Y_reg = self._get_Y_reg(df_Y)
         df_Y_clf = self._get_Y_clf(df_Y)
         # regression
         X_reg = np.array(df_X_reg)
         Y_reg = np.array(df_Y_reg)
         if X_reg.shape[1] > 0:
-            reg = Consensus()
-            reg.fit(X_reg[valid_idxs])
-            Y_reg_hat = reg.predict(X_reg[valid_idxs]).reshape(-1, 1)
+            reg = LinearRegression()
+            reg.fit(X_reg[valid_idxs], Y_reg[valid_idxs])
+            Y_reg_hat = reg.predict(X_reg)
         else:
             reg = None
         # classification
         X_clf = np.array(df_X_clf)
         Y_clf = np.array(df_Y_clf)
         if X_clf.shape[1] > 0:
-            clf = Consensus()
-            clf.fit(X_clf[valid_idxs])
-            Y_clf_hat = clf.predict(X_clf[valid_idxs]).reshape(-1, 1)
-            B_clf_hat = np.zeros(Y_clf_hat.shape, dtype=int)
-            B_clf_hat[Y_clf_hat > 0.5] = 1
+            clf = MultiOutputClassifier(LogisticRegressionCV())
+            clf.fit(X_clf[valid_idxs], Y_clf[valid_idxs])
+            B_clf_hat = clf.predict(X_clf)
+            Y_clf_hat = np.zeros(Y_clf.shape)
+            for j, yh in enumerate(clf.predict_proba(X_clf)):
+                Y_clf_hat[:, j] = yh[:, 1]
         else:
             clf = None
         path_ = os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER)
@@ -238,31 +220,33 @@ class Predictor(BaseEstimator):
     def run(self):
         self.reset_time()
         df = self._get_X()
-        df = _filter_out_manifolds(df)
         df_X_clf = self._get_X_clf(df)
         df_X_reg = self._get_X_reg(df)
         with open(os.path.join(self.trained_path, "columns.json"), "r") as f:
             columns = json.load(f)
             reg_cols = columns["reg"]
             clf_cols = columns["clf"]
-
         # regression
-        X_reg = np.array(df_X_reg)
-        if X_reg.shape[1] > 0:
-            reg = Consensus()
-            Y_reg_hat = reg.predict(X_reg).reshape(-1, 1)
+        reg_path = os.path.join(self.trained_path, "reg.joblib")
+        if os.path.exists(reg_path):
+            X_reg = np.array(df_X_reg)
+            reg = joblib.load(reg_path)
+            Y_reg_hat = reg.predict(X_reg)
         else:
             reg = None
+            Y_reg_hat = None
         # classification
-        X_clf = np.array(df_X_clf)
-        if X_clf.shape[1] > 0:
-            clf = Consensus()
-            Y_clf_hat = clf.predict(X_clf).reshape(-1, 1)
-            B_clf_hat = np.zeros(Y_clf_hat.shape, dtype=int)
-            B_clf_hat[Y_clf_hat > 0.5] = 1
+        clf_path = os.path.join(self.trained_path, "clf.joblib")
+        if os.path.exists(clf_path):
+            X_clf = np.array(df_X_clf)
+            clf = joblib.load(clf_path)
+            B_clf_hat = clf.predict(X_clf)
+            Y_clf_hat = np.zeros(B_clf_hat.shape)
+            for j, yh in enumerate(clf.predict_proba(X_clf)):
+                Y_clf_hat[:, j] = yh[:, 1]
         else:
             clf = None
-
+            Y_clf_hat = None
         path_ = os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER)
         if not os.path.exists(path_):
             os.makedirs(path_)

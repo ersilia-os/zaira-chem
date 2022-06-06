@@ -30,7 +30,9 @@ class Sampler(object):
             results = self.similarity_searcher.search(smi, cutoff=cutoff)
             for r in results:
                 G.add_edge(smi, r[1], weight=r[2])
-            results = self.stoned_sampler.sample(smi, n=int(max_n/len(smiles_list)*2))
+            results = self.stoned_sampler.sample(
+                smi, n=int(max_n / len(smiles_list) * 2)
+            )
             for i in range(len(results[0])):
                 G.add_edge(smi, results[0][i], weight=results[1][i])
         node_clashes = set()

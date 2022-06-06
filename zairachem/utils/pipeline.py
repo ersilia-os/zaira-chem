@@ -7,7 +7,6 @@ from ..vars import SESSION_FILE
 
 
 class SessionFile(ZairaBase):
-
     def __init__(self, output_dir):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
@@ -29,7 +28,7 @@ class SessionFile(ZairaBase):
             "mode": self.mode,
         }
         with open(self.session_file, "w") as f:
-            json.dump(data, f, indent=4)        
+            json.dump(data, f, indent=4)
 
     def delete_session_file(self):
         if os.path.exists(self.session_file):

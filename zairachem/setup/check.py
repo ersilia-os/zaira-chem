@@ -14,7 +14,6 @@ from ..vars import DATA_FILENAME
 
 
 class SetupChecker(object):
-
     def __init__(self, path):
         for f in os.listdir(path):
             if RAW_INPUT_FILENAME in f:

@@ -5,7 +5,6 @@ import pandas as pd
 from ... import ZairaBase
 from ..base import BaseEstimator, BaseOutcomeAssembler
 from ...automl.baseline import BaselineEstimator
-from .fingerprint import calculate_baseline_fingerprints
 
 from . import ESTIMATORS_FAMILY_SUBFOLDER
 from .. import RESULTS_UNMAPPED_FILENAME, RESULTS_MAPPED_FILENAME
@@ -23,12 +22,6 @@ class Fitter(BaseEstimator):
     def _get_smiles(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         return df[[SMILES_COLUMN]]
-
-    def _get_X(self):
-        smiles = list(self._get_smiles())
-        X = calculate_baseline_fingerprints(smiles)
-        columns = ["f-{0}".format(i) for i in range(X.shape[1])]
-        return pd.DataFrame(X, columns=columns)
 
     def _get_y(self, task):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
@@ -56,12 +49,12 @@ class Fitter(BaseEstimator):
         else:
             time_budget_sec = time_budget_sec
         train_idxs = self.get_train_indices(path=self.path)
-        df_X = self._get_X()
+        df_smiles = self._get_smiles()
         df_Y = self._get_Y()
-        df = pd.concat([df_X, df_Y], axis=1)
+        df = pd.concat([df_smiles, df_Y], axis=1)
         labels = list(df_Y.columns)
-        self.logger.debug("Starting Baseline estimation")
-        estimator = MolMapEstimator(save_path=self.trained_path)
+        self.logger.debug("Starting baseline estimation")
+        estimator = BaselineEstimator(save_path=self.trained_path)
         self.logger.debug("Fitting")
         estimator.fit(data=df.iloc[train_idxs, :], labels=labels)
         estimator.save()
@@ -83,7 +76,7 @@ class Predictor(BaseEstimator):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))[
             [SMILES_COLUMN]
         ]
-        model = MolMapEstimator(save_path=self.trained_path).load()
+        model = BaselineEstimator(save_path=self.trained_path).load()
         results = model.run(df)
         self.update_elapsed_time()
         return results

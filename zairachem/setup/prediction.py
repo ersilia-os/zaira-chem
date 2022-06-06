@@ -39,11 +39,16 @@ class PredictSetup(object):
 
     def _copy_input_file(self):
         extension = self.input_file.split(".")[-1]
-        shutil.copy(self.input_file, os.path.join(self.output_dir, RAW_INPUT_FILENAME+"."+extension))
+        shutil.copy(
+            self.input_file,
+            os.path.join(self.output_dir, RAW_INPUT_FILENAME + "." + extension),
+        )
 
     def _open_session(self):
         sf = SessionFile(self.output_dir)
-        sf.open_session(mode="predict", output_dir=self.output_dir, model_dir=self.model_dir)
+        sf.open_session(
+            mode="predict", output_dir=self.output_dir, model_dir=self.model_dir
+        )
         create_session_symlink(self.output_dir)
 
     def _make_output_dir(self):
@@ -80,9 +85,9 @@ class PredictSetup(object):
     def _melloddy_tuner_run(self):
         step = PipelineStep("melloddy_tuner", self.output_dir)
         if not step.is_done():
-            MelloddyTunerPredictPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run(
-                has_tasks=self.has_tasks
-            )
+            MelloddyTunerPredictPipeline(
+                os.path.join(self.output_dir, DATA_SUBFOLDER)
+            ).run(has_tasks=self.has_tasks)
             step.update()
 
     def _standardize(self):
@@ -94,7 +99,9 @@ class PredictSetup(object):
     def _tasks(self):
         step = PipelineStep("tasks", self.output_dir)
         if not step.is_done():
-            SingleTasksForPrediction(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            SingleTasksForPrediction(
+                os.path.join(self.output_dir, DATA_SUBFOLDER)
+            ).run()
             step.update()
 
     def _merge(self):

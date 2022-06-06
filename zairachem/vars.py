@@ -26,6 +26,9 @@ N_FOLDS = 5
 
 _CONFIG_FILENAME = "config.json"
 
+PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
+ZAIRACHEM_DATA_PATH = os.path.join(PACKAGE_ROOT, "data")
+
 # Ersilia Model Hub
 
 ERSILIA_HUB_DEFAULT_MODELS = [
