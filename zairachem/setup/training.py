@@ -43,10 +43,13 @@ class TrainSetup(object):
         self.input_file = os.path.abspath(input_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
-        
+
     def _copy_input_file(self):
         extension = self.input_file.split(".")[-1]
-        shutil.copy(self.input_file, os.path.join(self.output_dir, RAW_INPUT_FILENAME+"."+extension))
+        shutil.copy(
+            self.input_file,
+            os.path.join(self.output_dir, RAW_INPUT_FILENAME + "." + extension),
+        )
 
     def _load_params(self, params, passed_params):
         return ParametersFile(full_path=params, passed_params=passed_params).load()
@@ -64,7 +67,9 @@ class TrainSetup(object):
 
     def _open_session(self):
         sf = SessionFile(self.output_dir)
-        sf.open_session(mode="fit", output_dir=self.output_dir, model_dir=self.output_dir)
+        sf.open_session(
+            mode="fit", output_dir=self.output_dir, model_dir=self.output_dir
+        )
         create_session_symlink(self.output_dir)
 
     def _make_subfolder(self, name):
@@ -88,7 +93,9 @@ class TrainSetup(object):
     def _melloddy_tuner_run(self):
         step = PipelineStep("mellody_tuner", self.output_dir)
         if not step.is_done():
-            MelloddyTunerTrainPipeline(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            MelloddyTunerTrainPipeline(
+                os.path.join(self.output_dir, DATA_SUBFOLDER)
+            ).run()
             step.update()
 
     def _standardize(self):
@@ -132,7 +139,7 @@ class TrainSetup(object):
         if not step.is_done():
             SetupChecker(self.output_dir).run()
             step.update()
-       
+
     def _initialize(self):
         step = PipelineStep("initialize", self.output_dir)
         if not step.is_done():

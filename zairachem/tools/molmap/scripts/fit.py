@@ -13,6 +13,7 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
 from utils import descriptors_molmap, fingerprints_molmap
+
 # from utils import chunker, Hdf5XWriter, Hdf5XReader
 
 file_name = sys.argv[1]

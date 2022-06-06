@@ -21,6 +21,7 @@ import json
 import os
 import numpy as np
 import pandas as pd
+import random
 from time import time
 from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER
 from .vars import SESSION_FILE
@@ -88,6 +89,7 @@ class ZairaBase(object):
     def _dummy_indices(self, path):
         df = pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))
         idxs = np.array([i for i in range(df.shape[0])])
+        random.shuffle(idxs)
         return idxs
 
     def get_train_indices(self, path):
@@ -106,6 +108,7 @@ class ZairaBase(object):
                 "Training set is the full dataset. Interpret with caution!"
             )
             idxs = self._dummy_indices(path)
+            print(idxs)
             return idxs
 
     def get_validation_indices(self, path):

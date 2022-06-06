@@ -2,6 +2,7 @@ import os
 
 from .. import ZairaBase
 from ..utils.pipeline import PipelineStep
+from .from_baseline.pipe import BaselinePipeline
 from .from_individual_full_descriptors.pipe import IndividualFullDescriptorPipeline
 from .from_manifolds.pipe import ManifoldPipeline
 from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
@@ -18,6 +19,14 @@ class EstimatorPipeline(ZairaBase):
             self.path = path
         self.output_dir = os.path.abspath(self.path)
         assert os.path.exists(self.output_dir)
+
+    def _baseline_estimator_pipeline(self, time_budget_sec):
+        step = PipelineStep("baseline_estimator_pipeline", self.output_dir)
+        if not step.is_done():
+            self.logger.debug("Running baseline estimator pipeline")
+            p = BaselinePipeline(path=self.path)
+            p.run(time_budget_sec=time_budget_sec)
+            step.update()
 
     def _individual_estimator_pipeline(self, time_budget_sec):
         step = PipelineStep("individual_estimator_pipeline", self.output_dir)
@@ -58,6 +67,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def run(self, time_budget_sec=None):
+        self._baseline_estimator_pipeline(time_budget_sec)
         self._individual_estimator_pipeline(time_budget_sec)
         self._manifolds_pipeline(time_budget_sec)
         self._reference_pipeline(time_budget_sec)

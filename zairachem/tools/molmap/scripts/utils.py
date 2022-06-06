@@ -28,21 +28,20 @@ def fingerprints_molmap():
 
 def chunker(seq, size):
     for x in range(0, len(seq), size):
-        yield seq[x:x+size]
+        yield seq[x : x + size]
 
 
 def slicer(n, size):
     for x in range(0, n, size):
-        yield (x, x+size)
+        yield (x, x + size)
 
 
 class Hdf5XWriter(object):
-
     def __init__(self, file_name):
         self.file_name = os.path.abspath(file_name)
         self.name = "X"
         print("HDF5 file: {0}".format(self.file_name))
-    
+
     def append(self, X):
         if not os.path.exists(self.file_name):
             maxshape = list(X.shape)
@@ -55,22 +54,22 @@ class Hdf5XWriter(object):
                     data=X,
                     maxshape=maxshape,
                     chunks=True,
-                    dtype=X.dtype)
+                    dtype=X.dtype,
+                )
         else:
             with h5py.File(self.file_name, "a") as f:
                 f[self.name].resize((f[self.name].shape[0] + X.shape[0]), axis=0)
-                f[self.name][-X.shape[0]:] = X
+                f[self.name][-X.shape[0] :] = X
 
 
 class Hdf5XReader(object):
-
     def __init__(self, file_name):
         self.file_name = os.path.abspath(file_name)
         assert os.path.exists(self.file_name)
         self.name = "X"
         self.chunksize = 1000
         print("HDF5 file: {0}".format(self.file_name))
-    
+
     def read(self):
         with h5py.File(self.file_name, "r") as f:
             X = f["X"][:]

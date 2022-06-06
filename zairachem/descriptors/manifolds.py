@@ -8,8 +8,8 @@ from umap import UMAP
 from lol import LOL
 
 # Bugfix to deal with large data in UMAP #TODO check
-#from dill import extend
-#extend(use_dill=False)
+# from dill import extend
+# extend(use_dill=False)
 
 from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER
 
@@ -56,7 +56,10 @@ class Umap(object):
 
     def fit(self, X, y=None):
         if X.shape[0] > self._max_samples:
-            idxs = np.array(random.sample([i for i in range(X.shape[0])], self._max_samples), dtype=int)
+            idxs = np.array(
+                random.sample([i for i in range(X.shape[0])], self._max_samples),
+                dtype=int,
+            )
             X = X[idxs]
         self.pca = self._get_pca(X)
         self.pca.fit(X)

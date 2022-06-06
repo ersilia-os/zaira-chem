@@ -130,6 +130,8 @@ class ResultsFetcher(ZairaBase):
 
     def get_projections(self):
         df = self._read_processed_data()
+        umap0 = [0] * df.shape[0]
+        umap1 = [0] * df.shape[0]
         for c in list(df.columns):
             if "umap-0" in c:
                 umap0 = list(df["umap-0"])
@@ -139,6 +141,8 @@ class ResultsFetcher(ZairaBase):
 
     def get_projections_trained(self):
         df = self._read_processed_data_train()
+        umap0 = [0] * df.shape[0]
+        umap1 = [0] * df.shape[0]
         for c in list(df.columns):
             if "umap-0" in c:
                 umap0 = list(df["umap-0"])

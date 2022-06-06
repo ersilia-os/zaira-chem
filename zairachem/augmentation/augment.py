@@ -18,7 +18,7 @@ MAX_N = 5000
 MIN_N = 0
 AUGMENTATION_FACTOR = 0.1
 
-_TIME_BUDGET_SEC = 10 # TODO
+_TIME_BUDGET_SEC = 10  # TODO
 
 
 class Augmenter(ZairaBase):
@@ -125,7 +125,7 @@ class Augmenter(ZairaBase):
 
     def run(self):
         pass
-        #self._sample_smiles()
-        #self._get_df_xy()
-        #self._train_model()
-        #self._assemble()
+        # self._sample_smiles()
+        # self._get_df_xy()
+        # self._train_model()
+        # self._assemble()
