@@ -5,10 +5,6 @@ import json
 import joblib
 import h5py
 
-from sklearn.linear_model import LinearRegression
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.linear_model import LogisticRegressionCV
-
 from .. import ZairaBase
 from ..estimators.evaluate import ResultsIterator
 from ..estimators.base import BaseEstimator
