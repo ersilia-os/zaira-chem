@@ -4,7 +4,7 @@ import pandas as pd
 
 from ... import ZairaBase
 from ..base import BaseEstimator, BaseOutcomeAssembler
-from ...automl.baseline import BaselineEstimator
+from ...automl.fingerprint import FingerprintEstimator
 
 from . import ESTIMATORS_FAMILY_SUBFOLDER
 from .. import RESULTS_UNMAPPED_FILENAME, RESULTS_MAPPED_FILENAME
@@ -53,8 +53,8 @@ class Fitter(BaseEstimator):
         df_Y = self._get_Y()
         df = pd.concat([df_smiles, df_Y], axis=1)
         labels = list(df_Y.columns)
-        self.logger.debug("Starting baseline estimation")
-        estimator = BaselineEstimator(save_path=self.trained_path)
+        self.logger.debug("Starting fingerprint estimation")
+        estimator = FingerprintEstimator(save_path=self.trained_path)
         self.logger.debug("Fitting")
         estimator.fit(data=df.iloc[train_idxs, :], labels=labels)
         estimator.save()
@@ -76,7 +76,7 @@ class Predictor(BaseEstimator):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))[
             [SMILES_COLUMN]
         ]
-        model = BaselineEstimator(save_path=self.trained_path).load()
+        model = FingerprintEstimator(save_path=self.trained_path).load()
         results = model.run(df)
         self.update_elapsed_time()
         return results
@@ -126,10 +126,10 @@ class Estimator(ZairaBase):
         if not os.path.exists(path_):
             os.makedirs(path_, exist_ok=True)
         if not self.is_predict():
-            self.logger.debug("Starting baseline fitter")
+            self.logger.debug("Starting fingerprint fitter")
             self.estimator = Fitter(path=self.path)
         else:
-            self.logger.debug("Starting baseline predictor")
+            self.logger.debug("Starting fingerprint predictor")
             self.estimator = Predictor(path=self.path)
         self.assembler = Assembler(path=self.path)
 

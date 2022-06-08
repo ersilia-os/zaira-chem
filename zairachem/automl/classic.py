@@ -286,7 +286,7 @@ class ClassicDescriptor(object):
         return pd.DataFrame(X, columns=self.features)
 
 
-class BaselineClassifier(object):
+class ClassicClassifier(object):
     def __init__(
         self, automl=True, time_budget_sec=_TIME_BUDGET_SEC, estimator_list=None
     ):
@@ -335,7 +335,7 @@ class BaselineClassifier(object):
         return joblib.load(path)
 
 
-class BaselineRegressor(object):
+class ClassicRegressor(object):
     def __init__(
         self, automl=True, time_budget_sec=_TIME_BUDGET_SEC, estimator_list=None
     ):
@@ -384,7 +384,7 @@ class BaselineRegressor(object):
         return joblib.load(path)
 
 
-class BaselineEstimator(object):
+class ClassicEstimator(object):
     def __init__(self, save_path):
         self.save_path = save_path
         self.save_path_clf = os.path.join(self.save_path, "clf.joblib")
@@ -419,10 +419,10 @@ class BaselineEstimator(object):
         data_smiles, data_clf, data_reg = self._coltype_splitter(data, labels)
         X = np.array(data_smiles).ravel()
         if len(data_reg.columns) == 1:
-            self.reg_estimator = BaselineRegressor()
+            self.reg_estimator = ClassicRegressor()
             self.reg_estimator.fit(X, np.array(data_reg).ravel())
         if len(data_clf.columns) == 1:
-            self.clf_estimator = BaselineClassifier()
+            self.clf_estimator = ClassicClassifier()
             self.clf_estimator.fit(X, np.array(data_clf).ravel())
 
     def save(self):
@@ -444,12 +444,12 @@ class BaselineEstimator(object):
             clf_estimator = joblib.load(self.save_path_clf)
         else:
             clf_estimator = None
-        return BaselineArtifact(
+        return ClassicArtifact(
             reg_estimator=reg_estimator, clf_estimator=clf_estimator, columns=columns
         )
 
 
-class BaselineArtifact(object):
+class ClassicArtifact(object):
     def __init__(self, reg_estimator, clf_estimator, columns):
         self.reg_estimator = reg_estimator
         self.clf_estimator = clf_estimator
