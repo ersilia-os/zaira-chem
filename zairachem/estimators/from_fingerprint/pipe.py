@@ -1,7 +1,7 @@
 from .estimate import Estimator
 
 
-class BaselinePipeline(object):
+class FingerprintPipeline(object):
     def __init__(self, path):
         self.e = Estimator(path=path)
 
