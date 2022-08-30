@@ -19,7 +19,7 @@ def fit_cmd():
         "-r",
         default=None,
         type=click.STRING,
-        help="Reference file containing a relatively large set of molecules (at least 1000).",
+        help="Reference file containing a relatively large set of molecules (at least 1000). This parameter is currently not used...",
     )
     @click.option(
         "--model_dir",

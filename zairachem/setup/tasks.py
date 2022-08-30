@@ -390,6 +390,7 @@ class SingleTasks(ZairaBase):
                 assert self.task == "classification"
             df = self._get_data()
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
+            self._task = "classification"
         else:
             self.logger.debug("Data is not simply a binary")
             df = self._get_data()
@@ -424,6 +425,7 @@ class SingleTasksForPrediction(SingleTasks):
             if self.task is not None:
                 assert self.task == "classification"
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
+            self._task = "classification"
         else:
             self.logger.debug("Data is not simply a binary classification")
             df = self._get_data()
