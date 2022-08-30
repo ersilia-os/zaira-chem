@@ -3,6 +3,7 @@ import os
 from .plots import (
     ActivesInactivesPlot,
     ConfusionPlot,
+    IndividualEstimatorsClassificationScorePlot,
     RocCurvePlot,
     ScoreViolinPlot,
     ProjectionUmapPlot,
@@ -65,6 +66,9 @@ class Reporter(ZairaBase):
     def _individual_estimators_auroc_plot(self):
         IndividualEstimatorsAurocPlot(ax=None, path=self.path).save()
 
+    def _individual_estimators_classification_score_plot(self):
+        IndividualEstimatorsClassificationScorePlot(ax=None, path=self.path).save()
+
     def _individual_estimators_r2_plot(self):
         IndividualEstimatorsR2Plot(ax=None, path=self.path).save()
 
@@ -81,4 +85,5 @@ class Reporter(ZairaBase):
         self._histogram_plot_raw()
         self._transformation_plot()
         self._individual_estimators_auroc_plot()
+        self._individual_estimators_classification_score_plot()
         self._individual_estimators_r2_plot()

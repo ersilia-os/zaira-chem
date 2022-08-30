@@ -152,14 +152,14 @@ class IndividualPerformanceReporter(ZairaBase):
     def _has_reg_tasks(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         for c in list(df.columns):
-            if "reg_" in c:
+            if "reg_" in c and "_skip" not in c and "_aux" not in c:
                 return True
         return False
 
     def _has_clf_tasks(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         for c in list(df.columns):
-            if "clf_" in c:
+            if "clf_" in c and "_skip" not in c and "_aux" not in c:
                 return True
         return False
 

@@ -4,6 +4,7 @@ import pandas as pd
 import json
 import joblib
 import h5py
+from sklearn.linear_model import LogisticRegressionCV, LinearRegression
 
 from .. import ZairaBase
 from ..estimators.evaluate import ResultsIterator
@@ -99,15 +100,73 @@ class XGetter(ZairaBase):
         return df
 
 
-class Consensus(object):
-    def __init__(self):
-        pass
+class IndependentLogisticClassifier(object):
+    def __init__(self, path):
+        self.path = path
+        if not os.path.exists(self.path):
+            os.makedirs(self.path, exist_ok=True)
 
-    def fit(self, X):
-        return np.mean(X, axis=1)
+    def _get_model_filename(self, n):
+        return os.path.join(self.path, "clf-{0}.joblib".format(n))
 
-    def predict(self, X):
-        return np.mean(X, axis=1)
+    def fit(self, df_X, df_y):
+        y = np.array(df_y)
+        cols = list(df_X.columns)
+        for c in cols:
+            X = np.array(df_X[c]).reshape(-1, 1)
+            mdl = LogisticRegressionCV()
+            mdl.fit(X, y)
+            filename = self._get_model_filename(c)
+            joblib.dump(mdl, filename)
+        return self.predict(df_X)
+
+    def predict(self, df_X):
+        cols = list(df_X.columns)
+        Y_hat = []
+        for c in cols:
+            filename = self._get_model_filename(c)
+            if os.path.exists(filename):
+                mdl = joblib.load(filename)
+                X = np.array(df_X[c]).reshape(-1, 1)
+                y_hat = mdl.predict_proba(X)[:, 1]
+                Y_hat += [y_hat]
+        Y_hat = np.array(Y_hat).T
+        return np.median(Y_hat, axis=1)
+
+
+class IndependentLinearRegressor(object):
+    def __init__(self, path):
+        self.path = path
+        if not os.path.exists(self.path):
+            os.makedirs(self.path, exist_ok=True)
+
+    def _get_model_filename(self, n):
+        return os.path.join(self.path, "reg-{0}.joblib".format(n))
+
+    def fit(self, df_X, df_y):
+        y = np.array(df_y)
+        cols = list(df_X.columns)
+        for c in cols:
+            X = np.array(df_X[c]).reshape(-1, 1)
+            mdl = LinearRegression()
+            mdl.fit(X, y)
+            filename = self._get_model_filename(c)
+            joblib.dump(mdl, filename)
+        return self.predict(df_X)
+
+    def predict(self, df_X):
+        cols = list(df_X.columns)
+        Y_hat = []
+        for c in cols:
+            filename = self._get_model_filename(c)
+            print(filename)
+            if os.path.exists(filename):
+                mdl = joblib.load(filename)
+                X = np.array(df_X[c]).reshape(-1, 1)
+                y_hat = mdl.predict(X)
+                Y_hat += [y_hat]
+        Y_hat = np.array(Y_hat).T
+        return np.mean(Y_hat, axis=1)
 
 
 def _filter_out_bin(df):
@@ -131,7 +190,9 @@ def _filter_out_unwanted_columns(df):
 class Fitter(BaseEstimator):
     def __init__(self, path):
         BaseEstimator.__init__(self, path=path)
-        self.trained_path = os.path.join(self.get_output_dir(), POOL_SUBFOLDER)
+        self.trained_path = os.path.join(
+            self.get_output_dir(), POOL_SUBFOLDER, BAGGER_SUBFOLDER
+        )
 
     def _get_compound_ids(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
@@ -192,32 +253,25 @@ class Fitter(BaseEstimator):
         # compound ids only for validation
         cids = [cids[idx] for idx in valid_idxs]
         # regression
-        X_reg = np.array(df_X_reg)
-        Y_reg = np.array(df_Y_reg)
+        X_reg = pd.DataFrame(df_X_reg).reset_index(drop=True)
+        Y_reg = pd.DataFrame(df_Y_reg).reset_index(drop=True)
         if X_reg.shape[1] > 0:
-            reg = Consensus()
-            reg.fit(X_reg[valid_idxs])
+            reg = IndependentLinearRegressor(path=self.trained_path)
+            reg.fit(X_reg.iloc[valid_idxs], Y_reg.iloc[valid_idxs])
             Y_reg_hat = reg.predict(X_reg[valid_idxs]).reshape(-1, 1)
         else:
             reg = None
         # classification
-        X_clf = np.array(df_X_clf)
-        Y_clf = np.array(df_Y_clf)
+        X_clf = pd.DataFrame(df_X_clf).reset_index(drop=True)
+        Y_clf = pd.DataFrame(df_Y_clf).reset_index(drop=True)
         if X_clf.shape[1] > 0:
-            clf = Consensus()
-            clf.fit(X_clf[valid_idxs])
-            Y_clf_hat = clf.predict(X_clf[valid_idxs]).reshape(-1, 1)
+            clf = IndependentLogisticClassifier(path=self.trained_path)
+            clf.fit(X_clf.iloc[valid_idxs], Y_clf.iloc[valid_idxs])
+            Y_clf_hat = clf.predict(X_clf.iloc[valid_idxs]).reshape(-1, 1)
             B_clf_hat = np.zeros(Y_clf_hat.shape, dtype=int)
             B_clf_hat[Y_clf_hat > 0.5] = 1
         else:
             clf = None
-        path_ = os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER)
-        if not os.path.exists(path_):
-            os.makedirs(path_)
-        if reg:
-            joblib.dump(reg, os.path.join(path_, "reg.joblib"))
-        if clf:
-            joblib.dump(clf, os.path.join(path_, "clf.joblib"))
         with open(
             os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER, "columns.json"),
             "w",
@@ -276,29 +330,22 @@ class Predictor(BaseEstimator):
         # compound ids only for validation
         cids = self._get_compound_ids()
         # regression
-        X_reg = np.array(df_X_reg)
+        X_reg = pd.DataFrame(df_X_reg).reset_index(drop=True)
         if X_reg.shape[1] > 0:
-            reg = Consensus()
+            reg = IndependentLinearRegressor(path=self.trained_path)
             Y_reg_hat = reg.predict(X_reg).reshape(-1, 1)
         else:
             reg = None
         # classification
-        X_clf = np.array(df_X_clf)
+        X_clf = pd.DataFrame(df_X_clf).reset_index(drop=True)
+        print(X_clf)
         if X_clf.shape[1] > 0:
-            clf = Consensus()
+            clf = IndependentLogisticClassifier(path=self.trained_path)
             Y_clf_hat = clf.predict(X_clf).reshape(-1, 1)
             B_clf_hat = np.zeros(Y_clf_hat.shape, dtype=int)
             B_clf_hat[Y_clf_hat > 0.5] = 1
         else:
             clf = None
-
-        path_ = os.path.join(self.path, POOL_SUBFOLDER, BAGGER_SUBFOLDER)
-        if not os.path.exists(path_):
-            os.makedirs(path_)
-        if reg is not None:
-            joblib.dump(reg, os.path.join(path_, "reg.joblib"))
-        if clf is not None:
-            joblib.dump(clf, os.path.join(path_, "clf.joblib"))
         P = []
         columns = []
         for j, c in enumerate(reg_cols):

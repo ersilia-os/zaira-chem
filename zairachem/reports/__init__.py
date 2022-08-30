@@ -30,14 +30,14 @@ class BaseResults(ZairaBase):
     def has_clf_data(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         for c in list(df.columns):
-            if "clf_" in c:
+            if "clf_" in c and "_skip" not in c and "_aux" not in c:
                 return True
         return False
 
     def has_reg_data(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         for c in list(df.columns):
-            if "reg_" in c:
+            if "reg_" in c and "_skip" not in c and "_aux" not in c:
                 return True
         return False
 
