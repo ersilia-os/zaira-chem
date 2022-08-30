@@ -8,12 +8,14 @@ import pandas as pd
 import numpy as np
 
 from molmap.model import load_model
+from utils import descriptors_molmap, fingerprints_molmap
 
 file_name = sys.argv[1]
-x1_path = sys.argv[2]
-x2_path = sys.argv[3]
-model_path = sys.argv[4]
+model_path = sys.argv[2]
 path = os.path.dirname(file_name)
+
+mp1 = descriptors_molmap()
+mp2 = fingerprints_molmap()
 
 SMILES_COLUMN = "smiles"
 
@@ -21,11 +23,8 @@ data = pd.read_csv(file_name)
 
 smiles_list = list(data[SMILES_COLUMN])
 
-with open(x1_path, "rb") as f:
-    X1 = np.load(f)
-
-with open(x2_path, "rb") as f:
-    X2 = np.load(f)
+X1 = mp1.batch_transform(smiles_list)
+X2 = mp2.batch_transform(smiles_list)
 
 # Load regression
 if os.path.exists(os.path.join(model_path, "reg")):

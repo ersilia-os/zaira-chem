@@ -4,7 +4,9 @@ from .plots import (
     ActivesInactivesPlot,
     ConfusionPlot,
     RocCurvePlot,
-    ProjectionPlot,
+    ScoreViolinPlot,
+    ProjectionUmapPlot,
+    ProjectionPcaPlot,
     RegressionPlotRaw,
     HistogramPlotRaw,
     RegressionPlotTransf,
@@ -36,8 +38,14 @@ class Reporter(ZairaBase):
     def _roc_curve_plot(self):
         RocCurvePlot(ax=None, path=self.path).save()
 
-    def _projection_plot(self):
-        ProjectionPlot(ax=None, path=self.path).save()
+    def _score_violin_plot(self):
+        ScoreViolinPlot(ax=None, path=self.path).save()
+
+    def _projection_umap_plot(self):
+        ProjectionUmapPlot(ax=None, path=self.path).save()
+
+    def _projection_pca_plot(self):
+        ProjectionPcaPlot(ax=None, path=self.path).save()
 
     def _regression_plot_raw(self):
         RegressionPlotRaw(ax=None, path=self.path).save()
@@ -64,7 +72,9 @@ class Reporter(ZairaBase):
         self._actives_inactives_plot()
         self._confusion_matrix_plot()
         self._roc_curve_plot()
-        self._projection_plot()
+        self._score_violin_plot()
+        self._projection_umap_plot()
+        self._projection_pca_plot()
         self._regression_plot_transf()
         self._histogram_plot_transf()
         self._regression_plot_raw()

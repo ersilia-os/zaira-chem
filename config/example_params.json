@@ -7,5 +7,13 @@
         "grover-embedding",
         "molbert",
         "mordred"
+    ],
+    "estimators": [
+        "baseline-classic",
+        "baseline-fingerprint",
+        "flaml-individual-descriptors",
+        "autogluon-manifolds",
+        "kerastuner-reference-embedding",
+        "molmap"
     ]
 }

@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import json
 import pandas as pd
+from ersilia.utils.terminal import run_command
 
 from .utils.conda import SimpleConda
 
@@ -16,7 +17,7 @@ SMILES_COLUMN = "smiles"
 
 class MolMapModel(object):
     def __init__(self, save_path):
-        self.tmp_folder = tempfile.mkdtemp(prefix="ersilia-")
+        self.tmp_folder = tempfile.mkdtemp(prefix="zairachem-")
         self.save_path = os.path.abspath(save_path)
 
     def fit(self, data):
@@ -37,18 +38,32 @@ class MolMapModel(object):
                 indent=4,
             )
         data_file = os.path.join(self.tmp_folder, "data.csv")
+        x1_path = os.path.join(self.tmp_folder, "x1.np")
+        x2_path = os.path.join(self.tmp_folder, "x2.np")
         data.to_csv(data_file, index=False)
+        script_path = os.path.join(root, "scripts", "describe.py")
+        cmd = "python {0} {1} {2} {3}".format(script_path, data_file, x1_path, x2_path)
+        run_command(cmd)
         script_path = os.path.join(root, "scripts", "fit.py")
-        cmd = "python {0} {1} {2}".format(script_path, data_file, self.save_path)
+        cmd = "python {0} {1} {2} {3} {4}".format(
+            script_path, data_file, x1_path, x2_path, self.save_path
+        )
         SimpleConda().run_commandlines(MOLMAP_CONDA_ENVIRONMENT, cmd)
 
     def predict(self, data):
         with open(os.path.join(self.save_path, COLUMNS_MAPPING_FILENAME), "r") as f:
             columns = json.load(f)
         data_file = os.path.join(self.tmp_folder, "data.csv")
+        x1_path = os.path.join(self.tmp_folder, "x1.np")
+        x2_path = os.path.join(self.tmp_folder, "x2.np")
         data.to_csv(data_file, index=False)
+        script_path = os.path.join(root, "scripts", "describe.py")
+        cmd = "python {0} {1} {2} {3}".format(script_path, data_file, x1_path, x2_path)
+        run_command(cmd)
         script_path = os.path.join(root, "scripts", "predict.py")
-        cmd = "python {0} {1} {2}".format(script_path, data_file, self.save_path)
+        cmd = "python {0} {1} {2} {3} {4}".format(
+            script_path, data_file, x1_path, x2_path, self.save_path
+        )
         SimpleConda().run_commandlines(MOLMAP_CONDA_ENVIRONMENT, cmd)
         data = pd.DataFrame({SMILES_COLUMN: data[SMILES_COLUMN]})
         if len(columns["reg"]) > 0:

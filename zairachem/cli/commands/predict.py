@@ -16,7 +16,15 @@ def predict_cmd():
     @click.option("--input_file", "-i", type=click.STRING)
     @click.option("--output_dir", "-o", default=None, type=click.STRING)
     @click.option("--model_dir", "-m", default=None, type=click.STRING)
-    def predict(input_file, output_dir, model_dir):
+    @click.option(
+        "--flush",
+        "-f",
+        is_flag=True,
+        show_default=True,
+        default=False,
+        help="Clean directory at the end of the pipeline",
+    )
+    def predict(input_file, output_dir, model_dir, flush):
         echo("Results will be stored at {0}".format(output_dir))
         s = PredictSetup(
             input_file=input_file,
@@ -33,6 +41,6 @@ def predict_cmd():
         p.run()
         r = Reporter(path=output_dir)
         r.run()
-        f = Finisher(path=output_dir)
+        f = Finisher(path=output_dir, flush=flush)
         f.run()
         echo("Done", fg="green")

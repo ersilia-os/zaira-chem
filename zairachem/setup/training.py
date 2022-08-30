@@ -13,7 +13,7 @@ from .merge import DataMerger
 from .clean import SetupCleaner
 from .check import SetupChecker
 
-from . import PARAMETERS_FILE, RAW_INPUT_FILENAME
+from . import PARAMETERS_FILE, RAW_INPUT_FILENAME, RAW_REFERENCE_FILENAME
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import DESCRIPTORS_SUBFOLDER
@@ -30,17 +30,32 @@ from ..utils.pipeline import PipelineStep, SessionFile
 
 class TrainSetup(object):
     def __init__(
-        self, input_file, output_dir, time_budget, threshold, direction, parameters
+        self,
+        input_file,
+        reference_file,
+        output_dir,
+        time_budget,
+        task,
+        threshold,
+        direction,
+        parameters,
     ):
         if output_dir is None:
             output_dir = input_file.split(".")[0]
+        if task is None and threshold is not None:
+            task = "classification"
         passed_params = {
             "time_budget": time_budget,
             "threshold": threshold,
             "direction": direction,
+            "task": task,
         }
         self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
+        if reference_file is None:
+            self.reference_file = self.input_file
+        else:
+            self.reference_file = os.path.abspath(reference_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
 
@@ -49,6 +64,13 @@ class TrainSetup(object):
         shutil.copy(
             self.input_file,
             os.path.join(self.output_dir, RAW_INPUT_FILENAME + "." + extension),
+        )
+
+    def _copy_reference_file(self):
+        extension = self.reference_file.split(".")[-1]
+        shutil.copy(
+            self.reference_file,
+            os.path.join(self.output_dir, RAW_REFERENCE_FILENAME + "." + extension),
         )
 
     def _load_params(self, params, passed_params):
@@ -148,6 +170,7 @@ class TrainSetup(object):
             self._make_subfolders()
             self._save_params()
             self._copy_input_file()
+            self._copy_reference_file()
             step.update()
 
     def update_elapsed_time(self):
@@ -161,7 +184,7 @@ class TrainSetup(object):
         self._folds()
         self._tasks()
         self._merge()
-        self._augment()
+        # self._augment()
         self._clean()
         self._check()
         self.update_elapsed_time()

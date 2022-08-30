@@ -73,10 +73,26 @@ class OutcomeAssembler(ZairaBase):
         else:
             path = self.path
         if self.is_predict():
-            path = self.get_trained_dir()
-        with open(os.path.join(path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r") as f:
+            path_trained = self.get_trained_dir()
+        else:
+            path_trained = path
+        with open(
+            os.path.join(path_trained, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r"
+        ) as f:
             model_ids = list(json.load(f))
-        return model_ids
+        model_ids_successfull = []
+        for model_id in model_ids:
+            if os.path.isfile(
+                os.path.join(
+                    path,
+                    ESTIMATORS_SUBFOLDER,
+                    ESTIMATORS_FAMILY_SUBFOLDER,
+                    model_id,
+                    "y_hat.joblib",
+                )
+            ):
+                model_ids_successfull += [model_id]
+        return model_ids_successfull
 
     def run(self):
         model_ids = self._get_model_ids()

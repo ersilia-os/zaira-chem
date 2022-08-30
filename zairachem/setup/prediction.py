@@ -8,6 +8,7 @@ from .tasks import SingleTasksForPrediction
 from .standardize import Standardize
 from .merge import DataMergerForPrediction
 from .clean import SetupCleaner
+from .check import SetupChecker
 
 from . import PARAMETERS_FILE, RAW_INPUT_FILENAME
 
@@ -118,6 +119,12 @@ class PredictSetup(object):
             SetupCleaner(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
             step.update()
 
+    def _check(self):
+        step = PipelineStep("setup_check", self.output_dir)
+        if not step.is_done():
+            SetupChecker(self.output_dir).run()
+            step.update()
+
     def _initialize(self):
         step = PipelineStep("initialize", self.output_dir)
         if not step.is_done():
@@ -139,4 +146,5 @@ class PredictSetup(object):
             self._tasks()
         self._merge()
         self._clean()
+        self._check()
         self.update_elapsed_time()

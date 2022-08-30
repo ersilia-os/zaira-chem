@@ -52,8 +52,9 @@ class BasePlot(BaseResults):
 
     def save(self):
         if self.is_available:
+            plt.tight_layout()
             plt.savefig(
-                os.path.join(self.path, REPORT_SUBFOLDER, self.name + ".png"), dpi=300
+                os.path.join(self.path, REPORT_SUBFOLDER, self.name + ".png"), dpi=600
             )
 
     def load(self):

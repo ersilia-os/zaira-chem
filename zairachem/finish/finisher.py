@@ -32,16 +32,22 @@ class Cleaner(ZairaBase):
         self._clean_descriptors_by_subfolder(self.path, DESCRIPTORS_SUBFOLDER)
 
     def run(self):
+        self.logger.debug("Cleaning descriptors by subfolder")
         self._clean_descriptors()
 
 
 class Finisher(ZairaBase):
-    def __init__(self, path):
+    def __init__(self, path, flush=False):
         ZairaBase.__init__(self)
         if path is None:
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.flush = flush
+
+    def _clean_descriptors(self):
+        if self.flush:
+            Cleaner(path=self.path).run()
 
     def _predictions_file(self):
         shutil.copy(
@@ -51,5 +57,5 @@ class Finisher(ZairaBase):
 
     def run(self):
         self.logger.debug("Finishing")
-        Cleaner(path=self.path).run()
+        self._clean_descriptors()
         self._predictions_file()

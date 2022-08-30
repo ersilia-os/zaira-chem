@@ -28,7 +28,19 @@ from .vars import SESSION_FILE
 from .vars import ENSEMBLE_MODE
 
 
+def resolve_output_dir(output_dir):
+    if output_dir is None:
+        system_session = os.path.join(BASE_DIR, SESSION_FILE)
+        with open(system_session, "r") as f:
+            session = json.load(f)
+        return session["output_dir"]
+    else:
+        return os.path.abspath(output_dir)
+
+
 def create_session_symlink(output_dir):
+    if output_dir is None:
+        output_dir = resolve_output_dir(output_dir)
     output_session = os.path.join(os.path.abspath(output_dir), SESSION_FILE)
     system_session = os.path.join(BASE_DIR, SESSION_FILE)
     if os.path.islink(system_session):

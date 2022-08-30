@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 from ..tools.autogluon.multilabel import MultilabelPredictor, TabularDataset
 
-AUTOGLUON_TIME_BUDGET_SECONDS = 600
-AUTOGLUON_MINIMUM_TIME_BUDGET_SECONDS = 600
-AUTOGLUON_MAXIMUM_TIME_BUDGET_SECONDS = 1800
+AUTOGLUON_TIME_BUDGET_SECONDS = 300
+AUTOGLUON_MINIMUM_TIME_BUDGET_SECONDS = 60
+AUTOGLUON_MAXIMUM_TIME_BUDGET_SECONDS = 600
 
 
 class AutoGluonEstimator(object):
@@ -40,7 +40,7 @@ class AutoGluonEstimator(object):
             train_data=df,
             time_limit=self.time_limit,
             refit_full=True,
-            presets="best_quality",
+            presets="good_quality",
         )
 
     def get_out_of_sample(self):

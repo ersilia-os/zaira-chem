@@ -8,6 +8,7 @@ from rdkit import Chem
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import ERSILIA_HUB_DEFAULT_MODELS
+from ..vars import DEFAULT_ESTIMATORS
 from .schema import InputSchema
 from . import (
     COMPOUNDS_FILENAME,
@@ -89,6 +90,8 @@ class ParametersFile(object):
             data["direction"] = "high"
         if "ersilia_hub" not in data:
             data["ersilia_hub"] = ERSILIA_HUB_DEFAULT_MODELS
+        if "estimators" not in data:
+            data["estimators"] = DEFAULT_ESTIMATORS
         return data
 
 
@@ -144,12 +147,18 @@ class SingleFile(InputSchema):
         self.values_column = resolved_columns["values_column"]
         self.date_column = resolved_columns["date_column"]
         self.group_column = resolved_columns["group_column"]
+        identifiers = self._make_identifiers()
 
         if self.identifier_column is None:
-            identifiers = self._make_identifiers()
+            df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         else:
-            identifiers = self._sanitize_identifiers()
-        df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
+            identifiers_skip = self._sanitize_identifiers()
+            df = pd.DataFrame(
+                {
+                    COMPOUND_IDENTIFIER_COLUMN: identifiers,
+                    COMPOUND_IDENTIFIER_COLUMN + "_skip": identifiers_skip,
+                }
+            )
 
         df[SMILES_COLUMN] = self.df[self.smiles_column]
 

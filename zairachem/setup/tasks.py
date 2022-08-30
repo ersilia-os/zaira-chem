@@ -1,9 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+import collections
 from collections import OrderedDict
-from scipy.stats import rankdata, gumbel_r
-from scipy import interpolate
 import joblib
 import json
 
@@ -26,6 +25,27 @@ from sklearn.preprocessing import PowerTransformer, QuantileTransformer
 
 
 USED_CUTS_FILE = "used_cuts.json"
+
+
+class ExpectedTaskType(ZairaBase):
+    def __init__(self, path):
+        ZairaBase.__init__(self)
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
+        if self.is_predict():
+            self.trained_path = self.get_trained_dir()
+        else:
+            self.trained_path = self.get_output_dir()
+
+    def _get_params(self):
+        params = ParametersFile(path=os.path.join(self.trained_path, DATA_SUBFOLDER))
+        return params.params
+
+    def get(self):
+        params = self._get_params()
+        return params["task"]
 
 
 class RegTasks(object):
@@ -140,10 +160,6 @@ class ClfTasks(object):
         self.direction = params["direction"]
         self.thresholds = params["thresholds"]
         self.path = path
-        print(self.values)
-        print(self.direction)
-        print(self.thresholds)
-        print(self.path)
 
     def _is_high(self):
         if self.direction == "high":
@@ -152,7 +168,6 @@ class ClfTasks(object):
             return False
 
     def _binarize(self, cut):
-        b = []
         is_high = self._is_high()
         y = []
         for v in self.values:
@@ -271,6 +286,28 @@ class AuxiliaryBinaryTask(object):
         return self.df[self.reference]
 
 
+def task_skipper(df, task):
+    columns = list(df.columns)
+    new_columns = []
+    if task == "regression":
+        for c in columns:
+            if c.startswith("clf"):
+                if "_skip" not in c and "_aux" not in c:
+                    c = c + "_skip"
+            new_columns += [c]
+    if task == "classification":
+        for c in columns:
+            if c.startswith("reg"):
+                if "_skip" not in c and "_aux" not in c:
+                    c = c + "_skip"
+            new_columns += [c]
+    coldict = {}
+    for o, n in zip(columns, new_columns):
+        coldict[o] = n
+    df = df.rename(columns=coldict)
+    return df
+
+
 class SingleTasks(ZairaBase):
     def __init__(self, path):
         ZairaBase.__init__(self)
@@ -282,6 +319,7 @@ class SingleTasks(ZairaBase):
             self.trained_path = self.get_trained_dir()
         else:
             self.trained_path = self.get_output_dir()
+        self._task = ExpectedTaskType(path=path).get()
 
     def _get_params(self):
         params = ParametersFile(path=os.path.join(self.trained_path, DATA_SUBFOLDER))
@@ -289,19 +327,62 @@ class SingleTasks(ZairaBase):
 
     def _get_data(self):
         df = pd.read_csv(os.path.join(self.path, VALUES_FILENAME))
-        return df.drop(columns=[QUALIFIER_COLUMN])
+        columns = list(df.columns)
+        if QUALIFIER_COLUMN in columns:
+            return df.drop(columns=[QUALIFIER_COLUMN])
+        else:
+            return df
+
+    def _rewrite_data(self, df):
+        df.to_csv(os.path.join(self.path, VALUES_FILENAME), sep=",", index=False)
 
     def _is_simply_binary_classification(self, data):
-        if len(set(data[VALUES_COLUMN])) == 2:
+        unique_values = set(data[VALUES_COLUMN])
+        if len(unique_values) == 2:
+            if unique_values == {0, 1}:
+                self.logger.debug(
+                    "It is a binary classification, and values are already expressed as 0 and 1."
+                )
+            else:
+                self.logger.debug("This looks like a binary classification")
+                unique_values_count = collections.defaultdict(int)
+                for v in list(data[VALUES_COLUMN]):
+                    unique_values_count[v] += 1
+                unique_values_count = sorted(
+                    unique_values_count.items(), key=lambda x: -x[1]
+                )
+                val_0 = unique_values_count[0][0]  # majority class
+                val_1 = unique_values_count[0][1]  # minority class
+                self.logger.debug("0: {0}, 1: {1}".format(val_0, val_1))
+                data.loc[data[VALUES_COLUMN] == val_0, [VALUES_COLUMN]] = 0
+                data.loc[data[VALUES_COLUMN] == val_1, [VALUES_COLUMN]] = 1
+                self._rewrite_data(data)
+            self.logger.debug("It is simply classification")
             return True
+        if len(unique_values) == 3:
+            if unique_values == {0, 0.5, 1}:
+                self.logger.debug(
+                    "This looks like a binary classification where there is a third 0.5 value that corresponds to unknowns"
+                )
+                data.loc[data[VALUES_COLUMN] == 0.5, [VALUES_COLUMN]] = np.nan
+                data = data[data[VALUES_COLUMN].notnull()]
+                self._rewrite_data(data)
+                return True
         else:
+            self.logger.debug("There is continuous data")
             return False
 
     def run(self):
         df = self._get_data()
         if self._is_simply_binary_classification(df):
+            self.logger.debug("It is simply a binary classification")
+            if self.task is not None:
+                assert self.task == "classification"
+            df = self._get_data()
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
+            self.logger.debug("Data is not simply a binary")
+            df = self._get_data()
             params = self._get_params()
             reg_tasks = RegTasks(df, params, path=self.trained_path)
             reg = reg_tasks.as_dict()
@@ -317,6 +398,7 @@ class SingleTasks(ZairaBase):
         df = df.drop(columns=[VALUES_COLUMN])
         auxiliary = AuxiliaryBinaryTask(df)
         df[AUXILIARY_TASK_COLUMN] = auxiliary.get()
+        df = task_skipper(df, self._task)
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)
 
 
@@ -327,8 +409,12 @@ class SingleTasksForPrediction(SingleTasks):
     def run(self):
         df = self._get_data()
         if self._is_simply_binary_classification(df):
+            self.logger.debug("It is simply a binary classification")
+            df = self._get_data()
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
+            self.logger.debug("Data is not simply a binary classification")
+            df = self._get_data()
             params = self._get_params()
             reg_tasks = RegTasksForPrediction(df, params, self.path)
             reg_tasks.load(self.trained_path)
@@ -341,4 +427,5 @@ class SingleTasksForPrediction(SingleTasks):
             for k, v in clf.items():
                 df[k] = v
         df = df.drop(columns=[VALUES_COLUMN])
+        df = task_skipper(df, self._task)
         df.to_csv(os.path.join(self.path, TASKS_FILENAME), index=False)
