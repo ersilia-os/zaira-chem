@@ -159,11 +159,10 @@ class IndependentLinearRegressor(object):
         Y_hat = []
         for c in cols:
             filename = self._get_model_filename(c)
-            print(filename)
             if os.path.exists(filename):
                 mdl = joblib.load(filename)
                 X = np.array(df_X[c]).reshape(-1, 1)
-                y_hat = mdl.predict(X)
+                y_hat = mdl.predict(X)[:, 0]
                 Y_hat += [y_hat]
         Y_hat = np.array(Y_hat).T
         return np.mean(Y_hat, axis=1)
@@ -258,7 +257,7 @@ class Fitter(BaseEstimator):
         if X_reg.shape[1] > 0:
             reg = IndependentLinearRegressor(path=self.trained_path)
             reg.fit(X_reg.iloc[valid_idxs], Y_reg.iloc[valid_idxs])
-            Y_reg_hat = reg.predict(X_reg[valid_idxs]).reshape(-1, 1)
+            Y_reg_hat = reg.predict(X_reg.iloc[valid_idxs]).reshape(-1, 1)
         else:
             reg = None
         # classification
