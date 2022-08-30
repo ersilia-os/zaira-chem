@@ -44,6 +44,8 @@ class TrainSetup(object):
             output_dir = input_file.split(".")[0]
         if task is None and threshold is not None:
             task = "classification"
+        else:
+            task = "regression"
         passed_params = {
             "time_budget": time_budget,
             "threshold": threshold,

@@ -9,6 +9,7 @@ import json
 from . import (
     COMPOUNDS_FILENAME,
     COMPOUND_IDENTIFIER_COLUMN,
+    PARAMETERS_FILE,
     SMILES_COLUMN,
     VALUES_FILENAME,
     VALUES_COLUMN,
@@ -358,6 +359,7 @@ class SingleTasks(ZairaBase):
                 data.loc[data[VALUES_COLUMN] == val_1, [VALUES_COLUMN]] = 1
                 self._rewrite_data(data)
             self.logger.debug("It is simply classification")
+            self._force_classification_task()
             return True
         if len(unique_values) == 3:
             if unique_values == {0, 0.5, 1}:
@@ -367,10 +369,18 @@ class SingleTasks(ZairaBase):
                 data.loc[data[VALUES_COLUMN] == 0.5, [VALUES_COLUMN]] = np.nan
                 data = data[data[VALUES_COLUMN].notnull()]
                 self._rewrite_data(data)
+                self._force_classification_task()
                 return True
         else:
             self.logger.debug("There is continuous data")
             return False
+    
+    def _force_classification_task(self):
+        params = self._get_params()
+        params["task"] = "classification"
+        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, PARAMETERS_FILE), "w") as f:
+            json.dump(params, f, indent=4)
+        self.task = "classification"
 
     def run(self):
         df = self._get_data()
@@ -411,6 +421,8 @@ class SingleTasksForPrediction(SingleTasks):
         if self._is_simply_binary_classification(df):
             self.logger.debug("It is simply a binary classification")
             df = self._get_data()
+            if self.task is not None:
+                assert self.task == "classification"
             df["clf_ex1"] = [int(x) for x in list(df[VALUES_COLUMN])]
         else:
             self.logger.debug("Data is not simply a binary classification")
