@@ -12,7 +12,7 @@ from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
 
 RAW_FILE_NAME = "raw.h5"
 
-TIMEOUT_SEC = 60
+TIMEOUT_SEC = 600
 
 
 class RawLoader(ZairaBase):

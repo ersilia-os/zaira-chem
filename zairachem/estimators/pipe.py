@@ -1,4 +1,5 @@
 import os
+import json
 
 from .. import ZairaBase
 from ..utils.pipeline import PipelineStep
@@ -10,6 +11,9 @@ from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
 from .from_molmap.pipe import MolMapPipeline
 from .evaluate import SimpleEvaluator
 
+from ..vars import DATA_SUBFOLDER
+from ..setup import PARAMETERS_FILE
+
 
 class EstimatorPipeline(ZairaBase):
     def __init__(self, path):
@@ -20,8 +24,23 @@ class EstimatorPipeline(ZairaBase):
             self.path = path
         self.output_dir = os.path.abspath(self.path)
         assert os.path.exists(self.output_dir)
+        self.params = self._load_params()
+        self.get_estimators()
+
+    def _load_params(self):
+        with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
+            params = json.load(f)
+        return params
+
+    def get_estimators(self):
+        self.logger.debug("Getting estimators")
+        self._estimators_to_use = set()
+        for x in self.params["estimators"]:
+            self._estimators_to_use.update([x])
 
     def _classic_estimator_pipeline(self, time_budget_sec):
+        if "baseline-classic" not in self._estimators_to_use:
+            return
         step = PipelineStep("classic_estimator_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running classic estimator pipeline")
@@ -30,6 +49,8 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _fingerprint_estimator_pipeline(self, time_budget_sec):
+        if "baseline-fingerprint" not in self._estimators_to_use:
+            return
         step = PipelineStep("fingerprint_estimator_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running fingerprint estimator pipeline")
@@ -38,6 +59,8 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _individual_estimator_pipeline(self, time_budget_sec):
+        if "flaml-individual-descriptors" not in self._estimators_to_use:
+            return
         step = PipelineStep("individual_estimator_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running individual estimator pipeline")
@@ -46,6 +69,8 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _manifolds_pipeline(self, time_budget_sec):
+        if "autogluon-manifolds" not in self._estimators_to_use:
+            return
         step = PipelineStep("manifolds_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Running manifolds estimator pipeline")
@@ -54,6 +79,8 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _reference_pipeline(self, time_budget_sec):
+        if "kerastuner-reference-embedding" not in self._estimators_to_use:
+            return
         step = PipelineStep("reference_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Reference embedding pipeline")
@@ -62,6 +89,8 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _molmap_pipeline(self, time_budget_sec):
+        if "molmap" not in self._estimators_to_use:
+            return
         step = PipelineStep("molmap_pipeline", self.output_dir)
         if not step.is_done():
             self.logger.debug("Molmap estimator pipeline")

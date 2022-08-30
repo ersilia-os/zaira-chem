@@ -44,7 +44,12 @@ class PoolAssembler(BaseOutcomeAssembler):
         df = self._back_to_raw(df)
         df_c = self._get_compounds()
         df_y = df
-        df = pd.concat([df_c, df_y], axis=1)
+        avail_columns = set(df_y.columns)
+        if "compound_id" in avail_columns:
+            df = df_c.merge(df_y, how="left", on="compound_id")
+        else:
+            df = pd.concat([df_c, df_y], axis=1)
+        df = df.reset_index(drop=True)
         df.to_csv(
             os.path.join(self.path, POOL_SUBFOLDER, RESULTS_UNMAPPED_FILENAME),
             index=False,

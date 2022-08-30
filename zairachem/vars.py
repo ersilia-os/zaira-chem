@@ -39,6 +39,15 @@ ERSILIA_HUB_DEFAULT_MODELS = [
     "mordred",
 ]
 
+DEFAULT_ESTIMATORS = [
+    "baseline-classic",
+    "baseline-fingerprint",
+    "flaml-individual-descriptors",
+    "autogluon-manifolds",
+    "kerastuner-reference-embedding",
+    "molmap",
+]
+
 ENSEMBLE_MODE = (
-    "bagging"  # bagging, blending, stacking / at the moment stacking is not available
+    "bagging"  # bagging, blending, stacking / at the moment only bagging is available
 )

@@ -32,6 +32,10 @@ class ResultsFetcher(ZairaBase):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
         return df
 
+    def _read_data_train(self):
+        df = pd.read_csv(os.path.join(self.trained_path, DATA_SUBFOLDER, DATA_FILENAME))
+        return df
+
     def _read_pooled_results(self):
         df = pd.read_csv(os.path.join(self.path, POOL_SUBFOLDER, RESULTS_FILENAME))
         return df
@@ -92,6 +96,12 @@ class ResultsFetcher(ZairaBase):
             if "clf" in c and "_skip" not in c and "_aux" not in c:
                 return list(df[c])
 
+    def get_actives_inactives_trained(self):
+        df = self._read_data_train()
+        for c in list(df.columns):
+            if "clf" in c and "_skip" not in c and "_aux" not in c:
+                return list(df[c])
+
     def get_raw(self):
         df = self._read_data()
         for c in list(df.columns):
@@ -104,31 +114,34 @@ class ResultsFetcher(ZairaBase):
             if "reg" in c and "_skip" not in c and "_aux" not in c:
                 return list(df[c])
 
+    def get_true_clf(self):
+        return self.get_actives_inactives()
+
     def get_pred_binary_clf(self):
         df = self._read_pooled_results()
         for c in list(df.columns):
-            if "clf" in c and "bin" in c:
+            if "clf" in c and "bin" in c and "_skip" not in c:
                 return list(df[c])
 
     def get_pred_proba_clf(self):
         df = self._read_pooled_results()
         for c in list(df.columns):
-            if "clf" in c and "bin" not in c:
+            if "clf" in c and "bin" not in c and "_skip" not in c:
                 return list(df[c])
 
     def get_pred_reg_trans(self):
         df = self._read_pooled_results()
         for c in list(df.columns):
-            if "reg" in c and "raw" not in c:
+            if "reg" in c and "raw" not in c and "_skip" not in c:
                 return list(df[c])
 
     def get_pred_reg_raw(self):
         df = self._read_pooled_results()
         for c in list(df.columns):
-            if "reg" in c and "raw" in c:
+            if "reg" in c and "raw" in c and "_skip" not in c:
                 return list(df[c])
 
-    def get_projections(self):
+    def get_projections_umap(self):
         df = self._read_processed_data()
         umap0 = [0] * df.shape[0]
         umap1 = [0] * df.shape[0]
@@ -139,7 +152,18 @@ class ResultsFetcher(ZairaBase):
                 umap1 = list(df["umap-1"])
         return umap0, umap1
 
-    def get_projections_trained(self):
+    def get_projections_pca(self):
+        df = self._read_processed_data()
+        pca0 = [0] * df.shape[0]
+        pca1 = [0] * df.shape[0]
+        for c in list(df.columns):
+            if "pca-0" in c:
+                pca0 = list(df["pca-0"])
+            if "pca-1" in c:
+                pca1 = list(df["pca-1"])
+        return pca0, pca1
+
+    def get_projections_umap_trained(self):
         df = self._read_processed_data_train()
         umap0 = [0] * df.shape[0]
         umap1 = [0] * df.shape[0]
@@ -149,6 +173,17 @@ class ResultsFetcher(ZairaBase):
             if "umap-1" in c:
                 umap1 = list(df["umap-1"])
         return umap0, umap1
+
+    def get_projections_pca_trained(self):
+        df = self._read_processed_data_train()
+        pca0 = [0] * df.shape[0]
+        pca1 = [0] * df.shape[0]
+        for c in list(df.columns):
+            if "pca-0" in c:
+                pca0 = list(df["pca-0"])
+            if "pca-1" in c:
+                pca1 = list(df["pca-1"])
+        return pca0, pca1
 
     def get_parameters(self):
         with open(

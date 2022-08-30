@@ -4,18 +4,15 @@ import networkx as nx
 from ..tools.fpsim2.searcher import SimilaritySearcher, RandomSearcher
 from ..tools.exmol.sampler import StonedSampler
 
-MAX_N = 5000
-MIN_N = 0
-AUGMENTATION_FACTOR = 0.1
-
 TANIMOTO_CUTOFF = 0.6
 
 
 class Sampler(object):
-    def __init__(self):
+    def __init__(self, min_similarity=TANIMOTO_CUTOFF):
         self.stoned_sampler = StonedSampler()
         self.similarity_searcher = SimilaritySearcher()
         self.random_searcher = RandomSearcher()
+        self.min_similarity = min_similarity
 
     def has_available_nodes(self, G, query_smiles):
         for n in G.nodes():
@@ -62,7 +59,7 @@ class Sampler(object):
         return sampled
 
     def sample(self, smiles_list, n):
-        ref = self._sample(smiles_list, TANIMOTO_CUTOFF, max_n=n)
+        ref = self._sample(smiles_list, self.min_similarity, max_n=n)
         rnd = self.random_searcher.search(n - len(ref))
         sampled = list(ref.union(rnd))
         random.shuffle(sampled)

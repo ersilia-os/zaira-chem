@@ -114,6 +114,8 @@ class FingerprintRegressor(object):
     def __init__(
         self, automl=True, time_budget_sec=_TIME_BUDGET_SEC, estimator_list=None
     ):
+        if estimator_list is None:
+            estimator_list = ["rf", "extra_tree", "xgboost", "lgbm", "lr"]
         self.time_budget_sec = time_budget_sec
         self.estimator_list = estimator_list
         self.model = None
