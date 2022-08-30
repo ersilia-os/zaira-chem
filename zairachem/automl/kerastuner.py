@@ -179,33 +179,47 @@ class KerasTunerEstimator(object):
 
     def fit(self, data, labels):
         data_x, data_clf, data_reg = self._coltype_splitter(data, labels)
+        clf_cols = list(data_clf)
+        reg_cols = list(data_reg)
         X = np.array(data_x)
-        self.reg_estimator = TunerTrainerRegressor(
-            X, np.array(data_reg), save_path=self.save_path
-        )
-        self.reg_estimator.fit()
-        self.clf_estimator = TunerTrainerClassifier(
-            X, np.array(data_clf), save_path=self.save_path
-        )
-        self.clf_estimator.fit()
+        if reg_cols:
+            self.reg_estimator = TunerTrainerRegressor(
+                X, np.array(data_reg), save_path=self.save_path
+            )
+            self.reg_estimator.fit()
+        else:
+            self.reg_estimator = None
+        if clf_cols:
+            self.clf_estimator = TunerTrainerClassifier(
+                X, np.array(data_clf), save_path=self.save_path
+            )
+            self.clf_estimator.fit()
+        else:
+            self.clf_estimator = None
 
     def save(self):
-        self.reg_estimator.save()
-        self.clf_estimator.save()
+        if self.reg_estimator is not None:
+            print("Saving reg estimator")
+            self.reg_estimator.save()
+        if self.clf_estimator is not None:
+            print("Saving clf estimator")
+            self.clf_estimator.save()
         with open(os.path.join(self.save_path, COLUMNS_FILENAME), "w") as f:
             json.dump(self.columns, f)
 
     def load(self):
         with open(os.path.join(self.save_path, COLUMNS_FILENAME), "r") as f:
             columns = json.load(f)
-        reg_estimator = load_model(
-            os.path.join(self.save_path, TUNER_PROJECT_NAME, "reg"),
-            custom_objects=ak.CUSTOM_OBJECTS,
-        )
-        clf_estimator = load_model(
-            os.path.join(self.save_path, TUNER_PROJECT_NAME, "clf"),
-            custom_objects=ak.CUSTOM_OBJECTS,
-        )
+        reg_path = os.path.join(self.save_path, TUNER_PROJECT_NAME, "reg")
+        if os.path.exists(reg_path):
+            reg_estimator = load_model(reg_path, custom_objects=ak.CUSTOM_OBJECTS)
+        else:
+            reg_estimator = None
+        clf_path = os.path.join(self.save_path, TUNER_PROJECT_NAME, "clf")
+        if os.path.exists(clf_path):
+            clf_estimator = load_model(clf_path, custom_objects=ak.CUSTOM_OBJECTS)
+        else:
+            clf_estimator = None
         return KerasTunerArtifact(
             reg_estimator=reg_estimator, clf_estimator=clf_estimator, columns=columns
         )
@@ -219,21 +233,24 @@ class KerasTunerArtifact(object):
 
     def predict(self, data):
         X = np.array(data[self.columns["X"]])
-        print(self.reg_estimator.summary())
-        y_reg = self.reg_estimator.predict(X)
-        print(self.clf_estimator.summary())
-        y_clf = self.clf_estimator.predict_proba(X)
-        y_clf_bin = np.zeros(y_clf.shape)
-        y_clf_bin[y_clf > 0.5] = 1
+        if self.reg_estimator is not None:
+            print(self.reg_estimator.summary())
+            y_reg = self.reg_estimator.predict(X)
+        if self.clf_estimator is not None:
+            print(self.clf_estimator.summary())
+            y_clf = self.clf_estimator.predict_proba(X)
+            y_clf_bin = np.zeros(y_clf.shape)
+            y_clf_bin[y_clf > 0.5] = 1
         P = []
         labels = []
         for label in self.columns["labels"]:
-            if "clf" in label:
+            if "clf" in label and self.clf_estimator is not None:
                 idx = self.columns["clf"].index(label)
                 P += [list(y_clf[:, idx])]
                 P += [list(y_clf_bin[:, idx])]
                 labels += [label, label + "_bin"]
-            else:
+                continue
+            if "reg" in label and self.reg_estimator is not None:
                 idx = self.columns["reg"].index(label)
                 P += [list(y_reg[:, idx])]
                 labels += [label]

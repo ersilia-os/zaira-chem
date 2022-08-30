@@ -310,10 +310,17 @@ class SingleFileForPrediction(SingleFile):
         resolved_columns = self.resolve_columns()
         self.identifier_column = resolved_columns["identifier_column"]
         self.smiles_column = resolved_columns["smiles_column"]
+        identifiers = self._make_identifiers()
         if self.identifier_column is None:
-            identifiers = self._make_identifiers()
+            df = pd.DataFrame({COMPOUND_IDENTIFIER_COLUMN: identifiers})
         else:
-            identifiers = list(self.df[self.identifier_column])
+            identifiers_skip = list(self.df[self.identifier_column])
+            df = pd.DataFrame(
+                {
+                    COMPOUND_IDENTIFIER_COLUMN: identifiers,
+                    COMPOUND_IDENTIFIER_COLUMN + "_skip": identifiers_skip,
+                }
+            )
         self.qualifier_column = resolved_columns["qualifier_column"]
         self.values_column = resolved_columns["values_column"]
         if self.values_column is not None:

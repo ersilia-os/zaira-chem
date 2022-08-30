@@ -143,6 +143,31 @@ class IndividualEstimatorsAurocPlot(BasePlot):
             self.is_available = False
 
 
+class IndividualEstimatorsClassificationScorePlot(BasePlot):
+    def __init__(self, ax, path):
+        BasePlot.__init__(self, ax=ax, path=path)
+        if self.has_clf_data():
+            self.name = "raw-classification-scores"
+            ax = self.ax
+            self.fetcher = ResultsFetcher(path=path)
+            tasks = self.fetcher.get_clf_tasks()
+            task = tasks[0]
+            df_ys = self.fetcher._read_individual_estimator_results(task)
+            vals = []
+            labels = []
+            for yp in list(df_ys.columns):
+                vals += list(df_ys[yp])
+                labels += [yp] * len(df_ys[yp])
+            data = pd.DataFrame({"label": labels, "values": vals})
+            sns.boxplot(x="label", y="values", data=data, ax=ax)
+            ax.set_ylabel("Classification score (probability)")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+            ax.set_xlabel("")
+            self.is_available = True
+        else:
+            self.is_available = False
+
+
 class IndividualEstimatorsR2Plot(BasePlot):
     def __init__(self, ax, path):
         BasePlot.__init__(self, ax=ax, path=path)

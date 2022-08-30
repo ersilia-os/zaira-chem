@@ -40,7 +40,7 @@ class AutoGluonEstimator(object):
             train_data=df,
             time_limit=self.time_limit,
             refit_full=True,
-            presets="good_quality",
+            # presets='high_quality_fast_inference_only_refit',
         )
 
     def get_out_of_sample(self):
