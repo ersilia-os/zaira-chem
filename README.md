@@ -1,7 +1,5 @@
 # ZairaChem: Automated ML-based (Q)SAR
 
-**THIS REPOSITORY IS WORK IN PROGRESS**
-
 ZairaChem is the first library of Ersilia's family of tools devoted to providing **out-of-the-box** machine learning solutions for biomedical problems. In this case, we have focused on (Q)SAR models. (Q)SAR models take chemical structures as input and give as output predicted properties, typically pharmacological properties such as bioactivity against a certain target.
 
 ## Installation
@@ -36,7 +34,7 @@ zairachem example -f input.csv
 ### Fit
 
 ```bash
-zairachem fit -i input.csv -o model_folder
+zairachem fit -i input.csv -m model_folder
 ```
 
 ### Predict
