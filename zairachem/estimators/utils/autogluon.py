@@ -57,7 +57,7 @@ class Fitter(BaseEstimator):
         df_Y = self._get_Y()
         df = pd.concat([df_X, df_Y], axis=1)
         labels = list(df_Y.columns)
-        self.logger.debug("Staring AutoGluon estimation")
+        self.logger.debug("Starting AutoGluon estimation")
         estimator = AutoGluonEstimator(
             save_path=self.trained_path, time_budget=time_budget_sec
         )

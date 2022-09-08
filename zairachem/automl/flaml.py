@@ -17,7 +17,7 @@ from ..vars import N_FOLDS
 FLAML_TIME_BUDGET_SECONDS = 60
 
 FLAML_COLD_MINIMUM_TIME_BUDGET_SECONDS = 30  # 60
-FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS = 100  # 600
+FLAML_COLD_MAXIMUM_TIME_BUDGET_SECONDS = 120  # 600
 FLAML_WARM_MINIMUM_TIME_BUDGET_SECONDS = 10  # 10
 FLAML_WARM_MAXIMUM_TIME_BUDGET_SECONDS = 60  # 60
 
@@ -511,10 +511,6 @@ class FlamlRegressor(object):
 
     def load(self, file_name):
         model = joblib.load(file_name)
-        file_name = file_name.split(".")[0] + ".json"
-        if os.path.exists(file_name):
-            with open(file_name, "r") as f:
-                data = json.load(f)
         return FlamlRegressorArtifact(model)
 
 

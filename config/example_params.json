@@ -5,13 +5,14 @@
         "morgan-counts",
         "cc-signaturizer",
         "grover-embedding",
-        "molbert",
         "mordred"
     ],
     "estimators": [
         "baseline-classic",
         "baseline-fingerprint",
         "flaml-individual-descriptors",
+        "flaml-individual-reduced-descriptors",
+        "flaml-individual-selected-descriptors",
         "autogluon-manifolds",
         "kerastuner-reference-embedding",
         "molmap"

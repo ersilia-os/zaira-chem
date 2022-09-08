@@ -6,6 +6,12 @@ from ..utils.pipeline import PipelineStep
 from .from_classic.pipe import ClassicPipeline
 from .from_fingerprint.pipe import FingerprintPipeline
 from .from_individual_full_descriptors.pipe import IndividualFullDescriptorPipeline
+from .from_individual_reduced_descriptors.pipe import (
+    IndividualReducedDescriptorPipeline,
+)
+from .from_individual_selected_descriptors.pipe import (
+    IndividualSelectedDescriptorPipeline,
+)
 from .from_manifolds.pipe import ManifoldPipeline
 from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
 from .from_molmap.pipe import MolMapPipeline
@@ -68,6 +74,26 @@ class EstimatorPipeline(ZairaBase):
             p.run(time_budget_sec=time_budget_sec)
             step.update()
 
+    def _individual_reduced_estimator_pipeline(self, time_budget_sec):
+        if "flaml-individual-reduced-descriptors" not in self._estimators_to_use:
+            return
+        step = PipelineStep("individual_reduced_estimator_pipeline", self.output_dir)
+        if not step.is_done():
+            self.logger.debug("Running individual reduced estimator pipeline")
+            p = IndividualReducedDescriptorPipeline(path=self.path)
+            p.run(time_budget_sec=time_budget_sec)
+            step.update()
+
+    def _individual_selected_estimator_pipeline(self, time_budget_sec):
+        if "flaml-individual-selected-descriptors" not in self._estimators_to_use:
+            return
+        step = PipelineStep("individual_selected_estimator_pipeline", self.output_dir)
+        if not step.is_done():
+            self.logger.debug("Running individual selected estimator pipeline")
+            p = IndividualSelectedDescriptorPipeline(path=self.path)
+            p.run(time_budget_sec=time_budget_sec)
+            step.update()
+
     def _manifolds_pipeline(self, time_budget_sec):
         if "autogluon-manifolds" not in self._estimators_to_use:
             return
@@ -105,9 +131,11 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def run(self, time_budget_sec=None):
-        self._classic_estimator_pipeline(time_budget_sec)
-        self._fingerprint_estimator_pipeline(time_budget_sec)
-        self._individual_estimator_pipeline(time_budget_sec)
+        # self._classic_estimator_pipeline(time_budget_sec)
+        # self._fingerprint_estimator_pipeline(time_budget_sec)
+        # self._individual_estimator_pipeline(time_budget_sec)
+        # self._individual_reduced_estimator_pipeline(time_budget_sec)
+        self._individual_selected_estimator_pipeline(time_budget_sec)
         self._manifolds_pipeline(time_budget_sec)
         self._reference_pipeline(time_budget_sec)
         self._molmap_pipeline(time_budget_sec)
