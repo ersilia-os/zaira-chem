@@ -8,6 +8,10 @@ from rdkit.Chem import rdMolDescriptors as rd
 from rdkit import Chem
 
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.feature_selection import f_classif, f_regression
+from sklearn.feature_selection import SelectKBest
+from sklearn.decomposition import PCA
+from lol import LOL
 from flaml import AutoML
 
 from ..setup import SMILES_COLUMN
@@ -63,26 +67,43 @@ class FingerprintDescriptor(object):
 
 class FingerprintClassifier(object):
     def __init__(
-        self, automl=True, time_budget_sec=_TIME_BUDGET_SEC, estimator_list=None
+        self,
+        automl=True,
+        reduce=False,
+        time_budget_sec=_TIME_BUDGET_SEC,
+        estimator_list=None,
     ):
         self.time_budget_sec = time_budget_sec
         self.estimator_list = estimator_list
         self.model = None
         self.explainer = None
+        self._reduce = reduce
         self._automl = automl
         self.descriptor = FingerprintDescriptor()
+
+    def _fit_reducer(self, X, y):
+        if self._reduce:
+            max_n = np.min([X.shape[0], X.shape[1], 100])
+            self.reducer = LOL(n_components=max_n)
+            self.reducer.fit(X, y)
+        else:
+            max_n = np.min([X.shape[0], X.shape[1], 500])
+            self.reducer = SelectKBest(f_classif, k=max_n)
+            self.reducer.fit(X, y)
 
     def fit_automl(self, smiles, y):
         model = AutoML(task="classification", time_budget=self.time_budget_sec)
         X = self.descriptor.fit(smiles)
         y = np.array(y)
+        self._fit_reducer(X, y)
+        X = self.reducer.transform(X)
         model.fit(
             X, y, time_budget=self.time_budget_sec, estimator_list=self.estimator_list
         )
         self._n_pos = int(np.sum(y))
         self._n_neg = len(y) - self._n_pos
-        self._auroc = 1 - model.best_loss
-        self.meta = {"n_pos": self._n_pos, "n_neg": self._n_neg, "auroc": self._auroc}
+        self._score = 1 - model.best_loss
+        self.meta = {"n_pos": self._n_pos, "n_neg": self._n_neg, "score": self._score}
         self.model = model.model.estimator
         self.model.fit(X, y)
 
@@ -90,6 +111,8 @@ class FingerprintClassifier(object):
         model = RandomForestClassifier()
         X = self.descriptor.fit(smiles)
         y = np.array(y)
+        self._fit_reducer(X)
+        X = self.reducer.transform(X)
         model.fit(X, y)
         self.model = model
 
@@ -101,6 +124,7 @@ class FingerprintClassifier(object):
 
     def predict(self, smiles):
         X = self.descriptor.transform(smiles)
+        X = self.reducer.transform(X)
         return self.model.predict_proba(X)[:, 1].reshape(-1, 1)
 
     def save(self, path):
@@ -112,7 +136,11 @@ class FingerprintClassifier(object):
 
 class FingerprintRegressor(object):
     def __init__(
-        self, automl=True, time_budget_sec=_TIME_BUDGET_SEC, estimator_list=None
+        self,
+        automl=True,
+        reduce=False,
+        time_budget_sec=_TIME_BUDGET_SEC,
+        estimator_list=None,
     ):
         if estimator_list is None:
             estimator_list = ["rf", "extra_tree", "xgboost", "lgbm"]
@@ -121,19 +149,32 @@ class FingerprintRegressor(object):
         self.model = None
         self.explainer = None
         self._automl = automl
+        self._reduce = reduce
         self.descriptor = FingerprintDescriptor()
+
+    def _fit_reducer(self, X, y):
+        if self._reduce:
+            max_n = np.min([X.shape[0], X.shape[1], 100])
+            self.reducer = PCA(n_components=max_n)
+            self.reducer.fit(X, y)
+        else:
+            max_n = np.min([X.shape[0], X.shape[1], 500])
+            self.reducer = SelectKBest(f_regression, k=max_n)
+            self.reducer.fit(X, y)
 
     def fit_automl(self, smiles, y):
         model = AutoML(task="regression", time_budget=self.time_budget_sec)
         X = self.descriptor.fit(smiles)
         y = np.array(y)
+        self._fit_reducer(X, y)
+        X = self.reducer.transform(X)
         model.fit(
             X, y, time_budget=self.time_budget_sec, estimator_list=self.estimator_list
         )
         self._n_pos = int(np.sum(y))
         self._n_neg = len(y) - self._n_pos
-        self._auroc = 1 - model.best_loss
-        self.meta = {"n_pos": self._n_pos, "n_neg": self._n_neg, "auroc": self._auroc}
+        self._score = 1 - model.best_loss
+        self.meta = {"n_pos": self._n_pos, "n_neg": self._n_neg, "score": self._score}
         self.model = model.model.estimator
         self.model.fit(X, y)
 
@@ -141,6 +182,8 @@ class FingerprintRegressor(object):
         model = RandomForestRegressor()
         X = self.descriptor.fit(smiles)
         y = np.array(y)
+        self._fit_reducer(X, y)
+        X = self.reducer.transform(X)
         model.fit(X, y)
         self.model = model
 
@@ -152,6 +195,7 @@ class FingerprintRegressor(object):
 
     def predict(self, smiles):
         X = self.descriptor.transform(smiles)
+        X = self.reducer.transform(X)
         return self.model.predict(X).reshape(-1, 1)
 
     def save(self, path):

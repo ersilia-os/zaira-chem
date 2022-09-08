@@ -238,7 +238,11 @@ class KerasTunerArtifact(object):
             y_reg = self.reg_estimator.predict(X)
         if self.clf_estimator is not None:
             print(self.clf_estimator.summary())
-            y_clf = self.clf_estimator.predict_proba(X)
+            try:
+                y_clf = self.clf_estimator.predict_proba(X)
+            except:
+                y_clf = self.clf_estimator.predict(X)
+            print(y_clf)
             y_clf_bin = np.zeros(y_clf.shape)
             y_clf_bin[y_clf > 0.5] = 1
         P = []

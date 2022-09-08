@@ -262,7 +262,13 @@ class ProjectionUmapPlot(BasePlot):
             cmap.fit(y_pred)
             colors = cmap.transform(y_pred)
             ax.scatter(
-                red0, red1, color=colors, alpha=0.7, s=15, zorder=100000, edgecolors="none"
+                red0,
+                red1,
+                color=colors,
+                alpha=0.7,
+                s=15,
+                zorder=100000,
+                edgecolors="none",
             )
             self.is_available = True
             ax.set_title("UMAP 2D Projection")
@@ -340,7 +346,13 @@ class ProjectionPcaPlot(BasePlot):
             cmap.fit(y_pred)
             colors = cmap.transform(y_pred)
             ax.scatter(
-                red0, red1, color=colors, alpha=0.7, s=15, zorder=100000, edgecolors="none"
+                red0,
+                red1,
+                color=colors,
+                alpha=0.7,
+                s=15,
+                zorder=100000,
+                edgecolors="none",
             )
             self.is_available = True
             ax.set_title("PCA 2D Projection")

@@ -374,11 +374,13 @@ class SingleTasks(ZairaBase):
         else:
             self.logger.debug("There is continuous data")
             return False
-    
+
     def _force_classification_task(self):
         params = self._get_params()
         params["task"] = "classification"
-        with open(os.path.join(self.trained_path, DATA_SUBFOLDER, PARAMETERS_FILE), "w") as f:
+        with open(
+            os.path.join(self.trained_path, DATA_SUBFOLDER, PARAMETERS_FILE), "w"
+        ) as f:
             json.dump(params, f, indent=4)
         self.task = "classification"
 

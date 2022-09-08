@@ -24,15 +24,19 @@ class AutoGluonEstimator(object):
             shutil.rmtree(self.save_path)
         df = TabularDataset(data)
         problem_types = []
+        eval_metrics = []
         for l in labels:
             if "clf" in l:
                 problem_types += ["binary"]
+                eval_metrics += ["roc_auc"]
             else:
                 problem_types += ["regression"]
+                eval_metrics += ["r2"]
         self.model = MultilabelPredictor(
             labels=labels,
             path=self.save_path,
             problem_types=problem_types,
+            eval_metrics=eval_metrics,
             consider_labels_correlation=False,
             groups=groups,
         )

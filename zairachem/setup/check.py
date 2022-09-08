@@ -96,6 +96,8 @@ class SetupChecker(object):
         with open(self.input_schema, "r") as f:
             input_schema = json.load(f)
         input_values_column = input_schema["values_column"]
+        if input_values_column is None:
+            return
         if "reg_raw_skip" in data_schema["tasks"]:
             data_values_column = "reg_raw_skip"
         else:

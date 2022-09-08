@@ -35,14 +35,15 @@ ERSILIA_HUB_DEFAULT_MODELS = [
     "morgan-counts",
     "cc-signaturizer",
     "grover-embedding",
-    "molbert",
     "mordred",
-]
+]  # molbert was removed
 
 DEFAULT_ESTIMATORS = [
     "baseline-classic",
     "baseline-fingerprint",
     "flaml-individual-descriptors",
+    "flaml-individual-reduced-descriptors",
+    "flaml-individual-selected-descriptors",
     "autogluon-manifolds",
     "kerastuner-reference-embedding",
     "molmap",

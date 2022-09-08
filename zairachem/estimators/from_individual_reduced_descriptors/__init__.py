@@ -1,0 +1,1 @@
+ESTIMATORS_FAMILY_SUBFOLDER = "individual_reduced_descriptors"

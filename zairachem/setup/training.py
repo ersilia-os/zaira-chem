@@ -47,7 +47,7 @@ class TrainSetup(object):
         else:
             if task is None:
                 task = "regression"
-        assert (task in ["regression", "classification"])
+        assert task in ["regression", "classification"]
         passed_params = {
             "time_budget": time_budget,
             "threshold": threshold,
