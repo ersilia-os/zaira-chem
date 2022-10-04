@@ -1,13 +1,7 @@
 import tensorflow as tf
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras import Model, Input, layers
-from tensorflow.keras.layers import (
-    MaxPool2D,
-    GlobalMaxPool2D,
-    BatchNormalization,
-    Activation,
-)
-from tensorflow.keras.layers import Conv2D, Concatenate, Flatten, Dense, Dropout
+from tensorflow.keras import Input, layers
+from tensorflow.keras.layers import MaxPool2D, GlobalMaxPool2D
+from tensorflow.keras.layers import Conv2D, Concatenate, Dense
 
 
 def count_trainable_params(model):

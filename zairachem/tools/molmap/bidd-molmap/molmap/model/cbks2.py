@@ -3,7 +3,6 @@ from sklearn.metrics import auc as calculate_auc
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import accuracy_score
 import tensorflow as tf
-import os
 import numpy as np
 
 

@@ -16,15 +16,13 @@ import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
-from sklearn.utils.multiclass import unique_labels
-from sklearn.metrics import get_scorer, SCORERS
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 from .cbks2 import CLA_EarlyStoppingAndPerformance, Reg_EarlyStoppingAndPerformance
-from .net2 import MolMapNet, MolMapDualPathNet, MolMapAddPathNet, MolMapResNet
-from .loss import cross_entropy, weighted_cross_entropy
+from .net2 import MolMapNet, MolMapDualPathNet
+from .loss import cross_entropy
 
 
 from joblib import dump, load

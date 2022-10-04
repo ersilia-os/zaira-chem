@@ -1,7 +1,4 @@
 import tensorflow as tf
-from sklearn.metrics import roc_auc_score
-import numpy as np
-
 
 ###########  classification ##############
 def cross_entropy(y_true, y_pred, MASK=-1):
