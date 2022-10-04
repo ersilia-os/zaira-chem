@@ -70,6 +70,7 @@ class FingerprintClassifier(object):
         self,
         automl=True,
         reduce=False,
+        select=False,
         time_budget_sec=_TIME_BUDGET_SEC,
         estimator_list=None,
     ):
@@ -78,6 +79,7 @@ class FingerprintClassifier(object):
         self.model = None
         self.explainer = None
         self._reduce = reduce
+        self._select = select
         self._automl = automl
         self.descriptor = FingerprintDescriptor()
 
@@ -86,17 +88,20 @@ class FingerprintClassifier(object):
             max_n = np.min([X.shape[0], X.shape[1], 100])
             self.reducer = LOL(n_components=max_n)
             self.reducer.fit(X, y)
-        else:
+        elif self._select:
             max_n = np.min([X.shape[0], X.shape[1], 500])
             self.reducer = SelectKBest(f_classif, k=max_n)
             self.reducer.fit(X, y)
+        else:
+            self.reducer = None
 
     def fit_automl(self, smiles, y):
         model = AutoML(task="classification", time_budget=self.time_budget_sec)
         X = self.descriptor.fit(smiles)
         y = np.array(y)
         self._fit_reducer(X, y)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         model.fit(
             X, y, time_budget=self.time_budget_sec, estimator_list=self.estimator_list
         )
@@ -112,7 +117,8 @@ class FingerprintClassifier(object):
         X = self.descriptor.fit(smiles)
         y = np.array(y)
         self._fit_reducer(X)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         model.fit(X, y)
         self.model = model
 
@@ -124,7 +130,8 @@ class FingerprintClassifier(object):
 
     def predict(self, smiles):
         X = self.descriptor.transform(smiles)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         return self.model.predict_proba(X)[:, 1].reshape(-1, 1)
 
     def save(self, path):
@@ -139,6 +146,7 @@ class FingerprintRegressor(object):
         self,
         automl=True,
         reduce=False,
+        select=False,
         time_budget_sec=_TIME_BUDGET_SEC,
         estimator_list=None,
     ):
@@ -150,6 +158,7 @@ class FingerprintRegressor(object):
         self.explainer = None
         self._automl = automl
         self._reduce = reduce
+        self._select = select
         self.descriptor = FingerprintDescriptor()
 
     def _fit_reducer(self, X, y):
@@ -157,17 +166,20 @@ class FingerprintRegressor(object):
             max_n = np.min([X.shape[0], X.shape[1], 100])
             self.reducer = PCA(n_components=max_n)
             self.reducer.fit(X, y)
-        else:
+        elif self._select:
             max_n = np.min([X.shape[0], X.shape[1], 500])
             self.reducer = SelectKBest(f_regression, k=max_n)
             self.reducer.fit(X, y)
+        else:
+            self.reducer = None
 
     def fit_automl(self, smiles, y):
         model = AutoML(task="regression", time_budget=self.time_budget_sec)
         X = self.descriptor.fit(smiles)
         y = np.array(y)
         self._fit_reducer(X, y)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         model.fit(
             X, y, time_budget=self.time_budget_sec, estimator_list=self.estimator_list
         )
@@ -183,7 +195,8 @@ class FingerprintRegressor(object):
         X = self.descriptor.fit(smiles)
         y = np.array(y)
         self._fit_reducer(X, y)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         model.fit(X, y)
         self.model = model
 
@@ -195,7 +208,8 @@ class FingerprintRegressor(object):
 
     def predict(self, smiles):
         X = self.descriptor.transform(smiles)
-        X = self.reducer.transform(X)
+        if self.reducer is not None:
+            X = self.reducer.transform(X)
         return self.model.predict(X).reshape(-1, 1)
 
     def save(self, path):

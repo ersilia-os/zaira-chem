@@ -42,8 +42,6 @@ DEFAULT_ESTIMATORS = [
     "baseline-classic",
     "baseline-fingerprint",
     "flaml-individual-descriptors",
-    "flaml-individual-reduced-descriptors",
-    "flaml-individual-selected-descriptors",
     "autogluon-manifolds",
     "kerastuner-reference-embedding",
     "molmap",
