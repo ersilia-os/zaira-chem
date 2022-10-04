@@ -23,7 +23,10 @@ from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
-from ..augmentation.augment import Augmenter
+try:
+    from ..augmentation.augment import Augmenter
+except:
+    Augmenter = None
 
 from ..utils.pipeline import PipelineStep, SessionFile
 

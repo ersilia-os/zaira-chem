@@ -1,7 +1,16 @@
 from autogluon.tabular import TabularDataset, TabularPredictor
-from autogluon.core.utils.utils import setup_outputdir
-from autogluon.core.utils.loaders import load_pkl
-from autogluon.core.utils.savers import save_pkl
+try:
+    from autogluon.core.utils.utils import setup_outputdir
+except:
+    from autogluon.common.utils.utils import setup_outputdir
+try:
+    from autogluon.core.utils.loaders import load_pkl
+except:
+    from autogluon.common.utils.loaders import load_pkl
+try:
+    from autogluon.core.utils.savers import save_pkl
+except:
+    from autogluon.common.utils.savers import save_pkl
 import os.path
 
 from ... import ZairaBase
