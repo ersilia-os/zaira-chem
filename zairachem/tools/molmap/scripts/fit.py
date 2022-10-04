@@ -7,7 +7,6 @@ sys.path.append(os.path.join(root, "../bidd-molmap/"))
 import pandas as pd
 import numpy as np
 
-
 from molmap.model import save_model
 from molmap.model import RegressionEstimator, MultiClassEstimator
 from tensorflow.keras.utils import to_categorical

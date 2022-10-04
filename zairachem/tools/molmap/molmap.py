@@ -5,11 +5,9 @@ import json
 import pandas as pd
 from ersilia.utils.terminal import run_command
 
-from .utils.conda import SimpleConda
-
 root = os.path.dirname(os.path.abspath(__file__))
 
-MOLMAP_CONDA_ENVIRONMENT = "molmap"
+MOLMAP_CONDA_ENVIRONMENT = "zairachem"
 COLUMNS_MAPPING_FILENAME = "columns.json"
 
 SMILES_COLUMN = "smiles"
@@ -48,7 +46,7 @@ class MolMapModel(object):
         cmd = "python {0} {1} {2} {3} {4}".format(
             script_path, data_file, x1_path, x2_path, self.save_path
         )
-        SimpleConda().run_commandlines(MOLMAP_CONDA_ENVIRONMENT, cmd)
+        run_command(cmd)
 
     def predict(self, data):
         with open(os.path.join(self.save_path, COLUMNS_MAPPING_FILENAME), "r") as f:
@@ -64,7 +62,7 @@ class MolMapModel(object):
         cmd = "python {0} {1} {2} {3} {4}".format(
             script_path, data_file, x1_path, x2_path, self.save_path
         )
-        SimpleConda().run_commandlines(MOLMAP_CONDA_ENVIRONMENT, cmd)
+        run_command(cmd)
         data = pd.DataFrame({SMILES_COLUMN: data[SMILES_COLUMN]})
         if len(columns["reg"]) > 0:
             reg_pred = np.load(
