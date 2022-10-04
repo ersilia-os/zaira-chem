@@ -5,10 +5,6 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 with open("requirements.txt") as f:
     install_requires = f.read().splitlines()
-    install_requires += [
-        "melloddy_tuner @ git+git://github.com/melloddy/MELLODDY-TUNER#egg=melloddy_tuner"
-    ]
-
 
 setup(
     name="zairachem",

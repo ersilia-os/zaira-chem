@@ -3,7 +3,6 @@ click
 joblib
 pandas
 sklearn
-flaml
 dask
 tqdm
 faiss-cpu
@@ -12,3 +11,5 @@ lolP
 seaborn
 networkx
 timeout_decorator
+standardiser
+exmol
