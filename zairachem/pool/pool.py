@@ -7,6 +7,7 @@ import importlib
 
 from .. import ZairaBase
 from ..estimators.base import BaseOutcomeAssembler
+from ..utils.pipeline import PipelineStep
 from ..estimators import RESULTS_MAPPED_FILENAME, RESULTS_UNMAPPED_FILENAME
 from ..vars import DATA_SUBFOLDER, POOL_SUBFOLDER, ENSEMBLE_MODE
 
@@ -79,15 +80,17 @@ class Pooler(ZairaBase):
             self.estimator = Predictor(path=self.path)
 
     def run(self, time_budget_sec=None):
-        if time_budget_sec is not None:
-            self.time_budget_sec = int(time_budget_sec)
-        else:
-            self.time_budget_sec = None
-        if not self.is_predict():
-            self.logger.debug("Mode: fit")
-            results = self.estimator.run(time_budget_sec=self.time_budget_sec)
-        else:
-            self.logger.debug("Mode: predict")
-            results = self.estimator.run()
-        pa = PoolAssembler(path=self.path)
-        pa.run(results)
+        step = PipelineStep("pool", self.output_dir)
+        if not step.is_done():
+            if time_budget_sec is not None:
+                self.time_budget_sec = int(time_budget_sec)
+            else:
+                self.time_budget_sec = None
+            if not self.is_predict():
+                self.logger.debug("Mode: fit")
+                results = self.estimator.run(time_budget_sec=self.time_budget_sec)
+            else:
+                self.logger.debug("Mode: predict")
+                results = self.estimator.run()
+            pa = PoolAssembler(path=self.path)
+            pa.run(results)

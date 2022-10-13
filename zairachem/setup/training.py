@@ -21,6 +21,7 @@ from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
+from ..vars import OUTPUT_FILENAME
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 try:
@@ -182,6 +183,12 @@ class TrainSetup(object):
 
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
+
+    def is_done(self):
+        if os.path.exists(os.path.join(self.output_dir, OUTPUT_FILENAME)):
+            return True
+        else:
+            return False
 
     def setup(self):
         self._initialize()

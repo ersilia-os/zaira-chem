@@ -64,12 +64,11 @@ def fit_cmd():
         help="Path to parameters file in JSON format.",
     )
     @click.option(
-        "--flush",
-        "-f",
+        "--clean",
         is_flag=True,
         show_default=True,
         default=False,
-        help="Clean directory at the end of the pipeline",
+        help="Clean directory at the end of the pipeline. Only precalculated descriptors are removed.",
     )
     def fit(
         input_file,
@@ -80,7 +79,7 @@ def fit_cmd():
         cutoff,
         direction,
         parameters,
-        flush,
+        clean,
     ):
         output_dir = model_dir
         threshold = cutoff
@@ -95,6 +94,9 @@ def fit_cmd():
             direction=direction,
             threshold=threshold,
         )
+        if s.is_done():
+            echo("Model has already been trained. Skipping")
+            return
         s.setup()
         d = Describer(path=output_dir)
         d.run()
@@ -104,6 +106,6 @@ def fit_cmd():
         p.run()
         r = Reporter(path=output_dir)
         r.run()
-        f = Finisher(path=output_dir, flush=flush)
+        f = Finisher(path=output_dir, clean=clean, flush=False)
         f.run()
         echo("Done", fg="green")

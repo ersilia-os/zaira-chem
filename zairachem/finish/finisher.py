@@ -1,10 +1,14 @@
 import os
 import shutil
 
-from ..vars import DESCRIPTORS_SUBFOLDER, POOL_SUBFOLDER
+from ..vars import (
+    DESCRIPTORS_SUBFOLDER,
+    POOL_SUBFOLDER,
+    ESTIMATORS_SUBFOLDER,
+    OUTPUT_FILENAME,
+)
 from .. import ZairaBase
 from ..estimators import RESULTS_MAPPED_FILENAME
-from . import OUTPUT_FILENAME
 
 
 class Cleaner(ZairaBase):
@@ -36,18 +40,42 @@ class Cleaner(ZairaBase):
         self._clean_descriptors()
 
 
-class Finisher(ZairaBase):
-    def __init__(self, path, flush=False):
+class Flusher(ZairaBase):
+    def __init__(self, path):
         ZairaBase.__init__(self)
         if path is None:
             self.path = self.get_output_dir()
         else:
             self.path = path
+        self.output_dir = os.path.abspath(self.path)
+        self.trained_dir = self.get_trained_dir()
+        assert os.path.exists(self.output_dir)
+        assert os.path.exists(self.trained_dir)
+
+    def _flush(self, path):
+        shutil.rmtree(os.path.join(path, DESCRIPTORS_SUBFOLDER))
+        shutil.rmtree(os.path.join(path, ESTIMATORS_SUBFOLDER))
+
+    def run(self):
+        self._flush(self.output_dir)
+        self._flush(self.trained_dir)
+
+
+class Finisher(ZairaBase):
+    def __init__(self, path, clean=False, flush=False):
+        ZairaBase.__init__(self)
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
+        self.clean = clean
         self.flush = flush
 
     def _clean_descriptors(self):
-        if self.flush:
-            Cleaner(path=self.path).run()
+        Cleaner(path=self.path).run()
+
+    def _flush(self):
+        Flusher(path=self.path).run()
 
     def _predictions_file(self):
         shutil.copy(
@@ -57,5 +85,8 @@ class Finisher(ZairaBase):
 
     def run(self):
         self.logger.debug("Finishing")
-        self._clean_descriptors()
         self._predictions_file()
+        if self.clean:
+            self._clean_descriptors()
+        if self.flush:
+            self._flush()

@@ -18,6 +18,7 @@ POOL_SUBFOLDER = "pool"
 RESULTS_FILENAME = "results_unmapped.csv"
 LITE_SUBFOLDER = "lite"
 REPORT_SUBFOLDER = "report"
+OUTPUT_FILENAME = "output.csv"
 
 CLF_PERCENTILES = [1, 10, 25, 50]
 
