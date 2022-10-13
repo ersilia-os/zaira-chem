@@ -18,6 +18,7 @@ from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
+from ..vars import OUTPUT_FILENAME
 
 from ..tools.melloddy.pipeline import MelloddyTunerPredictPipeline
 
@@ -36,7 +37,7 @@ class PredictSetup(object):
         assert model_dir is not None, "Model directory not specified"
         self.model_dir = os.path.abspath(model_dir)
         self.time_budget = time_budget  # TODO
-        assert os.path.exists(self.model_dir)
+        assert self.model_is_ready(), "Model is not ready"
 
     def _copy_input_file(self):
         extension = self.input_file.split(".")[-1]
@@ -136,6 +137,21 @@ class PredictSetup(object):
 
     def update_elapsed_time(self):
         ZairaBase().update_elapsed_time()
+
+    def is_done(self):
+        if os.path.exists(os.path.join(self.output_dir, OUTPUT_FILENAME)):
+            return True
+        else:
+            return False
+
+    def model_is_ready(self):
+        if not os.path.exists(self.model_dir):
+            return False
+        if not os.path.exists(os.path.join(self.model_dir, OUTPUT_FILENAME)):
+            return False
+        if not os.path.exists(os.path.join(self.model_dir, ESTIMATORS_SUBFOLDER)):
+            return False
+        return True
 
     def setup(self):
         self._initialize()
