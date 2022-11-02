@@ -17,6 +17,8 @@ from ..vars import DESCRIPTORS_SUBFOLDER
 from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
+from ..vars import INTERPRETABILITY_SUBFOLDER
+from ..vars import APPLICABILITY_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 from ..vars import OUTPUT_FILENAME
 
@@ -67,6 +69,8 @@ class PredictSetup(object):
         self._make_subfolder(ESTIMATORS_SUBFOLDER)
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
+        self._make_subfolder(INTERPRETABILITY_SUBFOLDER)
+        self._make_subfolder(APPLICABILITY_SUBFOLDER)
         self._make_subfolder(REPORT_SUBFOLDER)
         shutil.copyfile(
             os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE),

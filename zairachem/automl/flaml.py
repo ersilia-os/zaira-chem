@@ -161,6 +161,12 @@ class FlamlEstimator(object):
         catboost_info = os.path.join(cwd, "catboost_info")
         if os.path.exists(catboost_info):
             shutil.rmtree(catboost_info)
+        catboost_folders = []
+        for f in os.listdir(cwd):
+            if f.startswith("catboost"):
+                catboost_folders += [f]
+        for f in catboost_folders:
+            shutil.rmtree(os.path.join(cwd, f))
 
     @staticmethod
     def _get_starting_point(model):

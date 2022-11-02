@@ -1,21 +1,52 @@
 import os
 import pandas as pd
+import numpy as np
 import collections
 import json
+from sklearn.metrics import (
+    roc_curve,
+    auc,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    f1_score,
+    accuracy_score,
+    balanced_accuracy_score,
+    matthews_corrcoef,
+    confusion_matrix,
+)
 
 from ..estimators.evaluate import ResultsIterator
+from ..tools.ghost.ghost import GhostLight
+
 from ..vars import (
     DATA_FILENAME,
     DATA_SUBFOLDER,
     ESTIMATORS_SUBFOLDER,
     POOL_SUBFOLDER,
+    APPLICABILITY_SUBFOLDER,
     RESULTS_FILENAME,
 )
 from ..estimators import RESULTS_UNMAPPED_FILENAME
-from ..setup import PARAMETERS_FILE
+from ..setup import (
+    MAPPING_FILENAME,
+    VALUES_COLUMN,
+    SMILES_COLUMN,
+    INPUT_SCHEMA_FILENAME,
+    PARAMETERS_FILE,
+    RAW_INPUT_FILENAME,
+    MAPPING_ORIGINAL_COLUMN,
+    MAPPING_DEDUPE_COLUMN,
+)
 from ..setup.tasks import USED_CUTS_FILE
+from ..applicability import (
+    BASIC_PROPERTIES_FILENAME,
+    TANIMOTO_SIMILARITY_NEAREST_NEIGHBORS_FILENAME,
+)
 
 from .. import ZairaBase
+
+RAW_INPUT_FILENAME += ".csv"
 
 
 class ResultsFetcher(ZairaBase):
@@ -36,14 +67,21 @@ class ResultsFetcher(ZairaBase):
         df = pd.read_csv(os.path.join(self.trained_path, DATA_SUBFOLDER, DATA_FILENAME))
         return df
 
-    def _read_pooled_results(self):
+    def _read_pooled_results(self, path=None):
+        if path is None:
+            path = self.path
         df = pd.read_csv(os.path.join(self.path, POOL_SUBFOLDER, RESULTS_FILENAME))
         return df
 
-    def _read_individual_estimator_results(self, task):
+    def _read_pooled_results_train(self):
+        return self._read_pooled_results(path=self.trained_path)
+
+    def _read_individual_estimator_results(self, task, path=None):
+        if path is None:
+            path = self.path
         prefixes = []
         R = []
-        for rpath in ResultsIterator(path=self.path).iter_relpaths():
+        for rpath in ResultsIterator(path=path).iter_relpaths():
             prefixes += ["-".join(rpath)]
             file_name = "/".join(
                 [self.path, ESTIMATORS_SUBFOLDER] + rpath + [RESULTS_UNMAPPED_FILENAME]
@@ -54,6 +92,11 @@ class ResultsFetcher(ZairaBase):
         for i in range(len(R)):
             d[prefixes[i]] = R[i]
         return pd.DataFrame(d)
+
+    def _read_individual_estimator_results_train(self, task):
+        return self._read_individual_estimator_results(
+            task=task, path=self.trained_path
+        )
 
     def _read_processed_data(self):
         df = pd.read_csv(os.path.join(self.path, POOL_SUBFOLDER, DATA_FILENAME))
@@ -123,8 +166,20 @@ class ResultsFetcher(ZairaBase):
             if "clf" in c and "bin" in c and "_skip" not in c:
                 return list(df[c])
 
+    def get_pred_binary_clf_trained(self):
+        df = self._read_pooled_results_train()
+        for c in list(df.columns):
+            if "clf" in c and "bin" in c and "_skip" not in c:
+                return list(df[c])
+
     def get_pred_proba_clf(self):
         df = self._read_pooled_results()
+        for c in list(df.columns):
+            if "clf" in c and "bin" not in c and "_skip" not in c:
+                return list(df[c])
+
+    def get_pred_proba_clf_trained(self):
+        df = self._read_pooled_results_train()
         for c in list(df.columns):
             if "clf" in c and "bin" not in c and "_skip" not in c:
                 return list(df[c])
@@ -135,8 +190,20 @@ class ResultsFetcher(ZairaBase):
             if "reg" in c and "raw" not in c and "_skip" not in c:
                 return list(df[c])
 
+    def get_pred_reg_trans_trained(self):
+        df = self._read_pooled_results_train()
+        for c in list(df.columns):
+            if "reg" in c and "raw" not in c and "_skip" not in c:
+                return list(df[c])
+
     def get_pred_reg_raw(self):
         df = self._read_pooled_results()
+        for c in list(df.columns):
+            if "reg" in c and "raw" in c and "_skip" not in c:
+                return list(df[c])
+
+    def get_pred_reg_raw_trained(self):
+        df = self._read_pooled_results_train()
         for c in list(df.columns):
             if "reg" in c and "raw" in c and "_skip" not in c:
                 return list(df[c])
@@ -211,3 +278,142 @@ class ResultsFetcher(ZairaBase):
         for k, v in used_cuts["pcuts"].items():
             if "_skip" not in k:
                 return v
+
+    def get_tanimoto_similarities_to_training_set(self):
+        df = pd.read_csv(
+            os.path.join(
+                self.path,
+                APPLICABILITY_SUBFOLDER,
+                TANIMOTO_SIMILARITY_NEAREST_NEIGHBORS_FILENAME,
+            )
+        )
+        return df
+
+    def get_basic_properties(self):
+        df = pd.read_csv(
+            os.path.join(self.path, APPLICABILITY_SUBFOLDER, BASIC_PROPERTIES_FILENAME)
+        )
+        return df
+
+    def get_smiles(self):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        return list(df[SMILES_COLUMN])
+
+    def get_original_identifiers(self):
+        raw_data = pd.read_csv(os.path.join(self.path, RAW_INPUT_FILENAME))
+        with open(
+            os.path.join(self.path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r"
+        ) as f:
+            schema = json.load(f)
+        n = raw_data.shape[0]
+        if schema["identifier_column"] is None:
+            identifiers = ["entry-{0}".format(str(i).zfill(7)) for i in range(n)]
+        else:
+            identifiers = list(raw_data[schema["identifier_column"]])
+        return identifiers
+
+    def get_original_smiles(self):
+        raw_data = pd.read_csv(os.path.join(self.path, RAW_INPUT_FILENAME))
+        with open(
+            os.path.join(self.path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r"
+        ) as f:
+            schema = json.load(f)
+        return list(raw_data[schema["smiles_column"]])
+
+    def get_original_values(self):
+        raw_data = pd.read_csv(os.path.join(self.path, RAW_INPUT_FILENAME))
+        with open(
+            os.path.join(self.path, DATA_SUBFOLDER, INPUT_SCHEMA_FILENAME), "r"
+        ) as f:
+            schema = json.load(f)
+        if schema["values_column"] is None:
+            return None
+        else:
+            return list(raw_data[VALUES_COLUMN])
+
+    def _top_binarizer(self, y, k):
+        idxs = np.argsort(y)[::-1]
+        idxs = idxs[:k]
+        b = [0] * len(y)
+        for i in idxs:
+            b[i] = 1
+        return b
+
+    def classification_performance_report(
+        self, y_true_train, y_pred_train, y_true_test, y_pred_test
+    ):
+        n_tr = len(y_true_train)
+        n_te = len(y_true_test)
+        n_tr_0 = int(np.sum(y_true_train == 0))
+        n_tr_1 = int(np.sum(y_true_train == 1))
+        n_te_0 = int(np.sum(y_true_test == 0))
+        n_te_1 = int(np.sum(y_true_test == 1))
+        fpr, tpr, _ = roc_curve(y_true_test, y_pred_test)
+        auroc = auc(fpr, tpr)
+        prec, rec, _ = precision_recall_curve(y_true_test, y_pred_test)
+        aupr = auc(rec, prec)
+        ghost = GhostLight()
+        cutoff = ghost.get_threshold(y_true_train, y_pred_train)
+        b_pred_test = []
+        for y in y_pred_test:
+            if y >= cutoff:
+                b_pred_test += [1]
+            else:
+                b_pred_test += [0]
+        b_pred_test = np.array(b_pred_test)
+        tn, fp, fn, tp = confusion_matrix(y_true_test, b_pred_test).ravel()
+        data = collections.OrderedDict()
+        data["num_train"] = n_tr
+        data["num_test"] = n_te
+        data["num_train_0"] = n_tr_0
+        data["num_train_1"] = n_tr_1
+        data["num_test_0"] = n_te_0
+        data["num_test_1"] = n_te_1
+        data["auroc"] = auroc
+        data["aupr"] = aupr
+        data["cutoff"] = cutoff
+        data["tp"] = tp
+        data["tn"] = tn
+        data["fp"] = fp
+        data["fn"] = fn
+        data["accuracy"] = accuracy_score(y_true_test, b_pred_test)
+        data["balanced_accuracy"] = balanced_accuracy_score(y_true_test, b_pred_test)
+        data["precision"] = precision_score(y_true_test, b_pred_test)
+        data["recall"] = recall_score(y_true_test, b_pred_test)
+        data["f1_score"] = f1_score(y_true_test, b_pred_test)
+        data["mcc"] = matthews_corrcoef(y_true_test, b_pred_test)
+        data["precision_at_1"] = precision_score(
+            y_true_test, self._top_binarizer(y_pred_test, 1)
+        )
+        data["precision_at_5"] = precision_score(
+            y_true_test, self._top_binarizer(y_pred_test, 5)
+        )
+        data["precision_at_10"] = precision_score(
+            y_true_test, self._top_binarizer(y_pred_test, 10)
+        )
+        data["precision_at_50"] = precision_score(
+            y_true_test, self._top_binarizer(y_pred_test, 50)
+        )
+        data["precision_at_100"] = precision_score(
+            y_true_test, self._top_binarizer(y_pred_test, 100)
+        )
+        return data
+
+    def regression_performance_report(self):
+        pass
+
+    def map_to_original(self, values):
+        n = pd.read_csv(os.path.join(self.path, RAW_INPUT_FILENAME)).shape[0]
+        dm = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, MAPPING_FILENAME))
+        dm = dm[dm[MAPPING_DEDUPE_COLUMN].notnull()]
+        u2o = collections.defaultdict(list)
+        for v in dm[[MAPPING_ORIGINAL_COLUMN, MAPPING_DEDUPE_COLUMN]].values:
+            u2o[int(v[1])] += [int(v[0])]
+        mapped_values = [None] * n
+        for i, v in enumerate(values):
+            if i in u2o:
+                for idx in u2o[i]:
+                    mapped_values[idx] = v
+            else:
+                continue
+        return mapped_values

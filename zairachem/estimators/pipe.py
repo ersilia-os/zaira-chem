@@ -99,6 +99,7 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _simple_evaluation(self):
+        self.logger.debug("Simple evaluation")
         step = PipelineStep("simple_evaluation", self.output_dir)
         if not step.is_done():
             SimpleEvaluator(path=self.path).run()
