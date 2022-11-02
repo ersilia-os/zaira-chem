@@ -5,7 +5,10 @@ from ..vars import (
     DESCRIPTORS_SUBFOLDER,
     POOL_SUBFOLDER,
     ESTIMATORS_SUBFOLDER,
+    REPORT_SUBFOLDER,
     OUTPUT_FILENAME,
+    OUTPUT_TABLE_FILENAME,
+    PERFORMANCE_TABLE_FILENAME,
 )
 from .. import ZairaBase
 from ..estimators import RESULTS_MAPPED_FILENAME
@@ -52,9 +55,30 @@ class Flusher(ZairaBase):
         assert os.path.exists(self.output_dir)
         assert os.path.exists(self.trained_dir)
 
+    def _remover(self, path):
+        rm_dirs = []
+        rm_files = []
+        for root, dirs, files in os.walk(path):
+            for filename in files:
+                if filename.endswith(".json") or filename.endswith(".csv"):
+                    continue
+                else:
+                    rm_files += [os.path.join(root, filename)]
+            for dirname in dirs:
+                if dirname.startswith("autogluon"):
+                    rm_dirs += [os.path.join(root, dirname)]
+                if dirname.startswith("kerastuner"):
+                    rm_dirs += [os.path.join(root, dirname)]
+        for f in rm_files:
+            os.remove(f)
+        for d in rm_dirs:
+            shutil.rmtree(d)
+
     def _flush(self, path):
-        shutil.rmtree(os.path.join(path, DESCRIPTORS_SUBFOLDER))
-        shutil.rmtree(os.path.join(path, ESTIMATORS_SUBFOLDER))
+        self.logger.debug("Removing files descriptors folder in {0}".format(path))
+        self._remover(os.path.join(path, DESCRIPTORS_SUBFOLDER))
+        self.logger.debug("Removing files from estimators folder in {0}".format(path))
+        self._remover(os.path.join(path, ESTIMATORS_SUBFOLDER))
 
     def run(self):
         self._flush(self.output_dir)
@@ -83,9 +107,23 @@ class Finisher(ZairaBase):
             os.path.join(self.path, OUTPUT_FILENAME),
         )
 
+    def _output_table_file(self):
+        shutil.copy(
+            os.path.join(self.path, REPORT_SUBFOLDER, OUTPUT_TABLE_FILENAME),
+            os.path.join(self.path, OUTPUT_TABLE_FILENAME),
+        )
+
+    def _performance_table_file(self):
+        shutil.copy(
+            os.path.join(self.path, REPORT_SUBFOLDER, PERFORMANCE_TABLE_FILENAME),
+            os.path.join(self.path, PERFORMANCE_TABLE_FILENAME),
+        )
+
     def run(self):
         self.logger.debug("Finishing")
         self._predictions_file()
+        self._output_table_file()
+        self._performance_table_file()
         if self.clean:
             self._clean_descriptors()
         if self.flush:

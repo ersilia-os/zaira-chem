@@ -7,6 +7,7 @@ from ...setup.training import TrainSetup
 from ...descriptors.describe import Describer
 from ...estimators.pipe import EstimatorPipeline
 from ...pool.pool import Pooler
+from ...applicability.applicability import ApplicabilityEvaluator
 from ...reports.report import Reporter
 from ...finish.finisher import Finisher
 
@@ -104,6 +105,8 @@ def fit_cmd():
         e.run()
         p = Pooler(path=output_dir)
         p.run()
+        a = ApplicabilityEvaluator(path=output_dir)
+        a.run()
         r = Reporter(path=output_dir)
         r.run()
         f = Finisher(path=output_dir, clean=clean, flush=False)

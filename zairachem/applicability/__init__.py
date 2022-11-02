@@ -1,0 +1,3 @@
+BASIC_PROPERTIES_FILENAME = "basic_properties.csv"
+TANIMOTO_SIMILARITY_NEAREST_NEIGHBORS_FILENAME = "tanimoto_similarity.csv"
+ONECLASS_FILENAME = "oneclass.csv"

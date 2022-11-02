@@ -3,12 +3,16 @@ import pandas as pd
 import json
 import numpy as np
 import collections
+import csv
+import requests
 
 from rdkit import Chem
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import ERSILIA_HUB_DEFAULT_MODELS
 from ..vars import DEFAULT_ESTIMATORS
+from ..vars import REFERENCE_FILENAME
+from .. import ZairaBase
 from .schema import InputSchema
 from . import (
     COMPOUNDS_FILENAME,
@@ -16,6 +20,7 @@ from . import (
     VALUES_FILENAME,
     MAPPING_FILENAME,
     INPUT_SCHEMA_FILENAME,
+    RAW_REFERENCE_FILENAME,
 )
 from . import (
     MAPPING_ORIGINAL_COLUMN,
@@ -371,3 +376,46 @@ class SingleFileForPrediction(SingleFile):
         schema = self.input_schema()
         with open(os.path.join(path, INPUT_SCHEMA_FILENAME), "w") as f:
             json.dump(schema, f, indent=4)
+
+
+class ReferenceFile(ZairaBase):
+    def __init__(self, path=None):
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
+        self.raw_reference_file = os.path.join(
+            self.path, RAW_REFERENCE_FILENAME + ".csv"
+        )
+        self.reference_file = os.path.join(
+            self.path, DATA_SUBFOLDER, REFERENCE_FILENAME
+        )
+        if not os.path.exists(self.raw_reference_file):
+            self._download_from_ersilia()
+
+    def _download_from_ersilia(self):
+        url = "https://raw.githubusercontent.com/ersilia-os/ersilia-model-hub-maintained-inputs/main/compound/single/inp-000.csv"
+        with requests.Session() as s:
+            download = s.get(url)
+            decoded_content = download.content.decode("utf-8")
+            cr = csv.reader(decoded_content.splitlines(), delimiter=",")
+            data = list(cr)[1:]
+            R = []
+            for r in data:
+                R += [r[1]]
+        with open(self.raw_reference_file, "w") as f:
+            writer = csv.writer(f, delimiter="\t")
+            writer.writerow([SMILES_COLUMN])
+            for r in R:
+                writer.writerow([r])
+
+    def process(self):
+        df = pd.read_csv(
+            self.raw_reference_file
+        )  # TODO better processing of reference file
+        smiles = list(df[SMILES_COLUMN])
+        with open(self.reference_file, "w") as f:
+            writer = csv.writer(f, delimiter="\t")
+            writer.writerow([SMILES_COLUMN])
+            for r in smiles:
+                writer.writerow([r])

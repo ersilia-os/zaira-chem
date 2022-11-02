@@ -6,6 +6,7 @@ from .. import ZairaBase, create_session_symlink
 
 from .files import ParametersFile
 from .files import SingleFile
+from .files import ReferenceFile
 from .standardize import Standardize
 from .folding import Folds
 from .tasks import SingleTasks
@@ -20,15 +21,13 @@ from ..vars import DESCRIPTORS_SUBFOLDER
 from ..vars import ESTIMATORS_SUBFOLDER
 from ..vars import POOL_SUBFOLDER
 from ..vars import LITE_SUBFOLDER
+from ..vars import INTERPRETABILITY_SUBFOLDER
+from ..vars import APPLICABILITY_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 from ..vars import OUTPUT_FILENAME
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
-try:
-    from ..augmentation.augment import Augmenter
-except:
-    Augmenter = None
-
+from ..augmentation.augment import Augmenter
 from ..utils.pipeline import PipelineStep, SessionFile
 
 
@@ -60,9 +59,8 @@ class TrainSetup(object):
         }
         self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
-        if reference_file is None:
-            self.reference_file = self.input_file
-        else:
+        self.reference_file = reference_file
+        if reference_file is not None:
             self.reference_file = os.path.abspath(reference_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
@@ -75,11 +73,12 @@ class TrainSetup(object):
         )
 
     def _copy_reference_file(self):
-        extension = self.reference_file.split(".")[-1]
-        shutil.copy(
-            self.reference_file,
-            os.path.join(self.output_dir, RAW_REFERENCE_FILENAME + "." + extension),
-        )
+        if self.reference_file is not None:
+            extension = self.reference_file.split(".")[-1]
+            shutil.copy(
+                self.reference_file,
+                os.path.join(self.output_dir, RAW_REFERENCE_FILENAME + "." + extension),
+            )
 
     def _load_params(self, params, passed_params):
         return ParametersFile(full_path=params, passed_params=passed_params).load()
@@ -111,6 +110,8 @@ class TrainSetup(object):
         self._make_subfolder(ESTIMATORS_SUBFOLDER)
         self._make_subfolder(POOL_SUBFOLDER)
         self._make_subfolder(LITE_SUBFOLDER)
+        self._make_subfolder(INTERPRETABILITY_SUBFOLDER)
+        self._make_subfolder(APPLICABILITY_SUBFOLDER)
         self._make_subfolder(REPORT_SUBFOLDER)
 
     def _normalize_input(self):
@@ -132,6 +133,13 @@ class TrainSetup(object):
         step = PipelineStep("standardize", self.output_dir)
         if not step.is_done():
             Standardize(os.path.join(self.output_dir, DATA_SUBFOLDER)).run()
+            step.update()
+
+    def _process_reference_file(self):
+        step = PipelineStep("reference_file", self.output_dir)
+        if not step.is_done():
+            f = ReferenceFile(self.output_dir)
+            f.process()
             step.update()
 
     def _folds(self):
@@ -195,10 +203,11 @@ class TrainSetup(object):
         self._normalize_input()
         self._melloddy_tuner_run()
         self._standardize()
+        self._process_reference_file()
         self._folds()
         self._tasks()
         self._merge()
-        # self._augment()
+        self._augment()
         self._clean()
         self._check()
         self.update_elapsed_time()

@@ -8,8 +8,16 @@ from ...automl.molmap import MolMapEstimator
 
 from . import ESTIMATORS_FAMILY_SUBFOLDER
 from .. import RESULTS_UNMAPPED_FILENAME, RESULTS_MAPPED_FILENAME
-from ...vars import DATA_FILENAME, DATA_SUBFOLDER, ESTIMATORS_SUBFOLDER
+from ...vars import (
+    DATA_FILENAME,
+    DATA_SUBFOLDER,
+    ESTIMATORS_SUBFOLDER,
+    DATA_AUGMENTED_FILENAME,
+)
 from ...setup import SMILES_COLUMN
+
+
+_USE_AUGMENTED = True
 
 
 class Fitter(BaseEstimator):
@@ -18,13 +26,17 @@ class Fitter(BaseEstimator):
         self.trained_path = os.path.join(
             self.get_output_dir(), ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER
         )
+        if _USE_AUGMENTED:
+            self._data_filename = DATA_AUGMENTED_FILENAME
+        else:
+            self._data_filename = DATA_FILENAME
 
     def _get_X(self):
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, self._data_filename))
         return df[[SMILES_COLUMN]]
 
     def _get_y(self, task):
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, self._data_filename))
         return np.array(df[task])
 
     def _get_Y(self):
@@ -42,6 +54,29 @@ class Fitter(BaseEstimator):
         df = pd.DataFrame(Y, columns=columns)
         return df
 
+    def _get_X_forward(self):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        return df[[SMILES_COLUMN]]
+
+    def _get_y_forward(self, task):
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+        return np.array(df[task])
+
+    def _get_Y_forward(self):
+        Y = []
+        columns = []
+        for t in self._get_reg_tasks():
+            y = self._get_y_forward(t)
+            Y += [y]
+            columns += [t]
+        for t in self._get_clf_tasks():
+            y = self._get_y_forward(t)
+            Y += [y]
+            columns += [t]
+        Y = np.array(Y).T
+        df = pd.DataFrame(Y, columns=columns)
+        return df
+
     def run(self, time_budget_sec=None):
         self.reset_time()
         if time_budget_sec is None:
@@ -53,12 +88,15 @@ class Fitter(BaseEstimator):
         df_Y = self._get_Y()
         df = pd.concat([df_X, df_Y], axis=1)
         labels = list(df_Y.columns)
-        self.logger.debug("Staring BIDD MolMap estimation")
+        self.logger.debug("Starting BIDD MolMap estimation")
         estimator = MolMapEstimator(save_path=self.trained_path)
         self.logger.debug("Fitting")
         estimator.fit(data=df.iloc[train_idxs, :], labels=labels)
         estimator.save()
         estimator = estimator.load()
+        df_X = self._get_X_forward()
+        df_Y = self._get_Y_forward()
+        df = pd.concat([df_X, df_Y], axis=1)
         results = estimator.run(df)
         self.update_elapsed_time()
         return results

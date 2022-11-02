@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER, REPORT_SUBFOLDER
+import stylia
 
 from .. import ZairaBase
 
@@ -42,19 +43,25 @@ class BaseResults(ZairaBase):
         return False
 
 
+class BaseTable(BaseResults):
+    def __init__(self, path):
+        BaseResults.__init__(self, path=path)
+
+
 class BasePlot(BaseResults):
-    def __init__(self, ax, path):
+    def __init__(self, ax, path, figsize=None):
         BaseResults.__init__(self, path=path)
         if ax is None:
-            _, ax = plt.subplots(1, 1, figsize=INDIVIDUAL_FIGSIZE)
+            if figsize is None:
+                figsize = INDIVIDUAL_FIGSIZE
+            _, ax = stylia.create_figure(1, 1, figsize=figsize)
         self.name = "base"
-        self.ax = ax
+        self.ax = ax[0]
 
     def save(self):
         if self.is_available:
-            plt.tight_layout()
-            plt.savefig(
-                os.path.join(self.path, REPORT_SUBFOLDER, self.name + ".png"), dpi=600
+            stylia.save_figure(
+                os.path.join(self.path, REPORT_SUBFOLDER, self.name + ".png")
             )
 
     def load(self):

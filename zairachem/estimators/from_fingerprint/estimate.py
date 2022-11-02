@@ -11,6 +11,8 @@ from .. import RESULTS_UNMAPPED_FILENAME, RESULTS_MAPPED_FILENAME
 from ...vars import DATA_FILENAME, DATA_SUBFOLDER, ESTIMATORS_SUBFOLDER
 from ...setup import SMILES_COLUMN
 
+_USE_AUGMENTED = True
+
 
 class Fitter(BaseEstimator):
     def __init__(self, path):
@@ -18,24 +20,36 @@ class Fitter(BaseEstimator):
         self.trained_path = os.path.join(
             self.get_output_dir(), ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER
         )
+        if _USE_AUGMENTED:
+            self._data_filename = DATA_FILENAME
+        else:
+            self._data_filename = DATA_AUGMENTED_FILENAME
 
-    def _get_smiles(self):
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+    def _get_smiles(self, try_augmented):
+        if not try_augmented:
+            _data_filename = DATA_FILENAME
+        else:
+            _data_filename = self._data_filename
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, _data_filename))
         return df[[SMILES_COLUMN]]
 
-    def _get_y(self, task):
-        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))
+    def _get_y(self, task, try_augmented):
+        if not try_augmented:
+            _data_filename = DATA_FILENAME
+        else:
+            _data_filename = self._data_filename
+        df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, _data_filename))
         return np.array(df[task])
 
-    def _get_Y(self):
+    def _get_Y(self, try_augmented):
         Y = []
         columns = []
         for t in self._get_reg_tasks():
-            y = self._get_y(t)
+            y = self._get_y(t)  # TODO Resolve for regression
             Y += [y]
             columns += [t]
         for t in self._get_clf_tasks():
-            y = self._get_y(t)
+            y = self._get_y(t, try_augmented)
             Y += [y]
             columns += [t]
         Y = np.array(Y).T
@@ -49,8 +63,8 @@ class Fitter(BaseEstimator):
         else:
             time_budget_sec = time_budget_sec
         train_idxs = self.get_train_indices(path=self.path)
-        df_smiles = self._get_smiles()
-        df_Y = self._get_Y()
+        df_smiles = self._get_smiles(try_augmented=True)
+        df_Y = self._get_Y(try_augmented=True)
         df = pd.concat([df_smiles, df_Y], axis=1)
         labels = list(df_Y.columns)
         self.logger.debug("Starting fingerprint estimation")
@@ -59,6 +73,9 @@ class Fitter(BaseEstimator):
         estimator.fit(data=df.iloc[train_idxs, :], labels=labels)
         estimator.save()
         estimator = estimator.load()
+        df_smiles = self._get_smiles(try_augmented=False)
+        df_Y = self._get_Y(try_augmented=False)
+        df = pd.concat([df_smiles, df_Y], axis=1)
         results = estimator.run(df)
         self.update_elapsed_time()
         return results

@@ -12,6 +12,10 @@ SESSION_FILE = "session.json"
 
 DATA_SUBFOLDER = "data"
 DATA_FILENAME = "data.csv"
+DATA_AUGMENTED_FILENAME = "data_augmented.csv"
+REFERENCE_FILENAME = "reference.csv"
+INTERPRETABILITY_SUBFOLDER = "interpretability"
+APPLICABILITY_SUBFOLDER = "applicability"
 DESCRIPTORS_SUBFOLDER = "descriptors"
 ESTIMATORS_SUBFOLDER = "estimators"
 POOL_SUBFOLDER = "pool"
@@ -19,6 +23,8 @@ RESULTS_FILENAME = "results_unmapped.csv"
 LITE_SUBFOLDER = "lite"
 REPORT_SUBFOLDER = "report"
 OUTPUT_FILENAME = "output.csv"
+OUTPUT_TABLE_FILENAME = "output_table.csv"
+PERFORMANCE_TABLE_FILENAME = "performance_table.csv"
 
 CLF_PERCENTILES = [1, 10, 25, 50]
 
