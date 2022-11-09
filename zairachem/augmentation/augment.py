@@ -1,4 +1,5 @@
 import os
+import shutil
 import random
 import numpy as np
 import pandas as pd
@@ -237,7 +238,7 @@ class ClassifierAugmenter(ZairaBase):
             self._self_trained_classifier(num_0=num_0, num_1=num_1)
             self._assemble()
         else:
-            os.copy(
+            shutil.copy(
                 os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME),
                 os.path.join(self.path, DATA_SUBFOLDER, DATA_AUGMENTED_FILENAME),
             )
