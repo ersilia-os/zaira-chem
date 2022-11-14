@@ -59,6 +59,9 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _individual_estimator_pipeline(self, time_budget_sec):
+        if self.is_lazy:
+            self.logger.info("Lazy mode skips individual descriptors")
+            return
         if "flaml-individual-descriptors" not in self._estimators_to_use:
             return
         step = PipelineStep("individual_estimator_pipeline", self.output_dir)
@@ -69,6 +72,9 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _manifolds_pipeline(self, time_budget_sec):
+        if self.is_lazy:
+            self.logger.info("Lazy mode skips manifolds")
+            return
         if "autogluon-manifolds" not in self._estimators_to_use:
             return
         step = PipelineStep("manifolds_pipeline", self.output_dir)
@@ -79,6 +85,9 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _reference_pipeline(self, time_budget_sec):
+        if self.is_lazy:
+            self.logger.info("Lazy mode skips reference embedding model")
+            return
         if "kerastuner-reference-embedding" not in self._estimators_to_use:
             return
         step = PipelineStep("reference_pipeline", self.output_dir)
@@ -89,6 +98,9 @@ class EstimatorPipeline(ZairaBase):
             step.update()
 
     def _molmap_pipeline(self, time_budget_sec):
+        if self.is_lazy:
+            self.logger.info("Lazy mode skips molmap")
+            return
         if "molmap" not in self._estimators_to_use:
             return
         step = PipelineStep("molmap_pipeline", self.output_dir)

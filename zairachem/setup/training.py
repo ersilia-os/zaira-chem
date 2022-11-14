@@ -42,6 +42,7 @@ class TrainSetup(object):
         threshold,
         direction,
         parameters,
+        is_lazy,
     ):
         if output_dir is None:
             output_dir = input_file.split(".")[0]
@@ -57,6 +58,9 @@ class TrainSetup(object):
             "direction": direction,
             "task": task,
         }
+        self.is_lazy = is_lazy
+        if self.is_lazy:
+            passed_params["presets"] = "lazy"
         self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
         self.reference_file = reference_file
@@ -161,6 +165,8 @@ class TrainSetup(object):
             step.update()
 
     def _augment(self):
+        if self.is_lazy:
+            return
         step = PipelineStep("augment", self.output_dir)
         if not step.is_done():
             Augmenter(self.output_dir).run()

@@ -28,6 +28,9 @@ def setup_cmd():
         help="Direction of the outcome ('high' or 'low').",
     )
     @click.option("--parameters", "-p", default=None, type=click.STRING)
+    @click.option(
+        "--lazy", is_flag=True, default=False, help="Run ZairaChem in lazy (quick) mode"
+    )
     def setup(
         task,
         input_file,
@@ -37,6 +40,7 @@ def setup_cmd():
         threshold,
         direction,
         parameters,
+        lazy,
     ):
         echo("Reading from {0}".format(input_file))
         if task == "train":
@@ -47,6 +51,7 @@ def setup_cmd():
                 threshold=threshold,
                 direction=direction,
                 parameters=parameters,
+                is_lazy=lazy,
             )
             s.setup()
         elif task == "predict":
@@ -55,6 +60,7 @@ def setup_cmd():
                 output_dir=output_dir,
                 model_dir=model_dir,
                 time_budget=time_budget,
+                is_lazy=lazy,
             )
             s.setup()
         else:

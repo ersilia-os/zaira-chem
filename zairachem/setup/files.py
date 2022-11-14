@@ -5,15 +5,16 @@ import numpy as np
 import collections
 import csv
 import requests
-
 from rdkit import Chem
+
+from .. import ZairaBase
+from .schema import InputSchema
 
 from ..vars import DATA_SUBFOLDER
 from ..vars import ERSILIA_HUB_DEFAULT_MODELS
 from ..vars import DEFAULT_ESTIMATORS
 from ..vars import REFERENCE_FILENAME
-from .. import ZairaBase
-from .schema import InputSchema
+from ..vars import DEFAULT_PRESETS
 from . import (
     COMPOUNDS_FILENAME,
     ASSAYS_FILENAME,
@@ -97,6 +98,8 @@ class ParametersFile(object):
             data["ersilia_hub"] = ERSILIA_HUB_DEFAULT_MODELS
         if "estimators" not in data:
             data["estimators"] = DEFAULT_ESTIMATORS
+        if "presets" not in data:
+            data["presets"] = DEFAULT_PRESETS
         return data
 
 

@@ -17,8 +17,8 @@ class MelloddyTunerTrainPipeline(object):
         Folding(self.path).run()
 
 
-#        AggregateActivity(self.path).run()
-#        Thresholding(self.path).run()
+#        AggregateActivity(self.path).run() # TODO
+#        Thresholding(self.path).run() # TODO
 
 
 class MelloddyTunerPredictPipeline(object):
