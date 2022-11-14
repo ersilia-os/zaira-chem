@@ -12,6 +12,7 @@ SESSION_FILE = "session.json"
 
 DATA_SUBFOLDER = "data"
 DATA_FILENAME = "data.csv"
+PRESETS_FILENAME = "presets.json"
 DATA_AUGMENTED_FILENAME = "data_augmented.csv"
 REFERENCE_FILENAME = "reference.csv"
 INTERPRETABILITY_SUBFOLDER = "interpretability"
@@ -57,3 +58,5 @@ DEFAULT_ESTIMATORS = [
 ENSEMBLE_MODE = (
     "bagging"  # bagging, blending, stacking / at the moment only bagging is available
 )
+
+DEFAULT_PRESETS = "standard"  # the other option is lazy

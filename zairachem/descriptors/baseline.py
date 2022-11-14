@@ -37,7 +37,7 @@ class Fingerprinter(object):
     def __init__(self):
         self.fingerprinter = _Fingerprinter()
 
-    def calculate(self, smiles_list):
+    def _calculate(self, smiles_list):
         X = np.zeros((len(smiles_list), NBITS), np.uint8)
         for i, smi in tqdm(enumerate(smiles_list)):
             mol = Chem.MolFromSmiles(smi)
@@ -45,6 +45,19 @@ class Fingerprinter(object):
                 continue
             X[i, :] = self.fingerprinter.calc(mol)
         return X
+
+    def calculate(self, smiles_list, output_h5=None):
+        X = self._calculate(smiles_list)
+        if output_h5 is None:
+            return X
+        keys = ["mol-{0}".format(i) for i in range(X.shape[0])]
+        features = ["f-{0}".format(i) for i in range(X.shape[1])]
+        inputs = smiles_list
+        with h5py.File(output_h5, "w") as f:
+            f.create_dataset("Keys", data=keys, dtype=h5py.string_dtype())
+            f.create_dataset("Features", data=features, dtype=h5py.string_dtype())
+            f.create_dataset("Inputs", data=inputs, dtype=h5py.string_dtype())
+            f.create_dataset("Values", data=X)
 
 
 class Embedder(ZairaBase):
