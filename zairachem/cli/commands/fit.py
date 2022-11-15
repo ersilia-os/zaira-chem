@@ -78,10 +78,7 @@ def fit_cmd():
         help="Run fit pipeline in lazy mode, only for testing purposes.",
     )
     @click.option(
-        "--augment",
-        is_flag=True,
-        show_default=False,
-        help="Augment data if necessary"
+        "--augment", is_flag=True, show_default=False, help="Augment data if necessary"
     )
     def fit(
         input_file,
