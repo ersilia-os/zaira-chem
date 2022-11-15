@@ -94,6 +94,10 @@ class ApplicabilityEvaluator(ZairaBase):
             step.update()
 
     def run(self):
+        if not os.path.exists(os.path.join(self.trained_path, APPLICABILITY_SUBFOLDER)):
+            return
+        if not os.path.exists(os.path.join(self.path, APPLICABILITY_SUBFOLDER)):
+            return
         self._basic_properties()
         self._tanimoto_similarity()
         #  self._oneclass() # TODO Applicability one class classifier

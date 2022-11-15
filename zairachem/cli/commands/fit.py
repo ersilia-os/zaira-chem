@@ -77,6 +77,12 @@ def fit_cmd():
         show_default=False,
         help="Run fit pipeline in lazy mode, only for testing purposes.",
     )
+    @click.option(
+        "--augment",
+        is_flag=True,
+        show_default=False,
+        help="Augment data if necessary"
+    )
     def fit(
         input_file,
         reference_file,
@@ -88,6 +94,7 @@ def fit_cmd():
         parameters,
         clean,
         lazy,
+        augment,
     ):
         output_dir = model_dir
         threshold = cutoff
@@ -102,6 +109,7 @@ def fit_cmd():
             direction=direction,
             threshold=threshold,
             is_lazy=lazy,
+            augment=augment,
         )
         if s.is_done():
             echo("Model has already been trained. Skipping")
