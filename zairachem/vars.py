@@ -26,6 +26,7 @@ REPORT_SUBFOLDER = "report"
 OUTPUT_FILENAME = "output.csv"
 OUTPUT_TABLE_FILENAME = "output_table.csv"
 PERFORMANCE_TABLE_FILENAME = "performance_table.csv"
+OUTPUT_XLSX_FILENAME = "output.xlsx"
 
 CLF_PERCENTILES = [1, 10, 25, 50]
 
