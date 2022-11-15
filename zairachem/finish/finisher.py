@@ -96,7 +96,7 @@ class OutputToExcel(ZairaBase):
             self.path = path
         self.output_csv = os.path.join(self.path, OUTPUT_TABLE_FILENAME)
         self.performance_csv = os.path.join(self.path, PERFORMANCE_TABLE_FILENAME)
-        self.output_xlsx = os.path.join(self.path, OUTPUT_XLSX_FILENAME)    
+        self.output_xlsx = os.path.join(self.path, OUTPUT_XLSX_FILENAME)
 
     def run(self):
         df_o = pd.read_csv(self.output_csv)
