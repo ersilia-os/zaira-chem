@@ -10,7 +10,7 @@ conda activate $ZAIRACHEM_ENVIRONMENT
 
 # pip
 python3 -m pip install -U pip
-python3 -m pip install -U setuptools wheel
+python3 -m pip install -U setuptools wheel openpyxl
 
 # other pip-installable dependencies
 python3 -m pip install tensorflow

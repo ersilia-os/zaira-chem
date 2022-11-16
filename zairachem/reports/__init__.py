@@ -5,10 +5,12 @@ import pandas as pd
 from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER, REPORT_SUBFOLDER
 import stylia
 
+from stylia import TWO_COLUMNS_WIDTH
+
 from .. import ZairaBase
 
 
-INDIVIDUAL_FIGSIZE = (5, 5)
+INDIVIDUAL_FIGSIZE = (TWO_COLUMNS_WIDTH / 2, TWO_COLUMNS_WIDTH / 2)
 
 
 class BaseResults(ZairaBase):
@@ -54,7 +56,7 @@ class BasePlot(BaseResults):
         if ax is None:
             if figsize is None:
                 figsize = INDIVIDUAL_FIGSIZE
-            _, ax = stylia.create_figure(1, 1, figsize=figsize)
+            _, ax = stylia.create_figure(1, 1, width=figsize[0], height=figsize[1])
         self.name = "base"
         self.ax = ax[0]
 
