@@ -22,7 +22,7 @@ class Describer(ZairaBase):
         self.logger.debug(self.path)
 
     def _raw_descriptions(self):
-        if self.is_lazy:
+        if self.is_lazy():
             self.logger.info("Lazy mode skips raw descriptors")
             return
         step = PipelineStep("raw_descriptions", self.output_dir)
@@ -31,7 +31,7 @@ class Describer(ZairaBase):
             step.update()
 
     def _treated_descriptions(self):
-        if self.is_lazy:
+        if self.is_lazy():
             return
         step = PipelineStep("treated_descriptions", self.output_dir)
         if not step.is_done():
@@ -41,7 +41,7 @@ class Describer(ZairaBase):
     def _reference_descriptors(self):
         step = PipelineStep("reference_descriptors", self.output_dir)
         if not step.is_done():
-            if self.is_lazy:
+            if self.is_lazy():
                 SimpleDescriptors().run()
             else:
                 ReferenceDescriptors().run()

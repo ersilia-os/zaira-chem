@@ -103,6 +103,7 @@ class ZairaBase(object):
         model_dir = self.get_trained_dir()
         with open(os.path.join(output_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "r") as f:
             data = json.load(f)
+        print(data)
         if data["is_lazy"]:
             return True
         with open(os.path.join(model_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "r") as f:
