@@ -25,6 +25,7 @@ from ..vars import INTERPRETABILITY_SUBFOLDER
 from ..vars import APPLICABILITY_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 from ..vars import OUTPUT_FILENAME
+from ..vars import PRESETS_FILENAME
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 from ..augmentation.augment import Augmenter
@@ -78,6 +79,9 @@ class TrainSetup(object):
         self.time_budget = time_budget  # TODO
 
     def is_lazy(self):
+        with open(os.path.join(self.output_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "w") as f:
+            data = {"is_lazy": self._is_lazy}
+            json.dump(data, f, indent=4)
         return self._is_lazy
 
     def _copy_input_file(self):
