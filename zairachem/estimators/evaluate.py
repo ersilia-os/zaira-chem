@@ -29,7 +29,7 @@ class ResultsIterator(ZairaBase):
             self.path = path
 
     def _read_model_ids(self):
-        if self.is_lazy:
+        if self.is_lazy():
             return []
         with open(
             os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r"
