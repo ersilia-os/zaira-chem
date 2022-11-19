@@ -79,7 +79,9 @@ class TrainSetup(object):
         self.time_budget = time_budget  # TODO
 
     def is_lazy(self):
-        with open(os.path.join(self.output_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "w") as f:
+        with open(
+            os.path.join(self.output_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "w"
+        ) as f:
             data = {"is_lazy": self._is_lazy}
             json.dump(data, f, indent=4)
         return self._is_lazy
