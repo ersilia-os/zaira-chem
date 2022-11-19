@@ -83,6 +83,12 @@ class InputSchema(ZairaBase):
             return False
 
     def find_values_column(self):
+        for col in self.columns:
+            if col == "bin":
+                return [col]
+        for col in self.columns:
+            if col == "exp":
+                return [col]
         cols = []
         for col in self.columns:
             if self._is_values_column(col):

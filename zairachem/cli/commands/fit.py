@@ -75,6 +75,7 @@ def fit_cmd():
         "--lazy",
         is_flag=True,
         show_default=False,
+        default=False,
         help="Run fit pipeline in lazy mode, only for testing purposes.",
     )
     @click.option(
