@@ -9,6 +9,6 @@ authors:
   orcid: "https://orcid.org/0000-0002-9906-6936"
 title: "ZairaChem: automated ML modelling for chemistry datasets"
 version: 1.0.0
-doi: 10.5281/zenodo.1234
-date-released: 2022-10-19
+doi: 10.5281/zenodo.7352287
+date-released: 2022-11-23
 url: "https://github.com/ersilia-os/zaira-chem"
