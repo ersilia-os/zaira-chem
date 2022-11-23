@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/379620165.svg)](https://zenodo.org/badge/latestdoi/379620165)
+
 # ZairaChem: Automated ML-based (Q)SAR
 
 ZairaChem is the first library of Ersilia's family of tools devoted to providing **out-of-the-box** machine learning solutions for biomedical problems. In this case, we have focused on (Q)SAR models. (Q)SAR models take chemical structures as input and give as output predicted properties, typically pharmacological properties such as bioactivity against a certain target.
