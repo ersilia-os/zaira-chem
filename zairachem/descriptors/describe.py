@@ -2,7 +2,7 @@ import os
 
 from .raw import RawDescriptors
 from .treated import TreatedDescriptors
-from .reference import ReferenceDescriptors
+from .reference import ReferenceDescriptors, SimpleDescriptors
 from .manifolds import Manifolds
 
 from .. import ZairaBase
@@ -22,12 +22,17 @@ class Describer(ZairaBase):
         self.logger.debug(self.path)
 
     def _raw_descriptions(self):
+        if self.is_lazy():
+            self.logger.info("Lazy mode skips raw descriptors")
+            return
         step = PipelineStep("raw_descriptions", self.output_dir)
         if not step.is_done():
             RawDescriptors().run()
             step.update()
 
     def _treated_descriptions(self):
+        if self.is_lazy():
+            return
         step = PipelineStep("treated_descriptions", self.output_dir)
         if not step.is_done():
             TreatedDescriptors().run()
@@ -36,7 +41,10 @@ class Describer(ZairaBase):
     def _reference_descriptors(self):
         step = PipelineStep("reference_descriptors", self.output_dir)
         if not step.is_done():
-            ReferenceDescriptors().run()
+            if self.is_lazy():
+                SimpleDescriptors().run()
+            else:
+                ReferenceDescriptors().run()
             step.update()
 
     def _manifolds(self):

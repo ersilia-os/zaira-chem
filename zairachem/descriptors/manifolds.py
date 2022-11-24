@@ -15,7 +15,7 @@ from zairachem.vars import DATA_FILENAME, DATA_SUBFOLDER
 
 from . import DescriptorBase
 from .raw import DESCRIPTORS_SUBFOLDER
-from .reference import REFERENCE_FILE_NAME
+from .reference import REFERENCE_FILE_NAME, SIMPLE_FILE_NAME
 from ..utils.matrices import Hdf5, Data
 
 MAX_COMPONENTS = 4
@@ -133,6 +133,8 @@ class Manifolds(DescriptorBase):
 
     def run(self):
         file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, REFERENCE_FILE_NAME)
+        if not os.path.exists(file_name):
+            file_name = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, SIMPLE_FILE_NAME)
         data = Hdf5(file_name).load()
         self.keys = data.keys()
         self.inputs = data.inputs()

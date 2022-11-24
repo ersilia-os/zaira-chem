@@ -25,6 +25,7 @@ from ..vars import INTERPRETABILITY_SUBFOLDER
 from ..vars import APPLICABILITY_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
 from ..vars import OUTPUT_FILENAME
+from ..vars import PRESETS_FILENAME
 
 from ..tools.melloddy.pipeline import MelloddyTunerTrainPipeline
 from ..augmentation.augment import Augmenter
@@ -42,6 +43,8 @@ class TrainSetup(object):
         threshold,
         direction,
         parameters,
+        is_lazy,
+        augment,
     ):
         if output_dir is None:
             output_dir = input_file.split(".")[0]
@@ -57,6 +60,16 @@ class TrainSetup(object):
             "direction": direction,
             "task": task,
         }
+        self._is_lazy = is_lazy
+        if self._is_lazy:
+            passed_params["presets"] = "lazy"
+        else:
+            passed_params["presets"] = "standard"
+        self.augment = augment
+        if self.augment:
+            passed_params["augment"] = True
+        else:
+            passed_params["augment"] = False
         self.params = self._load_params(parameters, passed_params)
         self.input_file = os.path.abspath(input_file)
         self.reference_file = reference_file
@@ -64,6 +77,14 @@ class TrainSetup(object):
             self.reference_file = os.path.abspath(reference_file)
         self.output_dir = os.path.abspath(output_dir)
         self.time_budget = time_budget  # TODO
+
+    def is_lazy(self):
+        with open(
+            os.path.join(self.output_dir, DATA_SUBFOLDER, PRESETS_FILENAME), "w"
+        ) as f:
+            data = {"is_lazy": self._is_lazy}
+            json.dump(data, f, indent=4)
+        return self._is_lazy
 
     def _copy_input_file(self):
         extension = self.input_file.split(".")[-1]
@@ -161,6 +182,10 @@ class TrainSetup(object):
             step.update()
 
     def _augment(self):
+        if self.is_lazy():
+            return
+        if not self.augment:
+            return
         step = PipelineStep("augment", self.output_dir)
         if not step.is_done():
             Augmenter(self.output_dir).run()

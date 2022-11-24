@@ -71,6 +71,16 @@ def fit_cmd():
         default=False,
         help="Clean directory at the end of the pipeline. Only precalculated descriptors are removed.",
     )
+    @click.option(
+        "--lazy",
+        is_flag=True,
+        show_default=False,
+        default=False,
+        help="Run fit pipeline in lazy mode, only for testing purposes.",
+    )
+    @click.option(
+        "--augment", is_flag=True, show_default=False, help="Augment data if necessary"
+    )
     def fit(
         input_file,
         reference_file,
@@ -81,6 +91,8 @@ def fit_cmd():
         direction,
         parameters,
         clean,
+        lazy,
+        augment,
     ):
         output_dir = model_dir
         threshold = cutoff
@@ -94,6 +106,8 @@ def fit_cmd():
             task=task,
             direction=direction,
             threshold=threshold,
+            is_lazy=lazy,
+            augment=augment,
         )
         if s.is_done():
             echo("Model has already been trained. Skipping")

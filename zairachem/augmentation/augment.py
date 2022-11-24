@@ -1,4 +1,5 @@
 import os
+import shutil
 import random
 import numpy as np
 import pandas as pd
@@ -16,7 +17,6 @@ from ..vars import (
 _MIN_CLASS_N = 100
 _MIN_CLASS_IMBALANCE = 0.25
 _SELF_TRAINED_MAX_ITER = 10
-
 
 _LAZY_QSAR_TIME_BUDGET_SEC = 20
 
@@ -237,7 +237,7 @@ class ClassifierAugmenter(ZairaBase):
             self._self_trained_classifier(num_0=num_0, num_1=num_1)
             self._assemble()
         else:
-            os.copy(
+            shutil.copy(
                 os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME),
                 os.path.join(self.path, DATA_SUBFOLDER, DATA_AUGMENTED_FILENAME),
             )
