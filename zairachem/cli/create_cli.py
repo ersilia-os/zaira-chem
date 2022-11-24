@@ -12,6 +12,7 @@ def create_cli():
     cmd.estimate()
     cmd.pool()
     cmd.applicability()
+    cmd.split()
     cmd.fit()
     cmd.predict()
     cmd.report()
