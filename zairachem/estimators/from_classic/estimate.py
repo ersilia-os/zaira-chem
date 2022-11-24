@@ -26,7 +26,9 @@ class Fitter(BaseEstimator):
         self.trained_path = os.path.join(
             self.get_output_dir(), ESTIMATORS_SUBFOLDER, ESTIMATORS_FAMILY_SUBFOLDER
         )
-        if _USE_AUGMENTED:
+        if _USE_AUGMENTED and os.path.exists(
+            os.path.join(self.path, DATA_SUBFOLDER, DATA_AUGMENTED_FILENAME)
+        ):
             self._data_filename = DATA_AUGMENTED_FILENAME
         else:
             self._data_filename = DATA_FILENAME

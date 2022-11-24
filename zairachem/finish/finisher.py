@@ -1,5 +1,6 @@
 import os
 import shutil
+import pandas as pd
 
 from ..vars import (
     DESCRIPTORS_SUBFOLDER,
@@ -9,6 +10,7 @@ from ..vars import (
     OUTPUT_FILENAME,
     OUTPUT_TABLE_FILENAME,
     PERFORMANCE_TABLE_FILENAME,
+    OUTPUT_XLSX_FILENAME,
 )
 from .. import ZairaBase
 from ..estimators import RESULTS_MAPPED_FILENAME
@@ -85,6 +87,25 @@ class Flusher(ZairaBase):
         self._flush(self.trained_dir)
 
 
+class OutputToExcel(ZairaBase):
+    def __init__(self, path, clean=False, flush=False):
+        ZairaBase.__init__(self)
+        if path is None:
+            self.path = self.get_output_dir()
+        else:
+            self.path = path
+        self.output_csv = os.path.join(self.path, OUTPUT_TABLE_FILENAME)
+        self.performance_csv = os.path.join(self.path, PERFORMANCE_TABLE_FILENAME)
+        self.output_xlsx = os.path.join(self.path, OUTPUT_XLSX_FILENAME)
+
+    def run(self):
+        df_o = pd.read_csv(self.output_csv)
+        df_p = pd.read_csv(self.performance_csv)
+        with pd.ExcelWriter(self.output_xlsx, mode="w", engine="openpyxl") as writer:
+            df_o.to_excel(writer, sheet_name="Output", index=False)
+            df_p.to_excel(writer, sheet_name="Performance", index=False)
+
+
 class Finisher(ZairaBase):
     def __init__(self, path, clean=False, flush=False):
         ZairaBase.__init__(self)
@@ -119,11 +140,15 @@ class Finisher(ZairaBase):
             os.path.join(self.path, PERFORMANCE_TABLE_FILENAME),
         )
 
+    def _to_excel(self):
+        OutputToExcel(path=self.path).run()
+
     def run(self):
         self.logger.debug("Finishing")
         self._predictions_file()
         self._output_table_file()
         self._performance_table_file()
+        self._to_excel()
         if self.clean:
             self._clean_descriptors()
         if self.flush:

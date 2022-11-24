@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 
 from .. import ZairaBase, create_session_symlink
 
@@ -39,7 +40,17 @@ class PredictSetup(object):
         assert model_dir is not None, "Model directory not specified"
         self.model_dir = os.path.abspath(model_dir)
         self.time_budget = time_budget  # TODO
+        self.is_lazy = self._check_is_lazy()
         assert self.model_is_ready(), "Model is not ready"
+
+    def _check_is_lazy(self):
+        parameters_json = os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
+        with open(parameters_json, "r") as f:
+            data = json.load(f)
+        if data["presets"] == "lazy":
+            return True
+        else:
+            return False
 
     def _copy_input_file(self):
         extension = self.input_file.split(".")[-1]

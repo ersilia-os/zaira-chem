@@ -13,10 +13,10 @@ def session_cmd():
     @zairachem_cli.command(help="Set up a new session")
     @click.option("--output_dir", "-o", default=None, type=click.STRING)
     @click.option("--model_dir", "-m", default=None, type=click.STRING)
-    @click.option("--train/--predict", default=True)
-    def session(output_dir, model_dir, train):
+    @click.option("--fit/--predict", default=True)
+    def session(output_dir, model_dir, fit):
         echo("Opening a session")
-        if train:
+        if fit:
             mode = "train"
             if model_dir is None:
                 sys.exit(1)

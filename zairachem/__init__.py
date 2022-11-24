@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 import random
 from time import time
-from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER
+from .vars import BASE_DIR, DATA_FILENAME, DATA_SUBFOLDER, PRESETS_FILENAME
 from .vars import SESSION_FILE
 from .vars import ENSEMBLE_MODE
 
@@ -97,6 +97,18 @@ class ZairaBase(object):
             return False
         else:
             return True
+
+    def is_lazy(self):
+        output_dir = self.get_output_dir()
+        model_dir = self.get_trained_dir()
+        file_name = os.path.join(output_dir, DATA_SUBFOLDER, PRESETS_FILENAME)
+        if not os.path.exists(file_name):
+            file_name = os.path.join(model_dir, DATA_SUBFOLDER, PRESETS_FILENAME)
+        with open(file_name, "r") as f:
+            data = json.load(f)
+        if data["is_lazy"]:
+            return True
+        return False
 
     def _dummy_indices(self, path):
         df = pd.read_csv(os.path.join(path, DATA_SUBFOLDER, DATA_FILENAME))

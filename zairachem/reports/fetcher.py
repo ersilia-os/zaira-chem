@@ -70,7 +70,7 @@ class ResultsFetcher(ZairaBase):
     def _read_pooled_results(self, path=None):
         if path is None:
             path = self.path
-        df = pd.read_csv(os.path.join(self.path, POOL_SUBFOLDER, RESULTS_FILENAME))
+        df = pd.read_csv(os.path.join(path, POOL_SUBFOLDER, RESULTS_FILENAME))
         return df
 
     def _read_pooled_results_train(self):
@@ -84,7 +84,7 @@ class ResultsFetcher(ZairaBase):
         for rpath in ResultsIterator(path=path).iter_relpaths():
             prefixes += ["-".join(rpath)]
             file_name = "/".join(
-                [self.path, ESTIMATORS_SUBFOLDER] + rpath + [RESULTS_UNMAPPED_FILENAME]
+                [path, ESTIMATORS_SUBFOLDER] + rpath + [RESULTS_UNMAPPED_FILENAME]
             )
             df = pd.read_csv(file_name)
             R += [list(df[task])]
