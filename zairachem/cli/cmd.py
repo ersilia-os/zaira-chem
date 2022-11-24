@@ -8,6 +8,7 @@ from .commands.finish import finish_cmd
 from .commands.fit import fit_cmd
 from .commands.predict import predict_cmd
 from .commands.example import example_cmd
+from .commands.split import split_cmd
 from .commands.applicability import applicability_cmd
 
 
@@ -47,3 +48,6 @@ class Command(object):
 
     def example(self):
         example_cmd()
+
+    def split(self):
+        split_cmd()
