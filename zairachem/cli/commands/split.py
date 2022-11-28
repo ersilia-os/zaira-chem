@@ -70,12 +70,15 @@ def create_datasets_for_fold(df, test_fold_id, all_fold_ids, output_dir):
 
 def split_cmd():
     @zairachem_cli.command(help="Split input data set for cross-validation")
-    @click.option("--input_file", "-i", type=click.STRING)
-    @click.option("--folds_dir", "-f", default=None, type=click.STRING)
-    @click.option("--split_criterion", "-s", default='default', type=click.STRING)
-    @click.option("--kfold", "-k",
-                  is_flag=True,
-                  default=False)
+    @click.option("--input_file", "-i", type=click.STRING, required=True)
+    @click.option("--folds_dir", "-f", default=None, type=click.STRING,
+            help="Directorate where the train and test data sets will be created."
+                 " By default, same directory as input file.")
+    @click.option("--split_criterion", "-s", default='default',
+            type=click.Choice(['default', 'random', 'scaffold', 'similarity']))
+    @click.option("--kfold", "-k", is_flag=True, default=False,
+            help="Create five train-test splits for k-fold cross-validation,"
+                 " in subdirectories fold_0, fold_1, etc.")
     def split(input_file, folds_dir, split_criterion, kfold):
 
         # folds_dir: if not specified, use the same dir as input_file
@@ -93,8 +96,7 @@ def split_cmd():
         elif split_criterion == 'default':
             fold_var = 'fld_aux'
         else:
-            logger.error(f'Invalid value "{split_criterion}" for parameter --split_criterion.'
-                    ' Allowed values are: default, random, scaffold, similarity.')
+            logger.error(f'Invalid value "{split_criterion}" for parameter --split_criterion.')
             sys.exit(1)
             
         # Create directory to store the output of TrainSetup
