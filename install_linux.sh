@@ -4,21 +4,22 @@ conda init bash
 
 # create zairachem conda environment
 ZAIRACHEM_ENVIRONMENT='zairachem'
-conda create -n $ZAIRACHEM_ENVIRONMENT python=3.7 -y
+conda create -n $ZAIRACHEM_ENVIRONMENT python=3.8 -y
 source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ZAIRACHEM_ENVIRONMENT
 
 # pip
 python3 -m pip install -U pip
-python3 -m pip install -U setuptools wheel openpyxl
+python3 -m pip install -U setuptools wheel
+python3 -m pip install tables openpyxl
 
 # other pip-installable dependencies
-python3 -m pip install tensorflow
-python3 -m pip install autokeras #==1.0.16
+python3 -m pip install tensorflow==2.10.0
+python3 -m pip install autokeras==1.0.20 #==1.0.16
 
 # install autogluon cpu
 python3 -m pip install -U "mxnet<2.0.0"
-python3 -m pip install autogluon
+python3 -m pip install autogluon.tabular[all]==0.5.2
 
 # install autogluon gpu
 # Here we assume CUDA 10.1 is installed.  You should change the number
@@ -31,15 +32,15 @@ python3 -m pip install "xgboost==1.3.3"
 python3 -m pip install "SQLAlchemy<1.4.0"
 
 # install zairachem
-conda install -c conda-forge fpsim2 -y
-python3 -m pip install -q -U keras-tuner
+python3 -m pip install git+https://github.com/chembl/FPSim2.git@0.3.0
+python3 -m pip install -q -U keras-tuner==1.1.3
 
 # install ersilia
 python3 -m pip install git+https://github.com/ersilia-os/ersilia.git
 ersilia --help
 
 # install isaura
-python3 -m pip install git+https://github.com/ersilia-os/isaura.git
+python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0bdd6d7d4f796d2a84b17208a87b56
 
 # install stylia
 python3 -m pip install git+https://github.com/ersilia-os/stylia.git
@@ -52,22 +53,3 @@ python3 -m pip install git+https://github.com/melloddy/MELLODDY-TUNER.git@2.1.3
 
 # install zairachem
 python3 -m pip install -e .
-
-# create extra conda envirnoments
-
-# install molmap
-# MOLMAP_ENVIRONMENT='molmap'
-# conda create -n $MOLMAP_ENVIRONMENT python=3.6 -y
-# source $CONDA_PREFIX/etc/profile.d/conda.sh
-# conda activate $MOLMAP_ENVIRONMENT
-# cd zairachem/tools/molmap/bidd-molmap/
-# conda install -c tmap tmap -y
-# conda install -c conda-forge rdkit=2020.03 -y
-# python -m pip install -r requirements.txt
-# python -m pip install h5py==2.10.0
-# cd $WORKDIR
-
-# install mollib
-# cd zairachem/tools/mollib/virtual_libraries/
-# bash install_linux.sh
-# cd $WORKDIR
