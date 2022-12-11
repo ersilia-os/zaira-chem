@@ -59,6 +59,8 @@ class PerformanceTable(BaseTable, ResultsFetcher):
         data = collections.defaultdict(list)
         d = self._general_performance()
         data["model"] += ["pooled"]
+        if d is None:
+            return
         for k, v in d.items():
             data[k] += [v]
         for col, d_ in self._individual_performances():
@@ -108,19 +110,23 @@ class OutputTable(BaseTable, ResultsFetcher):
     def _get_true_value_column(self):
         if self.is_clf:
             values = self.get_true_clf()
-        return self.map_to_original(values)
+            return self.map_to_original(values)
+        else:
+            return None
 
     def _get_pred_value_column(self):
-        if self.is_clf:
+        try:
             values = self.get_pred_proba_clf()
-        else:
-            values = self.get_pred_reg_trans()
-        return self.map_to_original(values)
+            return self.map_to_original(values)
+             # values = self.get_pred_reg_trans()
+        except:
+            return None
 
     def _get_ensemble_predictions_columns(self):
-        if self.is_clf:
+        try:
             tasks = self.get_clf_tasks()
-        else:
+            print(tasks)
+        except:
             tasks = self.get_reg_tasks()
         task = tasks[0]
         df = self._read_individual_estimator_results(task)
