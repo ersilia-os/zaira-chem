@@ -4,7 +4,7 @@ conda init bash
 
 # create zairachem conda environment
 ZAIRACHEM_ENVIRONMENT='zairachem'
-conda create -n $ZAIRACHEM_ENVIRONMENT python=3.8 -y
+conda create -n $ZAIRACHEM_ENVIRONMENT python=3.7 -y
 source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ZAIRACHEM_ENVIRONMENT
 
