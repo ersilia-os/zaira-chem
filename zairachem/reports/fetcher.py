@@ -124,13 +124,19 @@ class ResultsFetcher(ZairaBase):
         ]
         return tasks
 
-    def get_clf_tasks(self):
-        df = self._read_data()
+    def get_clf_tasks(self, data=None):
+        if data is None:
+            df = self._read_data()
+        else:
+            df = data
         tasks = [
             c
             for c in list(df.columns)
             if "clf_" in c and "_skip" not in c and "_aux" not in c
         ]
+        if len(tasks)==0:
+            df = self._read_pooled_results()
+            return self.get_clf_tasks(data=df)
         return tasks
 
     def get_actives_inactives(self):

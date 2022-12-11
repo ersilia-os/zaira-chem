@@ -86,7 +86,6 @@ class Flusher(ZairaBase):
         self._flush(self.output_dir)
         self._flush(self.trained_dir)
 
-
 class OutputToExcel(ZairaBase):
     def __init__(self, path, clean=False, flush=False):
         ZairaBase.__init__(self)
@@ -100,11 +99,14 @@ class OutputToExcel(ZairaBase):
 
     def run(self):
         df_o = pd.read_csv(self.output_csv)
-        df_p = pd.read_csv(self.performance_csv)
+        if not os.path.exists(self.performance_csv):
+            df_p = None
+        else:
+            df_p = pd.read_csv(self.performance_csv)
         with pd.ExcelWriter(self.output_xlsx, mode="w", engine="openpyxl") as writer:
             df_o.to_excel(writer, sheet_name="Output", index=False)
-            df_p.to_excel(writer, sheet_name="Performance", index=False)
-
+            if df_p is not None:
+                df_p.to_excel(writer, sheet_name="Performance", index=False)
 
 class Finisher(ZairaBase):
     def __init__(self, path, clean=False, flush=False):
@@ -135,8 +137,10 @@ class Finisher(ZairaBase):
         )
 
     def _performance_table_file(self):
-        shutil.copy(
-            os.path.join(self.path, REPORT_SUBFOLDER, PERFORMANCE_TABLE_FILENAME),
+        filename = os.path.join(self.path, REPORT_SUBFOLDER, PERFORMANCE_TABLE_FILENAME)
+        if not os.path.exists(filename):
+            return
+        shutil.copy(filename,
             os.path.join(self.path, PERFORMANCE_TABLE_FILENAME),
         )
 
