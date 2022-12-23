@@ -12,8 +12,8 @@ from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
 from .from_molmap.pipe import MolMapPipeline
 from .evaluate import SimpleEvaluator
 
-from ..vars import DATA_SUBFOLDER
-from ..setup import PARAMETERS_FILE, DATA_FILE
+from ..vars import DATA_SUBFOLDER, DATA_FILENAME
+from ..setup import PARAMETERS_FILE
 
 MOLMAP_DATA_SIZE_LIMIT = 10000
 
@@ -32,7 +32,7 @@ class EstimatorPipeline(ZairaBase):
         self.data_size = self._get_data_size()
 
     def _get_data_size(self):
-        data = pd.read_csv(os.path.join(self.get_trained_dir(), DATA_SUBFOLDER, DATA_FILE))
+        data = pd.read_csv(os.path.join(self.get_trained_dir(), DATA_SUBFOLDER, DATA_FILENAME))
         return data.shape[0]
             
     def _load_params(self):
