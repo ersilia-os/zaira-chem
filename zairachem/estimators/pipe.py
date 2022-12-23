@@ -32,7 +32,7 @@ class EstimatorPipeline(ZairaBase):
         self.data_size = self._get_data_size()
 
     def _get_data_size(self):
-        data = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILE))
+        data = pd.read_csv(os.path.join(self.get_trained_dir(), DATA_SUBFOLDER, DATA_FILE))
         return data.shape[0]
             
     def _load_params(self):
