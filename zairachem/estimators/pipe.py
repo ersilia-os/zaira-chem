@@ -1,5 +1,6 @@
 import os
 import json
+import pandas as pd
 
 from .. import ZairaBase
 from ..utils.pipeline import PipelineStep
@@ -12,7 +13,9 @@ from .from_molmap.pipe import MolMapPipeline
 from .evaluate import SimpleEvaluator
 
 from ..vars import DATA_SUBFOLDER
-from ..setup import PARAMETERS_FILE
+from ..setup import PARAMETERS_FILE, DATA_FILE
+
+MOLMAP_DATA_SIZE_LIMIT = 10000
 
 
 class EstimatorPipeline(ZairaBase):
@@ -26,7 +29,12 @@ class EstimatorPipeline(ZairaBase):
         assert os.path.exists(self.output_dir)
         self.params = self._load_params()
         self.get_estimators()
+        self.data_size = self._get_data_size()
 
+    def _get_data_size(self):
+        data = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILE))
+        return data.shape[0]
+            
     def _load_params(self):
         with open(os.path.join(self.path, DATA_SUBFOLDER, PARAMETERS_FILE), "r") as f:
             params = json.load(f)
@@ -102,6 +110,9 @@ class EstimatorPipeline(ZairaBase):
             self.logger.info("Lazy mode skips molmap")
             return
         if "molmap" not in self._estimators_to_use:
+            return
+        if self.data_size > MOLMAP_DATA_SIZE_LIMIT:
+            self.logger.info("Data set is too big for molmap")
             return
         step = PipelineStep("molmap_pipeline", self.output_dir)
         if not step.is_done():
