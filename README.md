@@ -25,25 +25,49 @@ ZairaChem can be run as a command line interface.
 zairachem --help
 ```
 
-### Get your data
+### Quick start
 
-ZairaChem expect a comma- or tab-separated file containing molecules in SMILES format and activity values. If you don't have a dataset at hand, you can create an example with the following command. 
+ZairaChem expects a comma- or tab-separated file containing molecules in SMILES format and activity values. 
+
+To get started, let's load an example classification task from [Therapeutic Data Commons](https://tdcommons.ai/). 
 
 ```bash
-zairachem example -f input.csv
+zairachem example --classification --file_name input.csv
 ```
+
+This file can be split into train and test sets.
+
+```bash
+zairachem split -i input.csv
+```
+
+The command above will generate two files in the current folder, named train.csv and test.csv. By default, the train:test ratio is 80:20.
 
 ### Fit
 
+You can train a model as follows:
+
 ```bash
-zairachem fit -i input.csv -m model_folder
+zairachem fit -i train.csv -m model
 ```
+
+This command will run the full ZairaChem pipeline and produce a model folder with processed data, model checkpoints, and reports.
 
 ### Predict
 
+You can then run predictions on the test set:
+
 ```bash
-zairachem predict -i input.csv -m model_folder -o output_folder
+zairachem predict -i test.csv -m model -o test
 ```
+
+ZairaChem will run predictions using the checkpoints stored in model and store results in the test directory. Several performance plots will be generated alongside prediction outputs.
+
+## Additional Information
+
+For further technical details, please read the [ZairaChem page](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) of the Ersilia gitbook, which each describes major step in the ZairaChem pipeline.
+
+A corresponding manuscript for the ZairaChem pipeline is currently available as a [preprint](https://www.biorxiv.org/content/10.1101/2022.12.13.520154v1).
 
 ## About us
 
