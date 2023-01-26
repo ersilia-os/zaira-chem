@@ -2,7 +2,7 @@ loguru
 click
 joblib
 pandas
-sklearn
+scikit-learn
 dask
 tqdm
 faiss-cpu
