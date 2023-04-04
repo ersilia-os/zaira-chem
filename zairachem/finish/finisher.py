@@ -259,7 +259,7 @@ class OutputToExcel(ZairaBase):
 
 
 class Finisher(ZairaBase):
-    def __init__(self, path, clean=False, flush=False):
+    def __init__(self, path, clean=False, flush=False, anonymize=False):
         ZairaBase.__init__(self)
         if path is None:
             self.path = self.get_output_dir()
@@ -267,12 +267,16 @@ class Finisher(ZairaBase):
             self.path = path
         self.clean = clean
         self.flush = flush
+        self.anonymize = anonymize
 
     def _clean_descriptors(self):
         Cleaner(path=self.path).run()
 
     def _flush(self):
         Flusher(path=self.path).run()
+    
+    def _anonymize(self):
+        Anonymizer(path=self.path).run()
 
     def _predictions_file(self):
         shutil.copy(
@@ -308,3 +312,5 @@ class Finisher(ZairaBase):
             self._clean_descriptors()
         if self.flush:
             self._flush()
+        if self.anonymize:
+            self._anonymize()
