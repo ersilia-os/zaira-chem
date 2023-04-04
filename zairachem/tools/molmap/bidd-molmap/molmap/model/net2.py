@@ -48,7 +48,6 @@ def MolMapNet(
     dense_avf="relu",
     last_avf=None,
 ):
-
     """
     parameters
     ----------------------
@@ -153,7 +152,6 @@ def MolMapAddPathNet(
     dense_avf="relu",
     last_avf=None,
 ):
-
     """
     parameters
     ----------------------
@@ -202,7 +200,6 @@ def MolMapResNet(
     dense_avf="relu",
     last_avf=None,
 ):
-
     """
     parameters
     ----------------------

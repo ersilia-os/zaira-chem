@@ -58,7 +58,7 @@ def plot_pred_with_conf(
 
     :return: None
     """
-    pred_dist = conf_model.sample_prediction(x_star, nsamples=10 ** 4)
+    pred_dist = conf_model.sample_prediction(x_star, nsamples=10**4)
 
     point_pred = np.mean(pred_dist)
     plt.figure(figsize=(12, 6))

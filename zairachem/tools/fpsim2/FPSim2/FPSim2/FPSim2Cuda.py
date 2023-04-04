@@ -129,7 +129,6 @@ class FPSim2CudaEngine(BaseEngine):
             raise Exception("only supports 'raw' and 'element_wise' kernels")
 
     def _element_wise_search(self, query_string, threshold):
-
         np_query = self.load_query(query_string)
 
         # get the range of the molecule subset to screen
@@ -167,7 +166,6 @@ class FPSim2CudaEngine(BaseEngine):
         return np_ids, np_sim
 
     def _raw_kernel_search(self, query_string, threshold):
-
         np_query = self.load_query(query_string)
 
         # get the range of the molecule subset to screen

@@ -169,7 +169,6 @@ def get_one_hot(smiles, pad_len=-1):
     j = 0
     i = 0
     while cont:
-
         try:
             if smiles[i + 1] in ["r", "i", "l"]:
                 sym = smiles[i : i + 2]
