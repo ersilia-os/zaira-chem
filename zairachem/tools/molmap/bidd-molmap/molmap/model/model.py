@@ -59,7 +59,7 @@ def load_model(model_path, gpuid=None):
 
 class RegressionEstimator(BaseEstimator, RegressorMixin):
 
-    """ An MolMap CNN Regression estimator 
+    """An MolMap CNN Regression estimator
     Parameters
     ----------
     n_outputs: int,
@@ -69,13 +69,13 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
     fmap_shape2: tuple, default = None
         width and height of the second input feature map
     epochs : int, default = 100
-        A parameter used for training epochs. 
+        A parameter used for training epochs.
     dense_layers: list, default = [128]
-        A parameter used for the dense layers.    
+        A parameter used for the dense layers.
     monitor: str
         {'val_loss', 'val_r2'}
-        
-    
+
+
     Examples
     --------
 
@@ -102,7 +102,6 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
         name="Regression Estimator",
         gpuid="0",
     ):
-
         self.n_outputs = n_outputs
         self.fmap_shape1 = fmap_shape1
         self.fmap_shape2 = fmap_shape2
@@ -174,7 +173,6 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
         print(self)
 
     def get_params(self, deep=True):
-
         model_paras = {
             "n_outputs": self.n_outputs,
             "fmap_shape1": self.fmap_shape1,
@@ -206,7 +204,6 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
         return model_paras
 
     def fit(self, X, y, X_valid=None, y_valid=None):
-
         # Check that X and y have correct shape
 
         if self.fmap_shape2 is None:
@@ -308,9 +305,9 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
             Test samples.
         y : array-like of shape (n_samples,)
             True labels for X.
-        scoring: str, default: r2, 
+        scoring: str, default: r2,
             {'r2', 'rmse'}
-        
+
         Returns
         -------
         score : float
@@ -329,14 +326,14 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
 
 class MultiClassEstimator(BaseEstimator, ClassifierMixin):
 
-    """ An MolMap CNN MultiClass estimator
+    """An MolMap CNN MultiClass estimator
     Parameters
     ----------
     epochs : int, default = 150
-        A parameter used for training epochs. 
+        A parameter used for training epochs.
     dense_layers: list, default = [128]
-        A parameter used for the dense layers.    
-    
+        A parameter used for the dense layers.
+
     Examples
     --------
 
@@ -363,7 +360,6 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         name="MultiClass Estimator",
         gpuid=0,
     ):
-
         self.n_outputs = n_outputs
         self.fmap_shape1 = fmap_shape1
         self.fmap_shape2 = fmap_shape2
@@ -419,7 +415,6 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         print(self)
 
     def get_params(self, deep=True):
-
         model_paras = {
             "n_outputs": self.n_outputs,
             "fmap_shape1": self.fmap_shape1,
@@ -452,7 +447,6 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         return model_paras
 
     def fit(self, X, y, X_valid=None, y_valid=None):
-
         # Check that X and y have correct shape
 
         if self.fmap_shape2 is None:
@@ -525,7 +519,7 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         For a multi_class problem, if multi_class is set to be "multinomial"
         the softmax function is used to find the predicted probability of
         each class.
-        
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
@@ -543,7 +537,6 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         return y_prob
 
     def predict(self, X):
-
         # Check is fit had been called
         check_is_fitted(self)
         y_pred = np.round(self.predict_proba(X))
@@ -571,10 +564,10 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
 
 class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
 
-    """ An MolMAP CNN MultiLabel estimator
+    """An MolMAP CNN MultiLabel estimator
     Parameters
-    ---------- 
-    
+    ----------
+
     Examples
     --------
 
@@ -600,7 +593,6 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         name="MultiLabels Estimator",
         gpuid=0,
     ):
-
         self.n_outputs = n_outputs
         self.fmap_shape1 = fmap_shape1
         self.fmap_shape2 = fmap_shape2
@@ -655,7 +647,6 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         print(self)
 
     def get_params(self, deep=True):
-
         model_paras = {
             "n_outputs": self.n_outputs,
             "fmap_shape1": self.fmap_shape1,
@@ -688,7 +679,6 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         return model_paras
 
     def fit(self, X, y, X_valid=None, y_valid=None):
-
         # Check that X and y have correct shape
         if self.fmap_shape2 is None:
             if X.ndim != 4:
@@ -759,7 +749,7 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         For a multi_class problem, if multi_class is set to be "multinomial"
         the softmax function is used to find the predicted probability of
         each class.
-        
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
@@ -778,7 +768,6 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         return y_prob
 
     def predict(self, X):
-
         # Check is fit had been called
         check_is_fitted(self)
         y_pred = np.round(self.predict_proba(X))

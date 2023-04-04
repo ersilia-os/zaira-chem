@@ -118,7 +118,7 @@ class OutputTable(BaseTable, ResultsFetcher):
         try:
             values = self.get_pred_proba_clf()
             return self.map_to_original(values)
-             # values = self.get_pred_reg_trans()
+            # values = self.get_pred_reg_trans()
         except:
             return None
 

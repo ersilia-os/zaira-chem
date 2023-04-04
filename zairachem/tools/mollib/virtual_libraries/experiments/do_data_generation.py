@@ -52,7 +52,6 @@ def int_to_smile(array, indices_token, pad_char):
 
 
 def one_hot_encode(token_lists, n_chars):
-
     output = np.zeros((len(token_lists), len(token_lists[0]), n_chars))
     for i, token_list in enumerate(token_lists):
         for j, token in enumerate(token_list):
@@ -61,7 +60,6 @@ def one_hot_encode(token_lists, n_chars):
 
 
 def sample(model, temp, start_char, end_char, max_len, indices_token, token_indices):
-
     n_chars = len(indices_token)
 
     seed_token = [token_indices[start_char]]
@@ -82,7 +80,6 @@ def sample(model, temp, start_char, end_char, max_len, indices_token, token_indi
 
 
 def get_token_proba(preds, temp):
-
     preds = np.asarray(preds).astype("float64")
     preds = np.log(preds) / temp
     exp_preds = np.exp(preds)
@@ -98,7 +95,6 @@ def softmax(preds):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

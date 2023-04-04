@@ -30,7 +30,6 @@ parser.add_argument("-v", "--verbose", type=bool, help="Verbose", required=True)
 
 
 def do_combined_boxplot(df, desc_to_plot, epochs_to_plot, save_path, te):
-
     fig, ax = plt.subplots(figsize=(12, 8))
 
     start_palette = ["#1575A4"]
@@ -87,7 +86,6 @@ def get_dict_with_data(data_name, min_len, max_len, aug):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

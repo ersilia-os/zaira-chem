@@ -134,7 +134,7 @@ class ResultsFetcher(ZairaBase):
             for c in list(df.columns)
             if "clf_" in c and "_skip" not in c and "_aux" not in c
         ]
-        if len(tasks)==0:
+        if len(tasks) == 0:
             df = self._read_pooled_results()
             return self.get_clf_tasks(data=df)
         return tasks

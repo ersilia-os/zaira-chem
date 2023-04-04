@@ -26,7 +26,6 @@ parser.add_argument("-v", "--verbose", type=bool, help="Verbose", required=True)
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################
