@@ -10,6 +10,7 @@ from ...pool.pool import Pooler
 from ...applicability.applicability import ApplicabilityEvaluator
 from ...reports.report import Reporter
 from ...finish.finisher import Finisher
+from ...finish.finisher import Anonymizer
 
 
 def fit_cmd():
@@ -72,6 +73,13 @@ def fit_cmd():
         help="Clean directory at the end of the pipeline. Only precalculated descriptors are removed.",
     )
     @click.option(
+        "--anonymize",
+        is_flag=True,
+        show_default=True,
+        default=False,
+        help="Remove all information about training set, including smiles, physchem propertie and descriptors",
+    )
+    @click.option(
         "--lazy",
         is_flag=True,
         show_default=False,
@@ -91,6 +99,7 @@ def fit_cmd():
         direction,
         parameters,
         clean,
+        anonymize,
         lazy,
         augment,
     ):
@@ -123,6 +132,6 @@ def fit_cmd():
         a.run()
         r = Reporter(path=output_dir)
         r.run()
-        f = Finisher(path=output_dir, clean=clean, flush=False)
+        f = Finisher(path=output_dir, clean=clean, flush=False, anonymize=False)
         f.run()
         echo("Done", fg="green")
