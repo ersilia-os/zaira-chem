@@ -9,6 +9,7 @@ from .fetcher import ResultsFetcher
 from ..vars import OUTPUT_TABLE_FILENAME
 from ..vars import PERFORMANCE_TABLE_FILENAME
 from ..vars import REPORT_SUBFOLDER
+from ..vars import APPLICABILITY_SUBFOLDER
 
 
 class PerformanceTable(BaseTable, ResultsFetcher):
@@ -149,19 +150,21 @@ class OutputTable(BaseTable, ResultsFetcher):
 
     def _get_basic_properties_columns(self):
         df = self.get_basic_properties()
-        columns = list(df.columns)
-        for col in columns:
-            v = list(df[col])
-            v = self.map_to_original(v)
-            yield (col, v)
+        if df is not None:
+            columns = list(df.columns)
+            for col in columns:
+                v = list(df[col])
+                v = self.map_to_original(v)
+                yield (col, v)
 
     def _get_similarity_to_training_set_columns(self):
         df = self.get_tanimoto_similarities_to_training_set()
-        columns = list(df.columns)
-        for col in columns:
-            v = list(df[col])
-            v = self.map_to_original(v)
-            yield (col, v)
+        if df is not None:
+            columns = list(df.columns)
+            for col in columns:
+                v = list(df[col])
+                v = self.map_to_original(v)
+                yield (col, v)
 
     def run(self):
         data = {}
@@ -175,10 +178,11 @@ class OutputTable(BaseTable, ResultsFetcher):
             data[k] = v
         for k, v in self._get_manifolds_columns():
             data[k] = v
-        for k, v in self._get_basic_properties_columns():
-            data[k] = v
-        for k, v in self._get_similarity_to_training_set_columns():
-            data[k] = v
+        if not os.listdir(os.path.join(self.trained_path, APPLICABILITY_SUBFOLDER)):
+            for k, v in self._get_basic_properties_columns():
+                data[k] = v
+            for k, v in self._get_similarity_to_training_set_columns():
+                data[k] = vs
         data = pd.DataFrame(data)
         data.to_csv(
             os.path.join(self.path, REPORT_SUBFOLDER, OUTPUT_TABLE_FILENAME),

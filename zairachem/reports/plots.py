@@ -357,7 +357,10 @@ class ProjectionUmapPlot(BasePlot):
         self.name = "projection-umap"
         ax = self.ax
         if self.has_clf_data():
-            if self.is_predict():
+            if (
+                self.is_predict()
+                and ResultsFetcher(path=path).get_projections_umap_trained() is not None
+            ):
                 bp = ResultsFetcher(path=path).get_actives_inactives_trained()
                 bp_a = []
                 bp_i = []
@@ -440,7 +443,10 @@ class ProjectionPcaPlot(BasePlot):
         self.name = "projection-pca"
         ax = self.ax
         if self.has_clf_data():
-            if self.is_predict():
+            if (
+                self.is_predict()
+                and ResultsFetcher(path=path).get_projections_pca_trained() is not None
+            ):
                 bp = ResultsFetcher(path=path).get_actives_inactives_trained()
                 bp_a = []
                 bp_i = []
@@ -613,17 +619,23 @@ class Transformation(BasePlot):
 class TanimotoSimilarityToTrainPlot(BasePlot):
     def __init__(self, ax, path):
         BasePlot.__init__(self, ax=ax, path=path)
-        self.name = "tanimoto-similarity-to-train"
-        ax = self.ax
-        df = ResultsFetcher(path=path).get_tanimoto_similarities_to_training_set()
-        columns = [c for c in list(df.columns) if c.startswith("sim")]
-        df = df[columns]
-        cmap = ContinuousColorMap(cmap=named_cmaps.spectral)
-        cmap.fit([i for i in range(len(columns))])
-        colors = cmap.transform([i for i in range(len(columns))])
-        for i, col in enumerate(columns):
-            ax.hist(list(df[col]), cumulative=True, color=colors[i])
-        ax.set_xlabel("Tanimoto similarity")
-        ax.set_ylabel("Cumulative proportion")
-        ax.set_title("Tanimoto similarity to train")
-        self.is_available = True
+        if (
+            ResultsFetcher(path=path).get_tanimoto_similarities_to_training_set()
+            is not None
+        ):
+            self.name = "tanimoto-similarity-to-train"
+            ax = self.ax
+            df = ResultsFetcher(path=path).get_tanimoto_similarities_to_training_set()
+            columns = [c for c in list(df.columns) if c.startswith("sim")]
+            df = df[columns]
+            cmap = ContinuousColorMap(cmap=named_cmaps.spectral)
+            cmap.fit([i for i in range(len(columns))])
+            colors = cmap.transform([i for i in range(len(columns))])
+            for i, col in enumerate(columns):
+                ax.hist(list(df[col]), cumulative=True, color=colors[i])
+            ax.set_xlabel("Tanimoto similarity")
+            ax.set_ylabel("Cumulative proportion")
+            ax.set_title("Tanimoto similarity to train")
+            self.is_available = True
+        else:
+            self.is_available = False
