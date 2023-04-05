@@ -53,6 +53,7 @@ DEFAULT_ESTIMATORS = [
     "flaml-individual-descriptors",
     "autogluon-manifolds",
     "kerastuner-reference-embedding",
+    "kerastuner-eosce-embedding",
     "molmap",
 ]
 

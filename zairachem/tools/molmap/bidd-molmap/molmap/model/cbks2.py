@@ -11,7 +11,7 @@ from scipy.stats.stats import pearsonr
 
 def r2_score(x, y):
     pcc, _ = pearsonr(x, y)
-    return pcc ** 2
+    return pcc**2
 
 
 def prc_auc_score(y_true, y_score):

@@ -207,7 +207,7 @@ class ModelWithConfidence:
                     x_star, k=self._num_neighbours, num_threads=num_threads_available
                 )
             )
-            class_dist = neighbours[:, 1, :].clip(min=10 ** -15)
+            class_dist = neighbours[:, 1, :].clip(min=10**-15)
             class_ind = neighbours[:, 0, :].astype(int)
             if self.training_preds_by_class is None:
                 raise ValueError("training_preds_by_class has already been cached")
@@ -249,7 +249,7 @@ class ModelWithConfidence:
         :return: A weighted sum of average error and average distance
         """
         dist = self._alpha * np.average(
-            local_distance.clip(min=10 ** -15),
+            local_distance.clip(min=10**-15),
             weights=np.arange(local_distance.shape[1], 0, -1),
             axis=1,
         )
@@ -277,7 +277,7 @@ class ModelWithConfidence:
             class_dist, _, class_error = self.calc_dist_to_neighbours(x_star, cls)
 
             dist, error = self.calc_linear_distance_error_func(class_dist, class_error)
-            av_dist_func[i, :] = dist.clip(min=10 ** -10) + error
+            av_dist_func[i, :] = dist.clip(min=10**-10) + error
         relative_conf = self._calc_relative_distance_softmax_normalisation(av_dist_func)
         if change_conflicts:
             relative_conf = self._renormalise_conf_with_empirical_constant(
@@ -308,7 +308,7 @@ class ModelWithConfidence:
 
         point_prediction_confidence = class_confidence[
             np.arange(len(class_confidence)), point_prediction
-        ].clip(max=1 - 10 ** -15)
+        ].clip(max=1 - 10**-15)
         return point_prediction_confidence
 
     def _calc_relative_distance_softmax_normalisation(
