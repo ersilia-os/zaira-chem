@@ -30,7 +30,6 @@ parser.add_argument("-v", "--verbose", type=bool, help="Verbose", required=True)
 
 
 def do_plot(dict_src, dict_tgt, save_path, dashes=None):
-
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
@@ -71,7 +70,6 @@ def do_plot(dict_src, dict_tgt, save_path, dashes=None):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

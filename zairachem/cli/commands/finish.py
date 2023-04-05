@@ -24,9 +24,16 @@ def finish_cmd():
         default=False,
         help="Flush directory at the end of the pipeline. Only data, results and reports are kept. Use with caution: the original trained model will be flushed too.",
     )
-    def finish(dir, flush, clean):
+    @click.option(
+        "--anonymize",
+        is_flag=True,
+        show_default=True,
+        default=False,
+        help="Remove all information about training set, including smiles, physchem propertie and descriptors",
+    )
+    def finish(dir, flush, clean, anonymize):
         create_session_symlink(dir)
         echo("Finishing".format(dir))
-        r = Finisher(path=dir, flush=flush, clean=clean)
+        r = Finisher(path=dir, flush=flush, clean=clean, anonymize=anonymize)
         r.run()
         echo("Done", fg="green")

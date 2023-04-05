@@ -297,7 +297,6 @@ def do_processing(
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

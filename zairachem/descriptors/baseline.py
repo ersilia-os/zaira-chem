@@ -6,7 +6,7 @@ from tqdm import tqdm
 import h5py
 import os
 
-from zairachem.descriptors.treated import FullLineSimilarityImputer
+from zairachem.descriptors.treated import FullLineSimilarityImputer, Imputer
 from zairachem.vars import DESCRIPTORS_SUBFOLDER
 
 from .. import ZairaBase
@@ -81,6 +81,7 @@ class Embedder(ZairaBase):
             with h5py.File(output_h5, "r") as f:
                 X = f["Values"][:]
         imp = FullLineSimilarityImputer()
+        imp_simple = Imputer()
         trained_path = self.get_trained_dir()
         path = self.get_output_dir()
         if not self.is_predict():
@@ -91,15 +92,23 @@ class Embedder(ZairaBase):
                     path, DESCRIPTORS_SUBFOLDER, "{0}.joblib".format(imp._prefix)
                 )
             )
-        else:
-            imp = imp.load(
-                os.path.join(
-                    trained_path,
-                    DESCRIPTORS_SUBFOLDER,
-                    "{0}.joblib".format(imp._prefix),
-                )
+            imp_simple.fit(X)
+            imp_simple.save(
+                os.path.join(path, DESCRIPTORS_SUBFOLDER, "imputer_simple.joblib")
             )
-            X = imp.transform(X, smiles_list)
+        else:
+            fn = os.path.join(
+                trained_path, DESCRIPTORS_SUBFOLDER, "{0}.joblib".format(imp._prefix)
+            )
+            fn_simple = os.path.join(
+                trained_path, DESCRIPTORS_SUBFOLDER, "imputer_simple.joblib"
+            )
+            if os.path.exists(fn):
+                imp = imp.load(fn)
+                X = imp.transform(X, smiles_list)
+            else:
+                imp_simple = imp_simple.load(fn_simple)
+                X = imp_simple.transform(X)
         if output_h5 is None:
             return X
         else:

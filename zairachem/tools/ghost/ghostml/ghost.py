@@ -36,7 +36,6 @@ def optimize_threshold_from_predictions(
     with_replacement=False,
     random_seed=None,
 ):
-
     """Optimize the decision threshold based on subsets of the training set.
     The threshold that maximizes the Cohen's kappa coefficient or a ROC-based criterion
     on the training subsets is chosen as optimal.

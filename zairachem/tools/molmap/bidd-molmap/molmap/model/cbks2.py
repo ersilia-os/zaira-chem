@@ -68,7 +68,6 @@ class Reg_EarlyStoppingAndPerformance(tf.keras.callbacks.Callback):
         self.verbose = verbose
 
     def rmse(self, y_true, y_pred, inner_y_true=True):
-
         if self.y_scaler != None:
             if inner_y_true:
                 y_pred = self.y_scaler.inverse_transform(y_pred)
@@ -117,7 +116,6 @@ class Reg_EarlyStoppingAndPerformance(tf.keras.callbacks.Callback):
             self.best = -np.Inf
 
     def on_epoch_end(self, epoch, logs={}):
-
         y_pred = self.model.predict(self.x)
         rmse_list = self.rmse(self.y, y_pred)
         rmse_mean = np.nanmean(rmse_list)
@@ -293,7 +291,6 @@ class CLA_EarlyStoppingAndPerformance(tf.keras.callbacks.Callback):
             self.best = -np.Inf
 
     def on_epoch_end(self, epoch, logs={}):
-
         y_pred = self.model.predict(self.x)
         roc_list = self.roc_auc(self.y, y_pred)
         roc_mean = np.nanmean(roc_list)
@@ -369,7 +366,6 @@ class CLA_EarlyStoppingAndPerformance(tf.keras.callbacks.Callback):
             print("\nEpoch %05d: early stopping" % (self.stopped_epoch + 1))
 
     def evaluate(self, testX, testY):
-
         y_pred = self.model.predict(testX)
         roc_list = self.roc_auc(testY, y_pred)
         return roc_list

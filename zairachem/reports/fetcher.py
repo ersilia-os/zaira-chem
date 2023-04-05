@@ -134,7 +134,7 @@ class ResultsFetcher(ZairaBase):
             for c in list(df.columns)
             if "clf_" in c and "_skip" not in c and "_aux" not in c
         ]
-        if len(tasks)==0:
+        if len(tasks) == 0:
             df = self._read_pooled_results()
             return self.get_clf_tasks(data=df)
         return tasks
@@ -240,23 +240,29 @@ class ResultsFetcher(ZairaBase):
         df = self._read_processed_data_train()
         umap0 = [0] * df.shape[0]
         umap1 = [0] * df.shape[0]
-        for c in list(df.columns):
-            if "umap-0" in c:
-                umap0 = list(df["umap-0"])
-            if "umap-1" in c:
-                umap1 = list(df["umap-1"])
-        return umap0, umap1
+        if "umap-0" not in df.columns or "umap-1" not in df.columns:
+            return None
+        else:
+            for c in list(df.columns):
+                if "umap-0" in c:
+                    umap0 = list(df["umap-0"])
+                if "umap-1" in c:
+                    umap1 = list(df["umap-1"])
+            return umap0, umap1
 
     def get_projections_pca_trained(self):
         df = self._read_processed_data_train()
         pca0 = [0] * df.shape[0]
         pca1 = [0] * df.shape[0]
-        for c in list(df.columns):
-            if "pca-0" in c:
-                pca0 = list(df["pca-0"])
-            if "pca-1" in c:
-                pca1 = list(df["pca-1"])
-        return pca0, pca1
+        if "pca-0" not in df.columns or "pca-1" not in df.columns:
+            return None
+        else:
+            for c in list(df.columns):
+                if "pca-0" in c:
+                    pca0 = list(df["pca-0"])
+                if "pca-1" in c:
+                    pca1 = list(df["pca-1"])
+            return pca0, pca1
 
     def get_parameters(self):
         with open(
@@ -286,20 +292,27 @@ class ResultsFetcher(ZairaBase):
                 return v
 
     def get_tanimoto_similarities_to_training_set(self):
-        df = pd.read_csv(
-            os.path.join(
-                self.path,
-                APPLICABILITY_SUBFOLDER,
-                TANIMOTO_SIMILARITY_NEAREST_NEIGHBORS_FILENAME,
-            )
+        tanimoto_file = os.path.join(
+            self.path,
+            APPLICABILITY_SUBFOLDER,
+            TANIMOTO_SIMILARITY_NEAREST_NEIGHBORS_FILENAME,
         )
-        return df
+        if os.path.exists(tanimoto_file):
+            df = pd.read_csv(tanimoto_file)
+            return df
+        else:
+            return None
 
     def get_basic_properties(self):
-        df = pd.read_csv(
-            os.path.join(self.path, APPLICABILITY_SUBFOLDER, BASIC_PROPERTIES_FILENAME)
-        )
-        return df
+        if not os.listdir(os.path.join(self.trained_path, APPLICABILITY_SUBFOLDER)):
+            return None
+        else:
+            df = pd.read_csv(
+                os.path.join(
+                    self.path, APPLICABILITY_SUBFOLDER, BASIC_PROPERTIES_FILENAME
+                )
+            )
+            return df
 
     def get_smiles(self):
         df = pd.read_csv(os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME))

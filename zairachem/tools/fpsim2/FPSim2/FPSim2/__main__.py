@@ -44,6 +44,7 @@ def die(msg: str):
 
 ### Convert from command-line strings, and to chemfp-like type parameter encodings
 
+
 # decorator to add an "encoder" function to a decoder function
 def encoder(encoder_func: Callable) -> Callable:
     def set_encoder(f: Callable) -> Callable:
@@ -160,17 +161,13 @@ class FPType:
         self.fp_type = fp_type  # The FPSim2 name
         self.fps_typename = fps_typename  # The chemfp name
         self.args = args  # list of fields which must be in the type string, in order
-        self.optional_args = (
-            optional_args
-        )  # list of fields which are in the type string if not their default value
+        self.optional_args = optional_args  # list of fields which are in the type string if not their default value
         if (
             aliases is None
         ):  # mapping from FPSim2 arg to chemfp arg (chemfp always 'fpSize')
             aliases = {}
         self.aliases = aliases
-        self.not_supported = (
-            not_supported
-        )  # Params which either aren't supported by this driver or by chemfp
+        self.not_supported = not_supported  # Params which either aren't supported by this driver or by chemfp
 
     def encode(self, fp_params: Dict[str, Any]) -> str:
         """Convert a dictionary of fingerprint parameters into the chemfp fingerprint type string"""
@@ -1157,7 +1154,6 @@ def format_filename(s: str) -> str:
 
 
 def search_command(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
-
     # Check the Tversky parameters, if given
     alpha = args.alpha
     beta = args.beta
