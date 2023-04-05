@@ -152,7 +152,6 @@ def do_interactive_chart(df, save_path):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################
@@ -172,7 +171,6 @@ if __name__ == "__main__":
     check_period = int(config["MODEL"]["period"])
 
     if check_epoch == 40 and check_period == 10:
-
         min_len = int(config["PROCESSING"]["min_len"])
         max_len = int(config["PROCESSING"]["max_len"])
         mode = config["EXPERIMENTS"]["mode"]

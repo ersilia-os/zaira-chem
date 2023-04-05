@@ -130,7 +130,6 @@ def draw_at_temp(temp, name_data, epochs_to_plot, save_path, descriptor):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################
@@ -150,7 +149,6 @@ if __name__ == "__main__":
     check_period = int(config["MODEL"]["period"])
 
     if check_epoch == 40 and check_period == 10:
-
         temp = float(config["EXPERIMENTS"]["temp"])
         desc_to_plot = FP.DESCRIPTORS["names"]
         desc_to_plot = re.search(r"\((.*?)\)", desc_to_plot).group(1)

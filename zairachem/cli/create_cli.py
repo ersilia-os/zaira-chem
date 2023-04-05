@@ -3,7 +3,6 @@ from .commands import zairachem_cli
 
 
 def create_cli():
-
     cmd = Command()
 
     cmd.session()

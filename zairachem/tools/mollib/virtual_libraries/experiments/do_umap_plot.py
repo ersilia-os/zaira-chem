@@ -66,7 +66,6 @@ def combined_plot(
     linewidth_gen="1.40",
     legend=False,
 ):
-
     fig, ax = plt.subplots(figsize=(14, 10))
 
     plt.xlim([np.min(embedding[:, 0]) - 0.5, np.max(embedding[:, 0]) + 1.5])
@@ -190,7 +189,6 @@ def get_n_random(path, n):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################
@@ -210,7 +208,6 @@ if __name__ == "__main__":
     check_period = int(config["MODEL"]["period"])
 
     if check_epoch == 40 and check_period == 10:
-
         min_len = int(config["PROCESSING"]["min_len"])
         max_len = int(config["PROCESSING"]["max_len"])
         mode = config["EXPERIMENTS"]["mode"]

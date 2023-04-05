@@ -63,7 +63,6 @@ class MultilabelPredictor(object):
         consider_labels_correlation=True,
         **kwargs,
     ):
-
         if len(labels) < 2:
             consider_labels_correlation = False
         else:

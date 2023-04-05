@@ -6,7 +6,6 @@ import numpy as np
 
 
 class BaseEngine(ABC):
-
     fp_filename = None
     storage = None
 
@@ -17,7 +16,6 @@ class BaseEngine(ABC):
         in_memory_fps: bool,
         fps_sort: bool,
     ) -> None:
-
         self.fp_filename = fp_filename
         self.in_memory_fps = in_memory_fps
         if storage_backend == "pytables":

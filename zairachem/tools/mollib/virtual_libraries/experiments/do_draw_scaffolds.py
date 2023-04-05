@@ -135,7 +135,6 @@ def draw_at_temp(temp, path_data, save_path):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

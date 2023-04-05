@@ -50,7 +50,6 @@ class ClinToxExample(object):
         self.data = Tox(name="ClinTox")
 
     def get_splits(self, folder_name):
-
         os.makedirs(folder_name, exist_ok=True)
 
         train_file = os.path.join(folder_name, "train.csv")

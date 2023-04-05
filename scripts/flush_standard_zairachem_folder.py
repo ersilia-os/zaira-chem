@@ -13,7 +13,6 @@ def remove(dirname):
 
 
 def ad_hoc_standard_flusher(dir_path):
-
     if not os.path.exists(dir_path):
         return
 

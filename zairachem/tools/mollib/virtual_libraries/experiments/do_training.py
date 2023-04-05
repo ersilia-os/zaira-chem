@@ -35,7 +35,6 @@ class SeqModel:
     def __init__(
         self, n_chars, max_length, layers, dropouts, trainables, lr, verbose=False
     ):
-
         self.n_chars = n_chars
         self.max_length = max_length
 
@@ -48,7 +47,6 @@ class SeqModel:
         self.build_model()
 
     def build_model(self):
-
         self.model = Sequential()
         self.model.add(BatchNormalization(input_shape=(None, self.n_chars)))
 
@@ -82,7 +80,6 @@ def create_model_checkpoint(period, save_path):
 
 
 if __name__ == "__main__":
-
     start = time.time()
 
     ####################################

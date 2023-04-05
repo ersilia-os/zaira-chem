@@ -1,10 +1,20 @@
-[![DOI](https://zenodo.org/badge/379620165.svg)](https://zenodo.org/badge/latestdoi/379620165)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://www.gnu.org/licenses/agpl-3.0) [![DOI](https://zenodo.org/badge/379620165.svg)](https://zenodo.org/badge/latestdoi/379620165)
+
+[![documentation](https://img.shields.io/badge/-Documentation-purple?logo=read-the-docs&logoColor=white)](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?logo=Python&logoColor=white)](https://github.com/psf/black)
+
+
 
 # ZairaChem: Automated ML-based (Q)SAR
 
 ZairaChem is the first library of Ersilia's family of tools devoted to providing **out-of-the-box** machine learning solutions for biomedical problems. In this case, we have focused on (Q)SAR models. (Q)SAR models take chemical structures as input and give as output predicted properties, typically pharmacological properties such as bioactivity against a certain target.
 
 ## Installation
+
+Clone the repository in your local system
+```
+git clone https://github.com/ersilia-os/zaira-chem.git
+cd zaira-chem
+```
 
 From the terminal, run the installation script:
 ```
@@ -19,7 +29,7 @@ conda activate zairachem
 
 ## Usage
 
-ZairaChem can be run as a command line interface.
+ZairaChem can be run as a command line interface. To learn more about the ZairaChem commands, see the help command_
 
 ```bash
 zairachem --help
@@ -27,12 +37,12 @@ zairachem --help
 
 ### Quick start
 
-ZairaChem expects a comma- or tab-separated file containing molecules in SMILES format and activity values. 
+ZairaChem expects a comma- or tab-separated file containing two columns: a "smiles" column with the molecules in SMILES format and an "activity" column with the activity values. 
 
 To get started, let's load an example classification task from [Therapeutic Data Commons](https://tdcommons.ai/). 
 
 ```bash
-zairachem example --classification --file_name input.csv
+zairachem example --file_name input.csv
 ```
 
 This file can be split into train and test sets.
@@ -41,7 +51,7 @@ This file can be split into train and test sets.
 zairachem split -i input.csv
 ```
 
-The command above will generate two files in the current folder, named train.csv and test.csv. By default, the train:test ratio is 80:20.
+The command above will generate two files your working directory, named train.csv and test.csv. By default, the train:test ratio is 80:20.
 
 ### Fit
 
@@ -51,7 +61,12 @@ You can train a model as follows:
 zairachem fit -i train.csv -m model
 ```
 
-This command will run the full ZairaChem pipeline and produce a model folder with processed data, model checkpoints, and reports.
+This command will run the full ZairaChem pipeline and produce a model folder with processed data, model checkpoints, and reports. If no cut-off is specified for the classification, ZairaChem will establish an internal cut-off to determine Category 0 and category 1. The output results will always provide the probability of a molecule being Category 1.
+Alternatively, you can set your preferred cuto-off with the following command:
+```bash
+zairachem fit -i train.csv -c 0.1 -d low -m model
+```
+Where the '-c' indicates the cut-off of the activity values and the '-d' specifies the direction. If set to 'low', values <= c will be considered 1 and if set to 'high', values => c will be considered 1.
 
 ### Predict
 
