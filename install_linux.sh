@@ -31,13 +31,16 @@ python3 -m pip install autogluon.tabular[all]==0.5.2
 python3 -m pip install "xgboost==1.3.3"
 python3 -m pip install "SQLAlchemy<1.4.0"
 
-# install zairachem
+# install extra dependencies
 python3 -m pip install git+https://github.com/chembl/FPSim2.git@0.3.0
 python3 -m pip install -q -U keras-tuner==1.1.3
 
 # install ersilia
 python3 -m pip install git+https://github.com/ersilia-os/ersilia.git
 ersilia --help
+
+# install ersilia compound embedding
+python3 -m pip install git+https://github.com/ersilia-os/compound-embedding-lite.git
 
 # install isaura
 python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0bdd6d7d4f796d2a84b17208a87b56

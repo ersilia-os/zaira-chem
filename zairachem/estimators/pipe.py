@@ -9,6 +9,7 @@ from .from_fingerprint.pipe import FingerprintPipeline
 from .from_individual_full_descriptors.pipe import IndividualFullDescriptorPipeline
 from .from_manifolds.pipe import ManifoldPipeline
 from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
+from .from_ersilia_embedding.pipe import EosceEmbeddingPipeline
 from .from_molmap.pipe import MolMapPipeline
 from .evaluate import SimpleEvaluator
 
@@ -107,6 +108,16 @@ class EstimatorPipeline(ZairaBase):
             p.run(time_budget_sec=time_budget_sec)
             step.update()
 
+    def _eosce_pipeline(self, time_budget_sec):
+        if "kerastuner-eosce-embedding" not in self._estimators_to_use:
+            return
+        step = PipelineStep("eosce_pipeline", self.output_dir)
+        if not step.is_done():
+            self.logger.debug("Ersilia compound embedding pipeline")
+            p = EosceEmbeddingPipeline(path=self.path)
+            p.run(time_budget_sec=time_budget_sec)
+            step.update()
+
     def _molmap_pipeline(self, time_budget_sec):
         if self.is_lazy():
             self.logger.info("Lazy mode skips molmap")
@@ -136,5 +147,6 @@ class EstimatorPipeline(ZairaBase):
         self._individual_estimator_pipeline(time_budget_sec)
         self._manifolds_pipeline(time_budget_sec)
         self._reference_pipeline(time_budget_sec)
+        self._eosce_pipeline(time_budget_sec)
         self._molmap_pipeline(time_budget_sec)
         self._simple_evaluation()

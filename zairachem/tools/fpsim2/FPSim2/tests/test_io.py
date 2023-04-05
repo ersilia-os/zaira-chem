@@ -62,17 +62,14 @@ def test_get_mol_supplier():
 
 
 def test_get_bounds_range():
-    assert (
-        get_bounds_range(
-            query=fps[0],
-            threshold=0.7,
-            a=0,
-            b=0,
-            ranges=popcnt_bins,
-            search_type="tanimoto",
-        )
-        == (0, 10)
-    )
+    assert get_bounds_range(
+        query=fps[0],
+        threshold=0.7,
+        a=0,
+        b=0,
+        ranges=popcnt_bins,
+        search_type="tanimoto",
+    ) == (0, 10)
 
 
 def test_build_fp():
