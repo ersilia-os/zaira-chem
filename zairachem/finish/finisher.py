@@ -144,11 +144,10 @@ class Anonymizer(ZairaBase):
         df.drop(columns=to_remove, inplace=True)
         df.to_csv(file_name, index=False)
 
-    def _replace_first_last_descriptors(self,file_name):
+    def _replace_first_last_descriptors(self, file_name):
         df = pd.read_csv(file_name)
         df.loc[0:1, df.columns[1:]] = self._empty_string
         df.to_csv(file_name, index=False)
-
 
     def _remove_raw_input(self):
         file_name = os.path.join(self.path, RAW_INPUT_FILENAME + ".csv")
@@ -168,8 +167,8 @@ class Anonymizer(ZairaBase):
             os.path.join(self.path, DATA_SUBFOLDER, DATA_FILENAME)
         )
         self._replace_sensitive_columns(os.path.join(self.path, OUTPUT_FILENAME))
-        self._replace_sensitive_columns(os.path.join(self.path, OUTPUT_TABLE_FILENAME))
         self._remove_sensitive_columns(os.path.join(self.path, OUTPUT_TABLE_FILENAME))
+        self._replace_sensitive_columns(os.path.join(self.path, OUTPUT_TABLE_FILENAME))
 
     def _clear_descriptors(self):
         Cleaner(path=self.path).run()
@@ -177,11 +176,10 @@ class Anonymizer(ZairaBase):
         for d in os.listdir(subfolder):
             if d.startswith("fp2sim"):
                 self._remove_file_if_exists(os.path.join(subfolder, d))
-        for file_path in glob.iglob(subfolder+"/**", recursive=True):
+        for file_path in glob.iglob(subfolder + "/**", recursive=True):
             file_name = file_path.split("/")[-1]
             if file_name == "raw_summary.csv":
                 self._replace_first_last_descriptors(file_path)
-                
 
     def _clear_estimators(self):
         subfolder = os.path.join(self.path, ESTIMATORS_SUBFOLDER).rstrip("/")
@@ -274,7 +272,7 @@ class Finisher(ZairaBase):
 
     def _flush(self):
         Flusher(path=self.path).run()
-    
+
     def _anonymize(self):
         Anonymizer(path=self.path).run()
 

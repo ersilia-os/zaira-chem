@@ -101,14 +101,14 @@ class Embedder(ZairaBase):
                 trained_path, DESCRIPTORS_SUBFOLDER, "{0}.joblib".format(imp._prefix)
             )
             fn_simple = os.path.join(
-                path, DESCRIPTORS_SUBFOLDER, "imputer_simple.joblib"
+                trained_path, DESCRIPTORS_SUBFOLDER, "imputer_simple.joblib"
             )
             if os.path.exists(fn):
                 imp = imp.load(fn)
                 X = imp.transform(X, smiles_list)
             else:
-                imp = imp.load(fn_simple)
-                X = imp.transform(X)
+                imp_simple = imp_simple.load(fn_simple)
+                X = imp_simple.transform(X)
         if output_h5 is None:
             return X
         else:

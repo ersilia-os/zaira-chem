@@ -96,6 +96,10 @@ class ApplicabilityEvaluator(ZairaBase):
     def run(self):
         if not os.path.exists(os.path.join(self.trained_path, APPLICABILITY_SUBFOLDER)):
             return
+        if not os.listdir(
+            os.path.join(self.trained_path, APPLICABILITY_SUBFOLDER)
+        ):  # in case the folder exists but its empty
+            return
         if not os.path.exists(os.path.join(self.path, APPLICABILITY_SUBFOLDER)):
             return
         self._basic_properties()

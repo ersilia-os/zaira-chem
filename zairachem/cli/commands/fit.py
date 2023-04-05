@@ -132,6 +132,6 @@ def fit_cmd():
         a.run()
         r = Reporter(path=output_dir)
         r.run()
-        f = Finisher(path=output_dir, clean=clean, flush=False, anonymize=False)
+        f = Finisher(path=output_dir, clean=clean, flush=False, anonymize=anonymize)
         f.run()
         echo("Done", fg="green")
