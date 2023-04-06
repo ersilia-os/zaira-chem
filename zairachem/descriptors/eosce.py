@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import h5py
 
-from eosce.models import ErsiliaCompoundEmbedding
+from eosce.models import ErsiliaCompoundEmbeddings
 from ..utils.matrices import Hdf5
 from .. import ZairaBase
 
@@ -15,7 +15,7 @@ EOSCE_FILE_NAME = "eosce.h5"
 class EosceEmbedder(ZairaBase):
     def __init__(self):
         ZairaBase.__init__(self)
-        self.model = ErsiliaCompoundEmbedding()
+        self.model = ErsiliaCompoundEmbeddings()
 
     def calculate(self, smiles_list, output_h5):
         X = self.model.transform(smiles_list)
