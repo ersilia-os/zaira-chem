@@ -7,6 +7,9 @@ from ..utils.pipeline import PipelineStep
 from .from_classic.pipe import ClassicPipeline
 from .from_fingerprint.pipe import FingerprintPipeline
 from .from_individual_full_descriptors.pipe import IndividualFullDescriptorPipeline
+from .from_individual_full_descriptors_tabpfn.pipe import (
+    IndividualFullDescriptorTabPFNPipeline,
+)
 from .from_manifolds.pipe import ManifoldPipeline
 from .from_reference_embedding.pipe import ReferenceEmbeddingPipeline
 from .from_ersilia_embedding.pipe import EosceEmbeddingPipeline
@@ -82,6 +85,19 @@ class EstimatorPipeline(ZairaBase):
             p.run(time_budget_sec=time_budget_sec)
             step.update()
 
+    def _individual_estimator_tabpfn_pipeline(self, time_budget_sec):
+        if self.is_lazy():
+            self.logger.info("Lazy mode skips individual descriptors with tabpfn")
+            return
+        if "tabpfn-individual-descriptors" not in self._estimators_to_use:
+            return
+        step = PipelineStep("individual_estimator_pipeline_tabpfn", self.output_dir)
+        if not step.is_done():
+            self.logger.debug("Running individual estimator pipeline")
+            p = IndividualFullDescriptorTabPFNPipeline(path=self.path)
+            p.run(time_budget_sec=time_budget_sec)
+            step.update()
+
     def _manifolds_pipeline(self, time_budget_sec):
         if self.is_lazy():
             self.logger.info("Lazy mode skips manifolds")
@@ -144,6 +160,7 @@ class EstimatorPipeline(ZairaBase):
     def run(self, time_budget_sec=None):
         self._classic_estimator_pipeline(time_budget_sec)
         self._fingerprint_estimator_pipeline(time_budget_sec)
+        self._individual_estimator_tabpfn_pipeline(time_budget_sec)
         self._individual_estimator_pipeline(time_budget_sec)
         self._manifolds_pipeline(time_budget_sec)
         self._reference_pipeline(time_budget_sec)
