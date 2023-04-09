@@ -16,12 +16,21 @@ class TabPFNBinaryClassifier(object):
         self.max_samples = 1000
 
     def _get_balanced_datasets(self, X, y):
-        smp = SMOTETomek(sampling_strategy="auto")
-        X_0, y_0 = smp.fit_resample(X, y)
-        smp = KMeansSMOTE(sampling_strategy="auto")
-        X_1, y_1 = smp.fit_resample(X, y)
-        smp = EditedNearestNeighbours(sampling_strategy="auto")
-        X_2, y_2 = smp.fit_resample(X, y)
+        try:
+            smp = SMOTETomek(sampling_strategy="auto")
+            X_0, y_0 = smp.fit_resample(X, y)
+        except:
+            X_0, y_0 = X, y
+        try:
+            smp = KMeansSMOTE(sampling_strategy="auto")
+            X_1, y_1 = smp.fit_resample(X, y)
+        except:
+            X_1, y_1 = X, y
+        try:
+            smp = EditedNearestNeighbours(sampling_strategy="auto")
+            X_2, y_2 = smp.fit_resample(X, y)
+        except:
+            X_2, y_2 = X, y
         results = [(X_0, y_0), (X_1, y_1), (X_2, y_2)]
         return results
 
