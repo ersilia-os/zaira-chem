@@ -54,5 +54,11 @@ python3 -m pip install git+https://github.com/ersilia-os/lazy-qsar.git
 # install melloddy-tuner
 python3 -m pip install git+https://github.com/melloddy/MELLODDY-TUNER.git@2.1.3
 
+# install tabpfn
+python3 -m pip install tabpfn==0.1.8
+
+# install imblearn
+python3 -m pip install imbalanced-learn==0.10.1
+
 # install zairachem
 python3 -m pip install -e .
