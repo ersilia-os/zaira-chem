@@ -43,7 +43,7 @@ ZAIRACHEM_DATA_PATH = os.path.join(PACKAGE_ROOT, "data")
 ERSILIA_HUB_DEFAULT_MODELS = [
     # "morgan-counts",
     "cc-signaturizer",
-    "image-mol-embeddings",
+    "molfeat-chemgpt",
     "rdkit-fingerprint",
     "grover-embedding",
     "mordred",
