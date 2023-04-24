@@ -230,7 +230,7 @@ class PoolClassifier(object):
                 w = w + 1
             y_hats += [np.average(Y_hat, axis=1, weights=w)]
         y_hats += [np.mean(Y_hat, axis=1)]
-        y_hats = np.clip(np.array(y_hats), 0, 1)
+        y_hats = np.array(y_hats)
         y_hat = np.mean(y_hats, axis=0)
         return y_hat
 
