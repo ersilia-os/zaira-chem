@@ -3,6 +3,7 @@ import os
 from .raw import RawDescriptors
 from .treated import TreatedDescriptors
 from .reference import ReferenceDescriptors, SimpleDescriptors
+from .eosce import EosceDescriptors
 from .manifolds import Manifolds
 
 from .. import ZairaBase
@@ -47,6 +48,12 @@ class Describer(ZairaBase):
                 ReferenceDescriptors().run()
             step.update()
 
+    def _eosce_descriptors(self):
+        step = PipelineStep("eosce_descriptors", self.output_dir)
+        if not step.is_done():
+            EosceDescriptors().run()
+            step.update()
+
     def _manifolds(self):
         step = PipelineStep("manifolds", self.output_dir)
         if not step.is_done():
@@ -58,5 +65,6 @@ class Describer(ZairaBase):
         self._raw_descriptions()
         self._treated_descriptions()
         self._reference_descriptors()
+        self._eosce_descriptors()
         self._manifolds()
         self.update_elapsed_time()

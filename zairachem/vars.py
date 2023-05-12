@@ -41,18 +41,22 @@ ZAIRACHEM_DATA_PATH = os.path.join(PACKAGE_ROOT, "data")
 # Ersilia Model Hub
 
 ERSILIA_HUB_DEFAULT_MODELS = [
-    "morgan-counts",
+    # "morgan-counts",
     "cc-signaturizer",
+    "molfeat-chemgpt",
+    "rdkit-fingerprint",
     "grover-embedding",
     "mordred",
-]  # molbert was removed
+]
 
 DEFAULT_ESTIMATORS = [
     "baseline-classic",
     "baseline-fingerprint",
     "flaml-individual-descriptors",
+    "tabpfn-individual-descriptors",
     "autogluon-manifolds",
     "kerastuner-reference-embedding",
+    "kerastuner-eosce-embedding",
     "molmap",
 ]
 
