@@ -8,9 +8,7 @@
 
 ZairaChem is the first library of Ersilia's family of tools devoted to providing **out-of-the-box** machine learning solutions for biomedical problems. In this case, we have focused on (Q)SAR models. (Q)SAR models take chemical structures as input and give as output predicted properties, typically pharmacological properties such as bioactivity against a certain target.
 
-Both Ersilia and Zaira are cities described in Italo Calvino’s book ‘Invisible Cities’ (1972). Ersilia is a “trading city” where inhabitants stretch strings from the corners of the houses to establish the relationships that sustain the life of the city. When the strings become too numerous, they rebuild Ersilia elsewhere, and their network of relationships remains. Zaira is a “city of memories”. It contains its own past written in every corner, scratched in every pole, window and bannister.
-
-![image](https://github.com/ersilia-os/zaira-chem/assets/19725330/5138052d-5de3-4d0b-8327-2d321767c39a)
+Both Ersilia and Zaira are cities described in Italo Calvino's book 'Invisible Cities' (1972). Ersilia is a "trading city" where inhabitants stretch strings from the corners of the houses to establish the relationships that sustain the life of the city. When the strings become too numerous, they rebuild Ersilia elsewhere, and their network of relationships remains. Zaira is a "city of memories". It contains its own past written in every corner, scratched in every pole, window and bannister.
 
 ## Installation
 
