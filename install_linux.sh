@@ -49,7 +49,7 @@ python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0b
 python3 -m pip install git+https://github.com/ersilia-os/stylia.git
 
 # install lazy-qsar
-python3 -m pip install git+https://github.com/ersilia-os/lazy-qsar.git
+python3 -m pip install git+https://github.com/ersilia-os/lazy-qsar.git@0.1
 
 # install melloddy-tuner
 python3 -m pip install git+https://github.com/melloddy/MELLODDY-TUNER.git@2.1.3
