@@ -84,7 +84,7 @@ ZairaChem will run predictions using the checkpoints stored in model and store r
 
 For further technical details, please read the [ZairaChem page](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) of the Ersilia gitbook, which describes each major step in the ZairaChem pipeline.
 
-A corresponding manuscript for the ZairaChem pipeline is currently available as a [preprint](https://www.biorxiv.org/content/10.1101/2022.12.13.520154v1).
+The corresponding publication for the ZairaChem pipeline is available [here](https://www.nature.com/articles/s41467-023-41512-2).
 
 ## About us
 
