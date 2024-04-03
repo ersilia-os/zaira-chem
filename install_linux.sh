@@ -1,11 +1,12 @@
 WORKDIR=$PWD
 
-conda init bash
+#conda init bash
+eval "$(conda shell.bash hook)"
 
 # create zairachem conda environment
 ZAIRACHEM_ENVIRONMENT='zairachem'
-conda create -n $ZAIRACHEM_ENVIRONMENT python=3.7 -y
-source $CONDA_PREFIX/etc/profile.d/conda.sh
+conda create -n $ZAIRACHEM_ENVIRONMENT python=3.10 -y
+#source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ZAIRACHEM_ENVIRONMENT
 
 # pip
@@ -15,11 +16,11 @@ python3 -m pip install tables openpyxl
 
 # other pip-installable dependencies
 python3 -m pip install tensorflow==2.10.0
-python3 -m pip install autokeras==1.0.20 #==1.0.16
+python3 -m pip install autokeras==1.0.20 #==1.0.16  
 
 # install autogluon cpu
 python3 -m pip install -U "mxnet<2.0.0"
-python3 -m pip install autogluon.tabular[all]==0.5.2
+python3 -m pip install autogluon.tabular[all]==0.7.0
 
 # install autogluon gpu
 # Here we assume CUDA 10.1 is installed.  You should change the number
