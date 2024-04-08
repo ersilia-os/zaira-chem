@@ -9,9 +9,8 @@ networkx==2.8.8
 standardiser==0.1.9
 exmol==3.0.3
 pytdc==0.4.1
-pandas==1.5.3
 tqdm==4.66.1
-ray==1.13.0 
 numpy==1.23.5
 protobuf==3.19.5
 python-Levenshtein==0.25.0
+dask[dataframe]==2024.4.1

@@ -8,7 +8,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="zairachem",
-    version="0.0.1",
+    version="0.2.0",
     author="Miquel Duran-Frigola",
     author_email="miquel@ersilia.io",
     url="https://github.com/ersilia-os/zaira-chem",
@@ -22,7 +22,10 @@ setup(
     entry_points={"console_scripts": ["zairachem=zairachem.cli:cli"]},
     classifiers=[
         "Programming Language :: Python :: 3.7",
-        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],

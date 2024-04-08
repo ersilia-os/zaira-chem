@@ -4,7 +4,7 @@ WORKDIR=$PWD
 eval "$(conda shell.bash hook)"
 
 # create zairachem conda environment
-ZAIRACHEM_ENVIRONMENT='zairachem'
+ZAIRACHEM_ENVIRONMENT='zairachem2'
 conda create -n $ZAIRACHEM_ENVIRONMENT python=3.10 -y
 #source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ZAIRACHEM_ENVIRONMENT
@@ -28,10 +28,6 @@ python3 -m pip install autogluon.tabular[all]==0.7.0
 #python3 -m pip install -U "mxnet_cu101<2.0.0"
 #python3 -m pip install autogluon
 
-# necessary requirements for flaml
-python3 -m pip install "xgboost==1.3.3"
-python3 -m pip install "SQLAlchemy<1.4.0"
-
 # install extra dependencies
 python3 -m pip install git+https://github.com/chembl/FPSim2.git@0.3.0
 python3 -m pip install -q -U keras-tuner==1.1.3
@@ -41,7 +37,7 @@ python3 -m pip install git+https://github.com/ersilia-os/ersilia.git
 ersilia --help
 
 # install ersilia compound embedding
-python3 -m pip install git+https://github.com/ersilia-os/compound-embedding-lite.git
+python3 -m pip install git+https://github.com/ersilia-os/compound-embedding-lite.git@v0.2.0
 
 # install isaura
 python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0bdd6d7d4f796d2a84b17208a87b56
@@ -50,7 +46,7 @@ python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0b
 python3 -m pip install git+https://github.com/ersilia-os/stylia.git
 
 # install lazy-qsar
-python3 -m pip install git+https://github.com/ersilia-os/lazy-qsar.git@v0.1
+python3 -m pip install git+https://github.com/ersilia-os/lazy-qsar.git@v0.4
 
 # install melloddy-tuner
 python3 -m pip install git+https://github.com/melloddy/MELLODDY-TUNER.git@2.1.3
