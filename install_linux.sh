@@ -4,7 +4,7 @@ WORKDIR=$PWD
 eval "$(conda shell.bash hook)"
 
 # create zairachem conda environment
-ZAIRACHEM_ENVIRONMENT='zairachem2'
+ZAIRACHEM_ENVIRONMENT='zairachem'
 conda create -n $ZAIRACHEM_ENVIRONMENT python=3.10 -y
 #source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ZAIRACHEM_ENVIRONMENT
