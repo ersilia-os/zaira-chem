@@ -82,9 +82,22 @@ ZairaChem will run predictions using the checkpoints stored in model and store r
 
 ## Additional Information
 
-For further technical details, please read the [ZairaChem page](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) of the Ersilia gitbook, which describes each major step in the ZairaChem pipeline.
+For further technical details, please read the [ZairaChem page](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) of the Ersilia gitbook, which describes each major step in the ZairaChem pipeline. The corresponding publication for the ZairaChem pipeline is available [here](https://www.nature.com/articles/s41467-023-41512-2).
 
-The corresponding publication for the ZairaChem pipeline is available [here](https://www.nature.com/articles/s41467-023-41512-2).
+## Citation
+If you use ZairaChem, please cite us:
+```
+@article{Turon2023,
+  author = {Turon, G. and Hlozek, J. and Woodland, J.G. and et al.},
+  title = {First fully-automated AI/ML virtual screening cascade implemented at a drug discovery centre in Africa},
+  journal = {Nat Commun},
+  volume = {14},
+  pages = {5736},
+  year = {2023},
+  doi = {10.1038/s41467-023-41512-2},
+  url = {https://doi.org/10.1038/s41467-023-41512-2}
+}
+```
 
 ## About us
 
