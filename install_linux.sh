@@ -37,7 +37,7 @@ python3 -m pip install git+https://github.com/ersilia-os/ersilia.git
 ersilia --help
 
 # install ersilia compound embedding
-python3 -m pip install git+https://github.com/ersilia-os/compound-embedding-lite.git@v0.2.0
+python3 -m pip install eosce==0.2.0
 
 # install isaura
 python3 -m pip install git+https://github.com/ersilia-os/isaura.git@ce293244ad0bdd6d7d4f796d2a84b17208a87b56
