@@ -91,7 +91,7 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
         dense_layers=[128, 64],
         dense_avf="relu",
         batch_size=128,
-        lr=1e-4,
+        learning_rate=1e-4,
         loss="logcosh",
         monitor="val_loss",
         metric="r2",
@@ -111,7 +111,7 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
         self.conv1_kernel_size = conv1_kernel_size
         self.dense_avf = dense_avf
         self.batch_size = batch_size
-        self.lr = lr
+        self.learning_rate = learning_rate
         self.loss = loss
         self.monitor = monitor
         self.metric = metric
@@ -164,7 +164,7 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
             )
 
         opt = tf.keras.optimizers.Adam(
-            lr=self.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0
+            learning_rate=self.learning_rate, beta_1=0.9, beta_2=0.999, epsilon=1e-08,
         )  #
         model.compile(optimizer=opt, loss=self.loss)
 
@@ -178,7 +178,7 @@ class RegressionEstimator(BaseEstimator, RegressorMixin):
             "fmap_shape1": self.fmap_shape1,
             "fmap_shape2": self.fmap_shape2,
             "epochs": self.epochs,
-            "lr": self.lr,
+            "learning_rate": self.learning_rate,
             "loss": self.loss,
             "conv1_kernel_size": self.conv1_kernel_size,
             "dense_layers": self.dense_layers,
@@ -350,7 +350,7 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         dense_layers=[128, 64],
         dense_avf="relu",
         batch_size=128,
-        lr=1e-4,
+        learning_rate=1e-4,
         loss="categorical_crossentropy",
         monitor="val_loss",
         metric="ROC",
@@ -369,7 +369,7 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
         self.conv1_kernel_size = conv1_kernel_size
         self.dense_avf = dense_avf
         self.batch_size = batch_size
-        self.lr = lr
+        self.learning_rate = learning_rate
         self.loss = loss
         self.monitor = monitor
         self.metric = metric
@@ -406,7 +406,7 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
             )
 
         opt = tf.keras.optimizers.Adam(
-            lr=self.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0
+            learning_rate=self.learning_rate, beta_1=0.9, beta_2=0.999, epsilon=1e-08,
         )  #
         model.compile(optimizer=opt, loss=self.loss, metrics=["accuracy"])
 
@@ -420,7 +420,7 @@ class MultiClassEstimator(BaseEstimator, ClassifierMixin):
             "fmap_shape1": self.fmap_shape1,
             "fmap_shape2": self.fmap_shape2,
             "epochs": self.epochs,
-            "lr": self.lr,
+            "learning_rate": self.learning_rate,
             "loss": self.loss,
             "conv1_kernel_size": self.conv1_kernel_size,
             "dense_layers": self.dense_layers,
@@ -583,7 +583,7 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         dense_layers=[128, 64],
         dense_avf="relu",
         batch_size=128,
-        lr=1e-4,
+        learning_rate=1e-4,
         loss=cross_entropy,
         monitor="val_loss",
         metric="ROC",
@@ -602,7 +602,7 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
         self.conv1_kernel_size = conv1_kernel_size
         self.dense_avf = dense_avf
         self.batch_size = batch_size
-        self.lr = lr
+        self.learning_rate = learning_rate
         self.loss = loss
         self.monitor = monitor
         self.metric = metric
@@ -639,7 +639,7 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
             )
 
         opt = tf.keras.optimizers.Adam(
-            lr=self.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0
+            learning_rate=self.learning_rate, beta_1=0.9, beta_2=0.999, epsilon=1e-08,
         )  #
         model.compile(optimizer=opt, loss=self.loss)
 
@@ -652,7 +652,7 @@ class MultiLabelEstimator(BaseEstimator, ClassifierMixin):
             "fmap_shape1": self.fmap_shape1,
             "fmap_shape2": self.fmap_shape2,
             "epochs": self.epochs,
-            "lr": self.lr,
+            "learning_rate": self.learning_rate,
             "loss": self.loss,
             "conv1_kernel_size": self.conv1_kernel_size,
             "dense_layers": self.dense_layers,
