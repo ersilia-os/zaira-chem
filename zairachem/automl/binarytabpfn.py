@@ -10,7 +10,7 @@ import joblib
 
 
 class TabPFNBinaryClassifier(object):
-    def __init__(self, device="cpu", N_ensemble_configurations=4):
+    def __init__(self, device="cpu", N_ensemble_configurations=1):
         self.device = device
         self.N_ensemble_configurations = N_ensemble_configurations
         self.max_samples = 1000
