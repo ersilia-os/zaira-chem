@@ -45,7 +45,6 @@ ERSILIA_HUB_DEFAULT_MODELS = [
     "cc-signaturizer",
     "molfeat-chemgpt",
     "rdkit-fingerprint",
-    "grover-embedding",
     "mordred",
 ]
 
@@ -53,7 +52,7 @@ DEFAULT_ESTIMATORS = [
     "baseline-classic",
     "baseline-fingerprint",
     "flaml-individual-descriptors",
-    "tabpfn-individual-descriptors",
+    #"tabpfn-individual-descriptors",
     "autogluon-manifolds",
     "kerastuner-reference-embedding",
     "kerastuner-eosce-embedding",
