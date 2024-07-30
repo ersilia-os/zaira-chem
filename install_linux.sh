@@ -34,7 +34,7 @@ python3 -m pip install git+https://github.com/chembl/FPSim2.git@0.3.0
 python3 -m pip install -q -U keras-tuner==1.4.7
 
 # install ersilia
-python3 -m pip install git+https://github.com/ersilia-os/ersilia.git@v0.1.33
+python3 -m pip install git+https://github.com/ersilia-os/ersilia.git@v0.1.34
 ersilia --help
 
 # install ersilia compound embedding
@@ -59,7 +59,7 @@ python3 -m pip install tabpfn==0.1.8
 python3 -m pip install imbalanced-learn==0.10.1
 
 #install olinda
-python3 -m pip install -e git+https:https://github.com/JHlozek/olinda.git
+python3 -m pip install -e git+https://github.com/JHlozek/olinda.git#egg=olinda
 
 # install zairachem
 python3 -m pip install -e .
