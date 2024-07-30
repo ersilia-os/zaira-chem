@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 
 from .baseline import Embedder, Fingerprinter
 from ..utils.matrices import Hdf5

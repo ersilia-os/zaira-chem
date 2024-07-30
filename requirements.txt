@@ -15,4 +15,3 @@ pandas==2.1.4
 protobuf==3.20.3
 python-Levenshtein==0.25.0
 dask[dataframe]==2024.4.1
-docker>=7.1.0
