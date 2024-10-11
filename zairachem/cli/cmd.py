@@ -10,6 +10,7 @@ from .commands.predict import predict_cmd
 from .commands.example import example_cmd
 from .commands.split import split_cmd
 from .commands.applicability import applicability_cmd
+from .commands.distill import distill_cmd
 
 
 class Command(object):
@@ -51,3 +52,6 @@ class Command(object):
 
     def split(self):
         split_cmd()
+        
+    def distill(self):
+        distill_cmd()

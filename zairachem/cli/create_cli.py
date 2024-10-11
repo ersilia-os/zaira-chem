@@ -16,6 +16,7 @@ def create_cli():
     cmd.predict()
     cmd.report()
     cmd.finish()
+    cmd.distill()
     cmd.example()
 
     return zairachem_cli
