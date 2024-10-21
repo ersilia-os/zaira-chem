@@ -21,7 +21,7 @@ python3 -m pip install autokeras==1.0.20 #==1.0.16
 
 # install autogluon cpu
 python3 -m pip install -U "mxnet<2.0.0"
-python3 -m pip install autogluon.tabular[all]==0.7.0
+python3 -m pip install autogluon.tabular==0.7.0
 
 # install autogluon gpu
 # Here we assume CUDA 10.1 is installed.  You should change the number
