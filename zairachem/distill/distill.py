@@ -1,6 +1,6 @@
 import os
 
-from olinda import distillation
+from olinda import Distiller
 from .. import ZairaBase
 
 class Distiller(ZairaBase):
@@ -16,6 +16,6 @@ class Distiller(ZairaBase):
         self.onnx_output_path = onnx_output_path
         
     def run(self):
-        olinda_distiller = distillation.Distiller()
+        olinda_distiller = Distiller()
         onnx_model = olinda_distiller.distill(self.trained_dir)
         onnx_model.save(self.onnx_output_path)
