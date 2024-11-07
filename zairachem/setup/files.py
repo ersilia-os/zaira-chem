@@ -331,7 +331,7 @@ class SingleFileForPrediction(SingleFile):
             )
         self.qualifier_column = resolved_columns["qualifier_column"]
         self.values_column = resolved_columns["values_column"]
-        if self.values_column is not None:
+        if self.values_column is not None and self.params is not None:
             trained_values_column = self.get_trained_values_column()
             if self.values_column != trained_values_column:
                 self.logger.warning(
@@ -343,7 +343,7 @@ class SingleFileForPrediction(SingleFile):
         df[SMILES_COLUMN] = self.df[self.smiles_column]
         assert df.shape[0] == self.df.shape[0]
 
-        if self.values_column is not None:
+        if self.values_column is not None and self.params is not None:
             if self.qualifier_column is None:
                 qualifiers = ["="] * self.df.shape[0]
             else:
