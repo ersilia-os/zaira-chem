@@ -109,8 +109,8 @@ class PredictSetup(object):
         step = PipelineStep("initialize", self.output_dir)
         if not step.is_done():
             self._make_output_dir()
-            self._open_session()
             self._make_subfolders()
+            self._open_session()
             self._copy_input_file()
             step.update()
 
@@ -141,10 +141,13 @@ class ZairaPredictSetup(PredictSetup):
 
     def _check_is_lazy(self):
         parameters_json = os.path.join(self.model_dir, DATA_SUBFOLDER, PARAMETERS_FILE)
-        with open(parameters_json, "r") as f:
-            data = json.load(f)
-        if data["presets"] == "lazy":
-            return True
+        if os.path.exists(parameters_json):
+            with open(parameters_json, "r") as f:
+                data = json.load(f)
+            if data["presets"] == "lazy":
+                return True
+            else:
+                return False
         else:
             return False
             

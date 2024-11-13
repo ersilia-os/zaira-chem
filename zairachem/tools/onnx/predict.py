@@ -18,7 +18,7 @@ class ONNXPredictor(ZairaBase):
         )
     
     def run(self):
-        model = onnx_runner.onnx_runner(self.model_path)
+        model = onnx_runner.ONNX_Runner(self.model_path)
         input_path = os.path.join(self.output_dir, DATA_SUBFOLDER, DATA_FILENAME)
         input_df = pd.read_csv(input_path)
         

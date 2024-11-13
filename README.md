@@ -80,6 +80,19 @@ zairachem predict -i test.csv -m model -o test
 
 ZairaChem will run predictions using the checkpoints stored in model and store results in the test directory. Several performance plots will be generated alongside prediction outputs.
 
+### Distill
+
+You can distill a more compact version of the model with the built-in Olinda[https://github.com/ersilia-os/olinda] pipeline:
+
+```bash
+zairachem distill -m path_to_zairachem_model -o model.onnx
+```
+
+You can then run predictions through the new Olinda ONNX model with the same ZairaChem cli command:
+```bash
+zairachem predict -i test.csv -m model.onnx -o test
+```
+
 ## Additional Information
 
 For further technical details, please read the [ZairaChem page](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) of the Ersilia gitbook, which describes each major step in the ZairaChem pipeline. The corresponding publication for the ZairaChem pipeline is available [here](https://www.nature.com/articles/s41467-023-41512-2).
