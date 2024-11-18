@@ -14,6 +14,7 @@ from ...vars import (
 )
 from . import ESTIMATORS_FAMILY_SUBFOLDER
 from .. import RESULTS_MAPPED_FILENAME, RESULTS_UNMAPPED_FILENAME
+from ...descriptors.reference import REFERENCE_FOLDER_NAME, REFERENCE_FILE_NAME
 
 
 class XGetter(ZairaBase):
@@ -25,7 +26,7 @@ class XGetter(ZairaBase):
 
     def _get_reference_descriptor(self):
         with h5py.File(
-            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "reference.h5"), "r"
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, REFERENCE_FOLDER_NAME, REFERENCE_FILE_NAME), "r"
         ) as f:
             X_ = f["Values"][:]
             self.X += [X_]

@@ -24,6 +24,7 @@ from ..vars import LITE_SUBFOLDER
 from ..vars import INTERPRETABILITY_SUBFOLDER
 from ..vars import APPLICABILITY_SUBFOLDER
 from ..vars import REPORT_SUBFOLDER
+from ..vars import DISTILL_SUBFOLDER
 from ..vars import OUTPUT_FILENAME
 from ..vars import PRESETS_FILENAME
 
@@ -134,6 +135,7 @@ class TrainSetup(object):
         self._make_subfolder(INTERPRETABILITY_SUBFOLDER)
         self._make_subfolder(APPLICABILITY_SUBFOLDER)
         self._make_subfolder(REPORT_SUBFOLDER)
+        self._make_subfolder(DISTILL_SUBFOLDER)
 
     def _normalize_input(self):
         step = PipelineStep("normalize_input", self.output_dir)

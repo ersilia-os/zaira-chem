@@ -11,6 +11,8 @@ exmol==3.0.3
 pytdc==0.4.1
 tqdm==4.66.1
 numpy==1.23.5
-protobuf==3.19.5
+pandas==2.1.4
+protobuf==3.20.3
 python-Levenshtein==0.25.0
 dask[dataframe]==2024.4.1
+requests==2.29.0

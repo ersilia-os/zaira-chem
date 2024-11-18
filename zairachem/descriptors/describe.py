@@ -63,8 +63,8 @@ class Describer(ZairaBase):
     def run(self):
         self.reset_time()
         self._raw_descriptions()
-        self._treated_descriptions()
         self._reference_descriptors()
+        self._treated_descriptions()
         self._eosce_descriptors()
         self._manifolds()
         self.update_elapsed_time()

@@ -1,15 +1,17 @@
 import click
+import onnx
 
 from . import zairachem_cli
 from ..echo import echo
 
-from ...setup.prediction import PredictSetup
+from ...setup.prediction import ZairaPredictSetup, ONNXPredictSetup
 from ...descriptors.describe import Describer
 from ...estimators.pipe import EstimatorPipeline
 from ...pool.pool import Pooler
 from ...applicability.applicability import ApplicabilityEvaluator
 from ...reports.report import Reporter
 from ...finish.finisher import Finisher
+from ...tools.onnx.predict import ONNXPredictor
 
 
 def predict_cmd():
@@ -33,26 +35,50 @@ def predict_cmd():
     )
     def predict(input_file, output_dir, model_dir, clean, flush):
         echo("Results will be stored at {0}".format(output_dir))
-        s = PredictSetup(
-            input_file=input_file,
-            output_dir=output_dir,
-            model_dir=model_dir,
-            time_budget=60,  # TODO
-        )
-        if s.is_done():
-            echo("Results are already available. Skipping calculations")
-            return
-        s.setup()
-        d = Describer(path=output_dir)
-        d.run()
-        e = EstimatorPipeline(path=output_dir)
-        e.run()
-        p = Pooler(path=output_dir)
-        p.run()
-        a = ApplicabilityEvaluator(path=output_dir)
-        a.run()
-        r = Reporter(path=output_dir)
-        r.run()
-        f = Finisher(path=output_dir, clean=clean, flush=flush)
-        f.run()
-        echo("Done", fg="green")
+        # check if model is Olinda onnx model 
+        try:
+            onnx.load(model_dir)
+            is_onnx = True
+        except:
+            is_onnx = False
+            
+        if is_onnx:
+            s = ONNXPredictSetup(
+                input_file=input_file,
+                output_dir=output_dir,
+                model_dir=model_dir,
+                time_budget=60,  # TODO
+            )
+            if s.is_done():
+                echo("Results are already available. Skipping calculations")
+                return
+            s.setup()
+            
+            op = ONNXPredictor(model_dir, output_dir)
+            op.run()
+            
+        else:
+            s = ZairaPredictSetup(
+                input_file=input_file,
+                output_dir=output_dir,
+                model_dir=model_dir,
+                time_budget=60,  # TODO
+            )    
+            if s.is_done():
+                echo("Results are already available. Skipping calculations")
+                return
+            s.setup()
+        
+            d = Describer(path=output_dir)
+            d.run()
+            e = EstimatorPipeline(path=output_dir)
+            e.run()
+            p = Pooler(path=output_dir)
+            p.run()
+            a = ApplicabilityEvaluator(path=output_dir)
+            a.run()
+            r = Reporter(path=output_dir)
+            r.run()
+            f = Finisher(path=output_dir, clean=clean, flush=flush)
+            f.run()
+            echo("Done", fg="green")

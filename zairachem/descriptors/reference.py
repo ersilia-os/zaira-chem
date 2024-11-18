@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 
 from .baseline import Embedder, Fingerprinter
 from ..utils.matrices import Hdf5
@@ -8,7 +9,8 @@ from .. import ZairaBase
 from ..setup import SMILES_COLUMN
 from ..vars import DATA_SUBFOLDER, DATA_FILENAME, DESCRIPTORS_SUBFOLDER
 
-REFERENCE_FILE_NAME = "reference.h5"
+REFERENCE_FOLDER_NAME = "grover-embedding"
+REFERENCE_FILE_NAME = "raw.h5"
 SIMPLE_FILE_NAME = "simple.h5"
 
 
@@ -36,7 +38,7 @@ class ReferenceDescriptors(ZairaBase):
         return list(df[SMILES_COLUMN])
 
     def output_h5_filename(self):
-        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER)
+        path = os.path.join(self.path, DESCRIPTORS_SUBFOLDER, REFERENCE_FOLDER_NAME)
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, REFERENCE_FILE_NAME)
 
@@ -44,6 +46,16 @@ class ReferenceDescriptors(ZairaBase):
         output_h5 = self.output_h5_filename()
         ref = Embedder()
         ref.calculate(self.smiles_list, output_h5)
+        
+        with open(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "r"
+        ) as f:
+            done_eos = json.load(f)
+            done_eos.append("grover-embedding")
+        with open(
+            os.path.join(self.path, DESCRIPTORS_SUBFOLDER, "done_eos.json"), "w"
+        ) as f:
+            json.dump(done_eos, f, indent=4)
 
 
 class SimpleDescriptors(ZairaBase):

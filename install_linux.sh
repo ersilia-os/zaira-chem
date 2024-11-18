@@ -11,7 +11,8 @@ conda activate $ZAIRACHEM_ENVIRONMENT
 
 # pip
 python3 -m pip install -U pip
-python3 -m pip install -U setuptools wheel
+#python3 -m pip install -U setuptools wheel
+python3 -m pip install setuptools==69.5.1
 python3 -m pip install tables openpyxl
 
 # other pip-installable dependencies
@@ -20,7 +21,7 @@ python3 -m pip install autokeras==1.0.20 #==1.0.16
 
 # install autogluon cpu
 python3 -m pip install -U "mxnet<2.0.0"
-python3 -m pip install autogluon.tabular[all]==0.7.0
+python3 -m pip install autogluon.tabular==0.7.0
 
 # install autogluon gpu
 # Here we assume CUDA 10.1 is installed.  You should change the number
@@ -30,10 +31,10 @@ python3 -m pip install autogluon.tabular[all]==0.7.0
 
 # install extra dependencies
 python3 -m pip install git+https://github.com/chembl/FPSim2.git@0.3.0
-python3 -m pip install -q -U keras-tuner==1.1.3
+python3 -m pip install -q -U keras-tuner==1.4.7
 
 # install ersilia
-python3 -m pip install git+https://github.com/ersilia-os/ersilia.git
+python3 -m pip install git+https://github.com/ersilia-os/ersilia.git@v0.1.34
 ersilia --help
 
 # install ersilia compound embedding
@@ -56,6 +57,9 @@ python3 -m pip install tabpfn==0.1.8
 
 # install imblearn
 python3 -m pip install imbalanced-learn==0.10.1
+
+#install olinda
+python3 -m pip install -e git+https://github.com/JHlozek/olinda.git#egg=olinda
 
 # install zairachem
 python3 -m pip install -e .
