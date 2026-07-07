@@ -2,7 +2,7 @@
 
 [![documentation](https://img.shields.io/badge/-Documentation-purple?logo=read-the-docs&logoColor=white)](https://ersilia.gitbook.io/ersilia-book/chemistry-tools/automated-activity-prediction-models/accurate-automl-with-zairachem) [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?logo=Python&logoColor=white)](https://github.com/psf/black)
 
-
+**Update: This version of ZairaChem has been archived. For a newer version please visit https://github.com/ersilia-os/zaira-chem**
 
 # ZairaChem: Automated ML-based (Q)SAR
 
